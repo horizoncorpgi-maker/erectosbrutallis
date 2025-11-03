@@ -525,7 +525,7 @@ function App() {
           </div>
 
           <div className="text-center mt-6 md:mt-12">
-            <button className="bg-[#B80000] text-white px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-semibold hover:bg-[#900000] transition-all hover:scale-105 shadow-lg">
+            <button onClick={scrollToOffers} className="bg-[#B80000] text-white px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-semibold hover:bg-[#900000] transition-all hover:scale-105 shadow-lg">
               I'm Ready to Be the Next Success Story!
             </button>
           </div>
