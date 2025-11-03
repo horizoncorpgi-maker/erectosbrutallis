@@ -1,12 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App';
 import Upsell from './pages/Upsell';
-import DevNavigation from './components/DevNavigation';
 
 function Router() {
   return (
     <BrowserRouter>
-      <DevNavigation />
       <Routes>
         <Route path="/" element={<App />} />
 
