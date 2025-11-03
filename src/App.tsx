@@ -40,15 +40,26 @@ function App() {
   useEffect(() => {
     setIsVisible(true);
 
-    const script = document.createElement("script");
-    script.src = "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a5775d3a4ef1487be6e/v4/player.js";
-    script.async = true;
-    document.head.appendChild(script);
+    const scripts = [
+      "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a5775d3a4ef1487be6e/v4/player.js",
+      "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a5b53b20aaaf09d1963/v4/player.js",
+      "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a615431bed16ae4af02/v4/player.js"
+    ];
+
+    const scriptElements = scripts.map(src => {
+      const script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      document.head.appendChild(script);
+      return script;
+    });
 
     return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
+      scriptElements.forEach(script => {
+        if (document.head.contains(script)) {
+          document.head.removeChild(script);
+        }
+      });
     };
   }, []);
 
@@ -117,7 +128,7 @@ function App() {
       age: 42,
       location: "Texas",
       rating: 5,
-      video: "https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=400",
+      videoId: "vid-69093a5775d3a4ef1487be6e",
       quote: "After 6 weeks, I feel like I'm in my 20s again. My confidence is through the roof and my partner has noticed the difference."
     },
     {
@@ -125,7 +136,7 @@ function App() {
       age: 51,
       location: "California",
       rating: 5,
-      video: "https://images.pexels.com/photos/3777943/pexels-photo-3777943.jpeg?auto=compress&cs=tinysrgb&w=400",
+      videoId: "vid-69093a5b53b20aaaf09d1963",
       quote: "I was skeptical at first, but the results speak for themselves. This is the real deal."
     },
     {
@@ -133,7 +144,7 @@ function App() {
       age: 38,
       location: "Florida",
       rating: 5,
-      video: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400",
+      videoId: "vid-69093a615431bed16ae4af02",
       quote: "Life-changing. I wish I had found this years ago. Thank you for giving me my confidence back."
     }
   ];
@@ -495,7 +506,7 @@ function App() {
             <div className="bg-gradient-to-br from-gray-50 to-white rounded-[20px] shadow-xl p-4 md:p-12 border border-gray-200">
               <div className="flex flex-col items-center text-center">
                 <div className="relative w-full max-w-xs aspect-[9/16] bg-black rounded-[15px] overflow-hidden shadow-lg mb-3">
-                  <vturb-smartplayer id="vid-69093a5775d3a4ef1487be6e" style={{display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px'}}></vturb-smartplayer>
+                  <vturb-smartplayer id={testimonials[currentTestimonial].videoId} style={{display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px'}}></vturb-smartplayer>
                 </div>
               </div>
             </div>
