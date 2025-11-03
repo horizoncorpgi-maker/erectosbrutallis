@@ -43,7 +43,7 @@ function App() {
 
   useEffect(() => {
     const currentTestimonialData = testimonials[currentTestimonial];
-    if (currentTestimonialData.scriptSrc && currentTestimonialData.scriptSrc !== 'SCRIPT_SRC_2' && currentTestimonialData.scriptSrc !== 'SCRIPT_SRC_3') {
+    if (currentTestimonialData.scriptSrc) {
       const existingScript = document.getElementById(`testimonial-script-${currentTestimonial}`);
       if (existingScript) {
         existingScript.remove();
@@ -138,8 +138,8 @@ function App() {
       age: 51,
       location: "California",
       rating: 5,
-      embedId: "EMBED_ID_2",
-      scriptSrc: "SCRIPT_SRC_2",
+      embedId: "69093a5b53b20aaaf09d1963",
+      scriptSrc: "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a5b53b20aaaf09d1963/v4/player.js",
       quote: "I was skeptical at first, but the results speak for themselves. This is the real deal."
     },
     {
@@ -147,8 +147,8 @@ function App() {
       age: 38,
       location: "Florida",
       rating: 5,
-      embedId: "EMBED_ID_3",
-      scriptSrc: "SCRIPT_SRC_3",
+      embedId: "69093a5775d3a4ef1487be6e",
+      scriptSrc: "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a5775d3a4ef1487be6e/v4/player.js",
       quote: "Life-changing. I wish I had found this years ago. Thank you for giving me my confidence back."
     }
   ];
@@ -510,22 +510,10 @@ function App() {
             <div className="bg-gradient-to-br from-gray-50 to-white rounded-[20px] shadow-xl p-4 md:p-12 border border-gray-200">
               <div className="flex flex-col items-center text-center">
                 <div className="relative w-full max-w-xs mb-3">
-                  {testimonials[currentTestimonial].embedId &&
-                   testimonials[currentTestimonial].embedId !== 'EMBED_ID_2' &&
-                   testimonials[currentTestimonial].embedId !== 'EMBED_ID_3' ? (
-                    <vturb-smartplayer
-                      id={`vid-${testimonials[currentTestimonial].embedId}`}
-                      style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
-                    />
-                  ) : (
-                    <div className="relative w-full aspect-[9/16] bg-black rounded-[15px] overflow-hidden shadow-lg">
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <button className="w-14 h-14 md:w-16 md:h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
-                          <Play className="w-7 h-7 md:w-8 md:h-8 text-white ml-1" fill="white" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <vturb-smartplayer
+                    id={`vid-${testimonials[currentTestimonial].embedId}`}
+                    style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
+                  />
                 </div>
               </div>
             </div>
