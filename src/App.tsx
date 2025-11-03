@@ -42,17 +42,18 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const testimonial = testimonials[currentTestimonial];
-    if (testimonial?.videoScript) {
-      const existingScript = document.querySelector(`script[src="${testimonial.videoScript}"]`);
-      if (!existingScript) {
-        const script = document.createElement('script');
-        script.src = testimonial.videoScript;
-        script.async = true;
-        document.head.appendChild(script);
+    testimonials.forEach((testimonial) => {
+      if (testimonial?.videoScript) {
+        const existingScript = document.querySelector(`script[src="${testimonial.videoScript}"]`);
+        if (!existingScript) {
+          const script = document.createElement('script');
+          script.src = testimonial.videoScript;
+          script.async = true;
+          document.head.appendChild(script);
+        }
       }
-    }
-  }, [currentTestimonial]);
+    });
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -500,10 +501,17 @@ function App() {
             <div className="bg-gradient-to-br from-gray-50 to-white rounded-[20px] shadow-xl p-4 md:p-12 border border-gray-200">
               <div className="flex flex-col items-center text-center">
                 <div className="relative w-full max-w-xs aspect-[9/16] rounded-[15px] overflow-hidden shadow-lg mb-3">
-                  <vturb-smartplayer
-                    id={testimonials[currentTestimonial].videoId}
-                    style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
-                  ></vturb-smartplayer>
+                  {testimonials.map((testimonial, index) => (
+                    <div
+                      key={testimonial.videoId}
+                      style={{ display: index === currentTestimonial ? 'block' : 'none' }}
+                    >
+                      <vturb-smartplayer
+                        id={testimonial.videoId}
+                        style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
+                      ></vturb-smartplayer>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
