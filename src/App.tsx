@@ -287,7 +287,10 @@ function App() {
                 <div className="text-2xl md:text-4xl font-bold text-[#FFD600] mb-3 md:mb-6">
                   YOU'RE SAVING $900
                 </div>
-                <button className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6">
+                <button
+                  onClick={() => window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875571:1'}
+                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                >
                   CLAIM OFFER NOW
                 </button>
                 <div className="text-white/90 text-sm md:text-lg mb-3 md:mb-6">
