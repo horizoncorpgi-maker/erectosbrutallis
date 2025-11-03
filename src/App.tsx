@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Play,
   Lock,
@@ -18,6 +18,7 @@ import {
 import ArticleReader from './ArticleReader';
 
 function App() {
+  const offersRef = useRef<HTMLDivElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentMedia, setCurrentMedia] = useState(0);
@@ -31,6 +32,10 @@ function App() {
   const [showUpsellPopup, setShowUpsellPopup] = useState(false);
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
+
+  const scrollToOffers = () => {
+    offersRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
     setIsVisible(true);
@@ -241,7 +246,7 @@ function App() {
       </section>
 
       {/* Offers Section */}
-      <section className="py-8 md:py-20 px-4 bg-white">
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -965,7 +970,7 @@ function App() {
           <p className="text-base md:text-2xl text-white/90 mb-6 md:mb-12 font-light px-4">
             Hundreds of men have already experienced the power of Erectos Brutallis — now it's your turn.
           </p>
-          <button className="bg-white text-[#B80000] px-8 md:px-12 py-4 md:py-5 rounded-full text-lg md:text-xl font-bold hover:bg-gray-100 transition-all hover:scale-105 shadow-2xl">
+          <button onClick={scrollToOffers} className="bg-white text-[#B80000] px-8 md:px-12 py-4 md:py-5 rounded-full text-lg md:text-xl font-bold hover:bg-gray-100 transition-all hover:scale-105 shadow-2xl">
             START MY TREATMENT NOW
           </button>
         </div>
