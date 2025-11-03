@@ -39,6 +39,17 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
+
+    const script = document.createElement("script");
+    script.src = "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a5775d3a4ef1487be6e/v4/player.js";
+    script.async = true;
+    document.head.appendChild(script);
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -484,16 +495,7 @@ function App() {
             <div className="bg-gradient-to-br from-gray-50 to-white rounded-[20px] shadow-xl p-4 md:p-12 border border-gray-200">
               <div className="flex flex-col items-center text-center">
                 <div className="relative w-full max-w-xs aspect-[9/16] bg-black rounded-[15px] overflow-hidden shadow-lg mb-3">
-                  <img
-                    src={testimonials[currentTestimonial].video}
-                    alt="Customer testimonial"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                    <button className="w-14 h-14 md:w-16 md:h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
-                      <Play className="w-7 h-7 md:w-8 md:h-8 text-white ml-1" fill="white" />
-                    </button>
-                  </div>
+                  <vturb-smartplayer id="vid-69093a5775d3a4ef1487be6e" style={{display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px'}}></vturb-smartplayer>
                 </div>
               </div>
             </div>
