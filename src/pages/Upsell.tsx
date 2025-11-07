@@ -64,7 +64,10 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-8 md:p-12 shadow-2xl mb-8">
+        <div className="bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-8 md:p-12 shadow-2xl mb-6 relative">
+          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#FFD600] text-gray-900 px-6 py-2 rounded-full font-bold text-sm md:text-base shadow-lg">
+            BEST VALUE
+          </div>
           <div className="text-white mb-6">
             <div className="text-4xl md:text-6xl font-bold mb-2">
               {bottles} Bottles
@@ -82,6 +85,27 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
             className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-xl md:text-2xl"
           >
             UPGRADE MY ORDER NOW
+          </button>
+        </div>
+
+        <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-[20px] p-6 md:p-8 shadow-lg border-2 border-gray-300">
+          <div className="text-gray-800 mb-4">
+            <div className="text-2xl md:text-4xl font-bold mb-2">
+              2 Bottles
+            </div>
+            <div className="text-lg md:text-2xl font-semibold">
+              $34.5 per bottle
+            </div>
+            <div className="text-xl md:text-3xl font-bold text-gray-900 mt-3">
+              Total: $69
+            </div>
+          </div>
+
+          <button
+            onClick={() => window.location.href = checkoutLink}
+            className="w-full max-w-md mx-auto bg-gray-700 text-white py-3 md:py-5 rounded-full font-bold hover:bg-gray-800 transition-all shadow-md text-lg md:text-xl"
+          >
+            SELECT THIS OPTION
           </button>
         </div>
         </div>
