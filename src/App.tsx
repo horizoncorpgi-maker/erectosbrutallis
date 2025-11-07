@@ -68,53 +68,74 @@ function App() {
   }, [showUpsellPopup, upsellTimer]);
 
   useEffect(() => {
-    // Pausa todos os vídeos quando o testemunho atual muda
-    const allVideos = document.querySelectorAll('video, iframe');
-    allVideos.forEach((video) => {
-      if (video instanceof HTMLVideoElement) {
-        video.pause();
-      } else if (video instanceof HTMLIFrameElement && video.contentWindow) {
+    // Pausa todos os vídeos vTurb quando o testemunho atual muda
+    const pauseAllVturbVideos = () => {
+      const allPlayers = document.querySelectorAll('vturb-smartplayer');
+      allPlayers.forEach((player: any) => {
         try {
-          video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-        } catch (e) {
-          // Ignora erros de cross-origin
-        }
-      }
-    });
-  }, [currentTestimonial]);
-
-  useEffect(() => {
-    // Adiciona listener para pausar outros vídeos quando um começa a tocar
-    const handlePlay = (event: Event) => {
-      const playingVideo = event.target;
-      const allVideos = document.querySelectorAll('video, iframe');
-
-      allVideos.forEach((video) => {
-        if (video !== playingVideo) {
-          if (video instanceof HTMLVideoElement) {
-            video.pause();
-          } else if (video instanceof HTMLIFrameElement && video.contentWindow) {
-            try {
-              video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
-            } catch (e) {
-              // Ignora erros de cross-origin
-            }
+          if (player && typeof player.pause === 'function') {
+            player.pause();
           }
+        } catch (e) {
+          console.log('Erro ao pausar vídeo:', e);
         }
       });
     };
 
-    // Adiciona o listener a todos os vídeos
-    const videos = document.querySelectorAll('video');
-    videos.forEach((video) => {
-      video.addEventListener('play', handlePlay);
-    });
+    pauseAllVturbVideos();
+  }, [currentTestimonial]);
+
+  useEffect(() => {
+    // Listener global para pausar outros vídeos quando um vTurb começa a tocar
+    const handleVturbPlay = () => {
+      const allPlayers = document.querySelectorAll('vturb-smartplayer');
+
+      allPlayers.forEach((player: any, index) => {
+        try {
+          // Pausa todos os players exceto o que está sendo exibido atualmente
+          if (index !== currentTestimonial && player && typeof player.pause === 'function') {
+            player.pause();
+          }
+        } catch (e) {
+          console.log('Erro ao pausar vídeo:', e);
+        }
+      });
+    };
+
+    // Adiciona listener para eventos de play do vTurb
+    const checkForPlayers = setInterval(() => {
+      const allPlayers = document.querySelectorAll('vturb-smartplayer');
+
+      allPlayers.forEach((player: any) => {
+        if (player && !player._pauseListenerAdded) {
+          // Marca que o listener já foi adicionado
+          player._pauseListenerAdded = true;
+
+          // Adiciona listener para o evento de play
+          player.addEventListener('play', handleVturbPlay);
+
+          // Tenta também capturar eventos do iframe interno
+          const iframe = player.querySelector('iframe');
+          if (iframe) {
+            iframe.addEventListener('load', () => {
+              try {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow?.document;
+                const video = iframeDocument?.querySelector('video');
+                if (video) {
+                  video.addEventListener('play', handleVturbPlay);
+                }
+              } catch (e) {
+                // Ignora erros de cross-origin
+              }
+            });
+          }
+        }
+      });
+    }, 500);
 
     // Cleanup
     return () => {
-      videos.forEach((video) => {
-        video.removeEventListener('play', handlePlay);
-      });
+      clearInterval(checkForPlayers);
     };
   }, [currentTestimonial]);
 
