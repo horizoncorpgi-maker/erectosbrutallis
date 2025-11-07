@@ -11,6 +11,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const total = bottles * pricePerBottle;
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
+  const isUp3bt = location.pathname === '/up3bt';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50 flex flex-col">
@@ -25,7 +26,11 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
       <div className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-3 md:mb-4 leading-tight">
-          There's still time to increase the <span className="text-[#B80000]">size</span> of your <span className="text-[#B80000]">instrument!</span>
+          {isUp3bt ? (
+            <>There's still time to increase the <span className="text-[#B80000]">size</span> of your <span className="text-[#B80000]">instrument!</span></>
+          ) : (
+            <>You're Just <span className="text-[#B80000]">ONE</span> Step<br />Away From <span className="text-[#B80000]">Success</span></>
+          )}
         </h1>
         <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 md:mb-12 font-light max-w-3xl mx-auto">
           Congratulations on securing your first bottles - but now, <span className="font-semibold text-gray-800">one last step could <span className="text-[#B80000]">change everything</span></span>
