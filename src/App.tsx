@@ -75,15 +75,18 @@ function App() {
 
   const handleAcceptOffer = () => {
     setShowUpsellPopup(false);
-    window.location.href = '/upsell';
+    // Redireciona para o pacote de 6 garrafas
+    window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875571:1';
   };
 
   const handleRefuseOffer = () => {
     setShowUpsellPopup(false);
     if (selectedPackage === '3-bottle') {
-      window.location.href = '/3-bottle';
+      // Redireciona para o pacote de 3 garrafas
+      window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875570:1';
     } else if (selectedPackage === '1-bottle') {
-      window.location.href = '/1-bottle';
+      // Redireciona para o pacote de 1 garrafa
+      window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875568:1';
     }
   };
 
@@ -337,7 +340,7 @@ function App() {
                   SAVE $399
                 </div>
                 <button
-                  onClick={() => window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875570:1'}
+                  onClick={() => handlePackageClick('3-bottle')}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
@@ -376,7 +379,7 @@ function App() {
                   SAVE $169
                 </div>
                 <button
-                  onClick={() => window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875568:1'}
+                  onClick={() => handlePackageClick('1-bottle')}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW

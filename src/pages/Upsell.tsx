@@ -3,9 +3,10 @@ import { Play, Volume2, AlertTriangle } from 'lucide-react';
 interface UpsellProps {
   bottles: number;
   pricePerBottle: number;
+  checkoutLink: string;
 }
 
-function Upsell({ bottles, pricePerBottle }: UpsellProps) {
+function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const total = bottles * pricePerBottle;
 
   return (
@@ -76,7 +77,10 @@ function Upsell({ bottles, pricePerBottle }: UpsellProps) {
             </div>
           </div>
 
-          <button className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-xl md:text-2xl">
+          <button
+            onClick={() => window.location.href = checkoutLink}
+            className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-xl md:text-2xl"
+          >
             UPGRADE MY ORDER NOW
           </button>
         </div>
