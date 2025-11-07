@@ -67,6 +67,57 @@ function App() {
     return () => clearInterval(interval);
   }, [showUpsellPopup, upsellTimer]);
 
+  useEffect(() => {
+    // Pausa todos os vídeos quando o testemunho atual muda
+    const allVideos = document.querySelectorAll('video, iframe');
+    allVideos.forEach((video) => {
+      if (video instanceof HTMLVideoElement) {
+        video.pause();
+      } else if (video instanceof HTMLIFrameElement && video.contentWindow) {
+        try {
+          video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        } catch (e) {
+          // Ignora erros de cross-origin
+        }
+      }
+    });
+  }, [currentTestimonial]);
+
+  useEffect(() => {
+    // Adiciona listener para pausar outros vídeos quando um começa a tocar
+    const handlePlay = (event: Event) => {
+      const playingVideo = event.target;
+      const allVideos = document.querySelectorAll('video, iframe');
+
+      allVideos.forEach((video) => {
+        if (video !== playingVideo) {
+          if (video instanceof HTMLVideoElement) {
+            video.pause();
+          } else if (video instanceof HTMLIFrameElement && video.contentWindow) {
+            try {
+              video.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+            } catch (e) {
+              // Ignora erros de cross-origin
+            }
+          }
+        }
+      });
+    };
+
+    // Adiciona o listener a todos os vídeos
+    const videos = document.querySelectorAll('video');
+    videos.forEach((video) => {
+      video.addEventListener('play', handlePlay);
+    });
+
+    // Cleanup
+    return () => {
+      videos.forEach((video) => {
+        video.removeEventListener('play', handlePlay);
+      });
+    };
+  }, [currentTestimonial]);
+
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
     setShowUpsellPopup(true);
