@@ -171,7 +171,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               <div className="relative bg-gradient-to-br from-[#EF5350] to-[#E53935] rounded-[30px] p-4 md:p-10 shadow-xl">
                 <div className="text-center">
                   <img
-                    src="/erectos pulse-9.png"
+                    src="/erectos pulse-7 copy.png"
                     alt="6 Drops Package"
                     className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
                   />
