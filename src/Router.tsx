@@ -10,7 +10,7 @@ function Router() {
       <Routes>
         <Route path="/" element={<App />} />
 
-        <Route path="/up1bt" element={<Upsell bottles={8} pricePerBottle={29} />} />
+        <Route path="/up1bt" element={<Upsell bottles={6} pricePerBottle={19.5} checkoutLink="" />} />
         <Route path="/up3bt" element={<Upsell bottles={6} pricePerBottle={39} />} />
         <Route path="/up6bt" element={<Upsell bottles={3} pricePerBottle={49} />} />
 
