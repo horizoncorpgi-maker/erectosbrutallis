@@ -448,7 +448,7 @@ function App() {
                 <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
                 <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">1 BOTTLE PACKAGE</p>
                 <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
-                  SAVE $169
+                  SAVE $118
                 </div>
                 <button
                   onClick={() => handlePackageClick('1-bottle')}
