@@ -178,7 +178,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                   <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS PULSE</h3>
                   <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">6 DROPS PACKAGE</p>
                   <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
-                    SAVE $500
+                    SAVE $867
                   </div>
                   <button
                     onClick={() => window.location.href = checkoutLink || ''}
@@ -187,7 +187,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                     BUY NOW
                   </button>
                   <div className="text-white/90 text-xs md:text-base mb-2 md:mb-4">
-                    $55 per drop
+                    $34.50 per drop
                   </div>
                   <div className="flex justify-center items-center gap-3 md:gap-4 text-white/90 text-xs md:text-sm">
                     <div className="flex items-center gap-1">
