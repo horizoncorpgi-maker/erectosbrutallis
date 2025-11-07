@@ -360,7 +360,7 @@ function App() {
                 <h3 className="text-2xl md:text-5xl font-bold text-white mb-1 md:mb-2 tracking-wide">ERECTOS BRUTALLIS</h3>
                 <p className="text-base md:text-2xl text-white/90 font-semibold mb-2 md:mb-4">6 BOTTLE PACKAGE</p>
                 <div className="text-2xl md:text-4xl font-bold text-[#FFD600] mb-3 md:mb-6">
-                  YOU'RE SAVING $900
+                  YOU'RE SAVING $888
                 </div>
                 <button
                   onClick={() => window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875571:1'}
