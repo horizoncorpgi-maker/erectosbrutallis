@@ -33,7 +33,11 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           )}
         </h1>
         <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 md:mb-12 font-light max-w-3xl mx-auto">
-          Congratulations on securing your first bottles - but now, <span className="font-semibold text-gray-800">one last step could <span className="text-[#B80000]">change everything</span></span>
+          {isUp3bt ? (
+            <>Congratulations on completing a full treatment, <span className="font-semibold text-gray-800">but now this product will <span className="text-[#B80000]">make you even more powerful!</span></span></>
+          ) : (
+            <>Congratulations on securing your first bottles - but now, <span className="font-semibold text-gray-800">one last step could <span className="text-[#B80000]">change everything</span></span></>
+          )}
         </p>
 
         <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-3 mb-4 max-w-2xl mx-auto">
