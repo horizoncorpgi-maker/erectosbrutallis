@@ -148,17 +148,17 @@ function App() {
   const handleAcceptOffer = () => {
     setShowUpsellPopup(false);
     // Redireciona para o pacote de 6 garrafas
-    window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875571:1';
+    window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1';
   };
 
   const handleRefuseOffer = () => {
     setShowUpsellPopup(false);
     if (selectedPackage === '3-bottle') {
       // Redireciona para o pacote de 3 garrafas
-      window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875570:1';
+      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875570:1';
     } else if (selectedPackage === '1-bottle') {
       // Redireciona para o pacote de 1 garrafa
-      window.location.href = 'https://horizoncorp.mycartpanda.com/checkout/197875568:1';
+      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875568:1';
     }
   };
 
@@ -412,7 +412,7 @@ function App() {
                   SAVE $414
                 </div>
                 <button
-                  onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875570:1'}
+                  onClick={() => handlePackageClick('3-bottle')}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
@@ -451,7 +451,7 @@ function App() {
                   SAVE $118
                 </div>
                 <button
-                  onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875568:1'}
+                  onClick={() => handlePackageClick('1-bottle')}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
