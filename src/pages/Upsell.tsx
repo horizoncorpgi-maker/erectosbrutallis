@@ -134,7 +134,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                     YOU'RE SAVING $1317
                   </div>
                   <button
-                    onClick={() => window.location.href = checkoutLink || ''}
+                    onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/198160252:1'}
                     className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                   >
                     CLAIM OFFER NOW
