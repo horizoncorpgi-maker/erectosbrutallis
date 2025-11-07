@@ -128,7 +128,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                     alt="9 Drops Package"
                     className="w-full h-48 md:h-80 lg:h-96 object-contain mb-3 md:mb-8 mt-2 md:mt-4"
                   />
-                  <h3 className="text-2xl md:text-5xl font-bold text-white mb-1 md:mb-2 tracking-wide">ERECTOS BRUTALLIS</h3>
+                  <h3 className="text-2xl md:text-5xl font-bold text-white mb-1 md:mb-2 tracking-wide">ERECTOS PULSE</h3>
                   <p className="text-base md:text-2xl text-white/90 font-semibold mb-2 md:mb-4">9 DROPS PACKAGE</p>
                   <div className="text-2xl md:text-4xl font-bold text-[#FFD600] mb-3 md:mb-6">
                     YOU'RE SAVING $1000
@@ -175,7 +175,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                     alt="6 Drops Package"
                     className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
                   />
-                  <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
+                  <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS PULSE</h3>
                   <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">6 DROPS PACKAGE</p>
                   <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
                     SAVE $500
@@ -213,7 +213,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                     alt="3 Drops Package"
                     className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
                   />
-                  <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
+                  <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS PULSE</h3>
                   <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">3 DROPS PACKAGE</p>
                   <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
                     SAVE $200
