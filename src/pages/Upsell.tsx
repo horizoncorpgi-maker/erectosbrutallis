@@ -81,7 +81,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           </div>
 
           <button
-            onClick={() => window.location.href = checkoutLink}
+            onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/201842174:1'}
             className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-xl md:text-2xl"
           >
             UPGRADE MY ORDER NOW
