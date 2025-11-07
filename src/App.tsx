@@ -576,21 +576,19 @@ function App() {
           </div>
 
           <div className="relative px-8 md:px-0">
-            <div className="bg-gradient-to-br from-gray-50 to-white rounded-[20px] shadow-xl p-4 md:p-12 border border-gray-200">
-              <div className="flex flex-col items-center text-center">
-                <div className="relative w-full max-w-xs aspect-[9/16] rounded-[15px] overflow-hidden shadow-lg mb-3">
-                  {testimonials.map((testimonial, index) => (
-                    <div
-                      key={testimonial.videoId}
-                      style={{ display: index === currentTestimonial ? 'block' : 'none' }}
-                    >
-                      <vturb-smartplayer
-                        id={testimonial.videoId}
-                        style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
-                      ></vturb-smartplayer>
-                    </div>
-                  ))}
-                </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="relative w-full max-w-xs aspect-[9/16] rounded-[15px] overflow-hidden mb-3">
+                {testimonials.map((testimonial, index) => (
+                  <div
+                    key={testimonial.videoId}
+                    style={{ display: index === currentTestimonial ? 'block' : 'none' }}
+                  >
+                    <vturb-smartplayer
+                      id={testimonial.videoId}
+                      style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
+                    ></vturb-smartplayer>
+                  </div>
+                ))}
               </div>
             </div>
 
