@@ -124,7 +124,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                 </div>
                 <div className="text-center">
                   <img
-                    src="/erectos pulse-10.png"
+                    src="/erectos pulse-9 copy.png"
                     alt="9 Drops Package"
                     className="w-full h-48 md:h-80 lg:h-96 object-contain mb-3 md:mb-8 mt-2 md:mt-4"
                   />
