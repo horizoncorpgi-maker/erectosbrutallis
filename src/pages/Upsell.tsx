@@ -124,7 +124,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                 </div>
                 <div className="text-center">
                   <img
-                    src="https://i.postimg.cc/Wz1S0fmQ/erectos-brutallis-10.png"
+                    src="/erectos pulse-10.png"
                     alt="9 Drops Package"
                     className="w-full h-48 md:h-80 lg:h-96 object-contain mb-3 md:mb-8 mt-2 md:mt-4"
                   />
@@ -171,7 +171,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               <div className="relative bg-gradient-to-br from-[#EF5350] to-[#E53935] rounded-[30px] p-4 md:p-10 shadow-xl">
                 <div className="text-center">
                   <img
-                    src="https://i.postimg.cc/FzHG0ng9/erectos-brutallis-13.png"
+                    src="/erectos pulse-9.png"
                     alt="6 Drops Package"
                     className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
                   />
@@ -209,7 +209,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               <div className="relative bg-gradient-to-br from-[#FF7043] to-[#FF5722] rounded-[30px] p-4 md:p-10 shadow-xl">
                 <div className="text-center">
                   <img
-                    src="https://i.postimg.cc/90Q1yNtc/erectos-brutallis-9.png"
+                    src="/erectos pulse-7.png"
                     alt="3 Drops Package"
                     className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
                   />
