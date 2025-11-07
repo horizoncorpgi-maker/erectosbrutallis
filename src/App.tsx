@@ -1128,15 +1128,18 @@ function App() {
               </div>
 
               <h2 className="text-3xl md:text-5xl font-bold text-white text-center mb-8">
-                Wait! You're Leaving ${selectedPackage === '3-bottle' ? '96' : '215'} Behind...
+                Wait! Special Offer Just For You!
               </h2>
 
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
                 <p className="text-xl md:text-2xl font-bold text-[#FFD600] text-center mb-4">
-                  Choose the 6 Bottle Pack now and save an extra ${selectedPackage === '3-bottle' ? '96' : '215'}!
+                  Get 2 Bottles for Just $69!
                 </p>
-                <p className="text-white text-center leading-relaxed">
-                  It's the most popular choice for long-term results — and it includes free shipping + a 180-day guarantee.
+                <p className="text-white text-center leading-relaxed mb-4">
+                  Only $34.50 per bottle — perfect for trying Erectos Brutallis with great savings!
+                </p>
+                <p className="text-white/90 text-center text-lg">
+                  Includes free shipping + 180-day money-back guarantee.
                 </p>
               </div>
 
@@ -1144,7 +1147,7 @@ function App() {
                 onClick={handleAcceptOffer}
                 className="w-full bg-[#FFD600] text-gray-900 py-5 rounded-full font-bold text-xl hover:bg-[#FFC400] transition-all hover:scale-105 shadow-xl mb-4"
               >
-                GET ${selectedPackage === '3-bottle' ? '96' : '215'} EXTRA DISCOUNT
+                YES! GET 2 BOTTLES FOR $69
               </button>
 
               <button
