@@ -33,6 +33,8 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
+  const [contentUnlocked, setContentUnlocked] = useState(false);
+  const [isBoltEnvironment, setIsBoltEnvironment] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +42,20 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
+
+    const isBolt = window.location.hostname.includes('localhost') ||
+                   window.location.hostname.includes('bolt.new') ||
+                   window.location.hostname.includes('127.0.0.1') ||
+                   window.location.hostname.includes('stackblitz');
+
+    setIsBoltEnvironment(isBolt);
+
+    if (isBolt) {
+      setContentUnlocked(true);
+      console.log('🔧 Ambiente Bolt detectado - todo conteúdo visível');
+    } else {
+      console.log('🌐 Ambiente de produção - conteúdo bloqueado até evento de scroll');
+    }
 
     const attemptScroll = (attempt = 0) => {
       const maxScrollAttempts = 5;
@@ -84,6 +100,7 @@ function App() {
     const handleSmartPlayerEvent = (event: any) => {
       if (event.detail?.name === 'smartplayer-scroll-event' || event.type === 'smartplayer-scroll-event') {
         console.log('🎬 SmartPlayer scroll event detectado!');
+        setContentUnlocked(true);
         setTimeout(() => attemptScroll(), 800);
       }
     };
@@ -474,6 +491,8 @@ function App() {
         </div>
       </section>
 
+      {(isBoltEnvironment || contentUnlocked) && (
+        <>
       {/* Offers Section */}
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -1232,6 +1251,8 @@ function App() {
           </button>
         </div>
       </section>
+        </>
+      )}
 
       {/* Footer */}
       <footer className="bg-black text-gray-400 py-8 px-4">
