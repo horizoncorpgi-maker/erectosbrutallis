@@ -69,6 +69,7 @@ function App() {
   useEffect(() => {
     if (showExpertVideo) {
       const scriptId = 'expert-video-script';
+      const playerId = 'vid-expert-69124f9036636797770589e5';
       const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
 
       // Remover script existente se houver
@@ -84,6 +85,7 @@ function App() {
         script.src = expertVideoScript;
         script.async = true;
         script.type = 'text/javascript';
+        script.setAttribute('data-player-id', playerId);
 
         script.onload = () => {
           console.log('Expert video script carregado com sucesso');
@@ -554,7 +556,7 @@ function App() {
                       </>
                     ) : (
                       <div
-                        id="vid_69124f9036636797770589e5"
+                        id="vid-expert-69124f9036636797770589e5"
                         style={{ width: '100%', position: 'relative' }}
                       ></div>
                     )}
