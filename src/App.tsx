@@ -505,8 +505,8 @@ function App() {
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-auto flex-shrink-0">
                   {currentExpert === 0 ? (
-                    <div className="relative w-full max-w-md md:max-w-lg bg-black rounded-[15px] overflow-hidden shadow-lg" style={{ minHeight: '300px' }}>
-                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', margin: '0 auto', width: '100%', minHeight: '300px' }}></vturb-smartplayer>
+                    <div className="relative w-full max-w-md md:max-w-lg rounded-[15px] overflow-hidden shadow-lg">
+                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', width: '100%' }}></vturb-smartplayer>
                     </div>
                   ) : (
                     <div className="relative w-full max-w-md md:max-w-lg aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
