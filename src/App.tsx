@@ -513,20 +513,16 @@ function App() {
             <div className="bg-white rounded-[20px] shadow-xl p-6 md:p-12">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-1/2 flex-shrink-0">
-                  {currentExpert === 0 && (
-                    <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg">
-                      <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                        <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
-                      </div>
+                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg" style={{ display: currentExpert === 0 ? 'block' : 'none' }}>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
-                  )}
-                  {currentExpert === 1 && (
-                    <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg">
-                      <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                        <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
-                      </div>
+                  </div>
+                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg" style={{ display: currentExpert === 1 ? 'block' : 'none' }}>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                      <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
-                  )}
+                  </div>
                   {currentExpert === 2 && (
                     <div className="relative w-full aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
                       <img
