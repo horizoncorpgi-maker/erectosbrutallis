@@ -32,7 +32,6 @@ function App() {
   const [showUpsellPopup, setShowUpsellPopup] = useState(false);
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
-  const [showExpertVideo, setShowExpertVideo] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,42 +62,7 @@ function App() {
       script.async = true;
       document.head.appendChild(script);
     }
-
   }, []);
-
-  useEffect(() => {
-    if (showExpertVideo) {
-      const scriptId = 'expert-video-script';
-      const playerId = 'vid-expert-69124f9036636797770589e5';
-      const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
-
-      // Remover script existente se houver
-      const existingScript = document.getElementById(scriptId);
-      if (existingScript) {
-        existingScript.remove();
-      }
-
-      // Aguardar um pouco para garantir que o DOM está pronto
-      setTimeout(() => {
-        const script = document.createElement('script');
-        script.id = scriptId;
-        script.src = expertVideoScript;
-        script.async = true;
-        script.type = 'text/javascript';
-        script.setAttribute('data-player-id', playerId);
-
-        script.onload = () => {
-          console.log('Expert video script carregado com sucesso');
-        };
-
-        script.onerror = () => {
-          console.error('Erro ao carregar script do vídeo');
-        };
-
-        document.head.appendChild(script);
-      }, 100);
-    }
-  }, [showExpertVideo]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -300,14 +264,8 @@ function App() {
     "https://images.pexels.com/photos/3825517/pexels-photo-3825517.jpeg?auto=compress&cs=tinysrgb&w=800"
   ];
 
-  const nextExpert = () => {
-    setCurrentExpert((prev) => (prev + 1) % experts.length);
-    setShowExpertVideo(false);
-  };
-  const prevExpert = () => {
-    setCurrentExpert((prev) => (prev - 1 + experts.length) % experts.length);
-    setShowExpertVideo(false);
-  };
+  const nextExpert = () => setCurrentExpert((prev) => (prev + 1) % experts.length);
+  const prevExpert = () => setCurrentExpert((prev) => (prev - 1 + experts.length) % experts.length);
 
   const nextTestimonial = () => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
   const prevTestimonial = () => setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -538,28 +496,16 @@ function App() {
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-auto flex-shrink-0">
                   <div className="relative w-full max-w-md md:max-w-lg aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
-                    {!showExpertVideo ? (
-                      <>
-                        <img
-                          src={experts[currentExpert].video}
-                          alt="Expert video"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <button
-                            onClick={() => setShowExpertVideo(true)}
-                            className="w-16 h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl"
-                          >
-                            <Play className="w-8 h-8 text-white ml-1" fill="white" />
-                          </button>
-                        </div>
-                      </>
-                    ) : (
-                      <div
-                        id="vid-expert-69124f9036636797770589e5"
-                        style={{ width: '100%', position: 'relative' }}
-                      ></div>
-                    )}
+                    <img
+                      src={experts[currentExpert].video}
+                      alt="Expert video"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <button className="w-16 h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
+                        <Play className="w-8 h-8 text-white ml-1" fill="white" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
