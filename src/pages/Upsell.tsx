@@ -16,18 +16,9 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
 
   useEffect(() => {
     const script = document.createElement('script');
+    script.type = 'text/javascript';
     script.src = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124ec0b910e6e322c32a69/v4/player.js';
     script.async = true;
-
-    script.onload = () => {
-      const player = document.getElementById('vid-69124ec0b910e6e322c32a69');
-      if (player && (window as any).smartplayer) {
-        (window as any).smartplayer('vid-69124ec0b910e6e322c32a69').then((video: any) => {
-          video.play();
-        });
-      }
-    };
-
     document.head.appendChild(script);
 
     return () => {
@@ -73,8 +64,19 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           </div>
         </div>
 
-        <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16] mb-4">
-          <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
+        <div className="relative w-full max-w-sm md:max-w-md mx-auto mb-4">
+          <div
+            id="vid_69124ec0b910e6e322c32a69"
+            style={{
+              position: 'relative',
+              width: '100%',
+              padding: '177.78% 0 0 0'
+            }}
+          >
+            <div dangerouslySetInnerHTML={{
+              __html: `<vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style="display: block; margin: 0 auto; width: 100%; max-width: 400px;"></vturb-smartplayer>`
+            }} />
+          </div>
         </div>
 
         <div className="flex items-center justify-center gap-2 text-gray-700 mb-3">
