@@ -116,15 +116,50 @@ function App() {
     // Adicionar listeners globais IMEDIATAMENTE
     console.log('📢 Adding global event listeners...');
 
-    window.addEventListener('smartplayer-scroll-event', (e) => {
-      console.log('🌍 WINDOW captured smartplayer-scroll-event:', e);
-      handleSmartplayerEvent(e);
-    }, true);
+    // INTERCEPTAR TODOS OS CUSTOM EVENTS PARA DEBUG
+    const originalDispatchEvent = EventTarget.prototype.dispatchEvent;
+    EventTarget.prototype.dispatchEvent = function(event: Event) {
+      if (event.type.includes('smart') || event.type.includes('scroll')) {
+        console.log('🚨 INTERCEPTED EVENT:', event.type, 'on', this, event);
+      }
+      return originalDispatchEvent.call(this, event);
+    };
 
-    document.addEventListener('smartplayer-scroll-event', (e) => {
-      console.log('📄 DOCUMENT captured smartplayer-scroll-event:', e);
-      handleSmartplayerEvent(e);
-    }, true);
+    console.log('✅ Event interceptor installed - will log all smartplayer events');
+
+    // Múltiplas variações do nome do evento
+    const eventVariations = [
+      'smartplayer-scroll-event',
+      'smartplayerScrollEvent',
+      'smartplayer:scroll',
+      'smartplayer.scroll',
+      'scroll-event',
+      'vturb-scroll',
+      'vturb:scroll',
+    ];
+
+    eventVariations.forEach(eventName => {
+      window.addEventListener(eventName, (e) => {
+        console.log(`🌍 WINDOW captured ${eventName}:`, e);
+        handleSmartplayerEvent(e);
+      }, true);
+
+      document.addEventListener(eventName, (e) => {
+        console.log(`📄 DOCUMENT captured ${eventName}:`, e);
+        handleSmartplayerEvent(e);
+      }, true);
+
+      // Também na fase de bubble
+      window.addEventListener(eventName, (e) => {
+        console.log(`🌍 WINDOW (bubble) captured ${eventName}:`, e);
+        handleSmartplayerEvent(e);
+      }, false);
+
+      document.addEventListener(eventName, (e) => {
+        console.log(`📄 DOCUMENT (bubble) captured ${eventName}:`, e);
+        handleSmartplayerEvent(e);
+      }, false);
+    });
 
     // Polling para encontrar o player
     let pollAttempts = 0;
@@ -155,25 +190,49 @@ function App() {
           console.log('🎯 Player tagName:', targetPlayer.tagName);
           console.log('🎯 Player id:', targetPlayer.id);
 
-          // Adicionar listener diretamente no player
-          targetPlayer.addEventListener('smartplayer-scroll-event', (e: any) => {
-            console.log('🎮 PLAYER captured smartplayer-scroll-event:', e);
-            handleSmartplayerEvent(e);
+          // Adicionar listener para TODAS as variações do evento
+          eventVariations.forEach(eventName => {
+            targetPlayer.addEventListener(eventName, (e: any) => {
+              console.log(`🎮 PLAYER captured ${eventName}:`, e);
+              handleSmartplayerEvent(e);
+            });
           });
 
-          console.log('✅ Event listener attached to player');
+          // Também tentar acessar o shadowRoot se existir
+          if (targetPlayer.shadowRoot) {
+            console.log('🌑 Player has shadowRoot, adding listeners there too');
+            eventVariations.forEach(eventName => {
+              targetPlayer.shadowRoot.addEventListener(eventName, (e: any) => {
+                console.log(`🌑 SHADOWROOT captured ${eventName}:`, e);
+                handleSmartplayerEvent(e);
+              });
+            });
+          }
+
+          console.log('✅ Event listeners attached to player (all variations)');
         }
 
         if (pollAttempts <= 2) {
           // Adicionar listener a todos os players
           allPlayers.forEach((player: any, index: number) => {
-            player.addEventListener('smartplayer-scroll-event', (e: any) => {
-              console.log(`🎮 PLAYER ${index + 1} captured smartplayer-scroll-event:`, e);
-              handleSmartplayerEvent(e);
+            eventVariations.forEach(eventName => {
+              player.addEventListener(eventName, (e: any) => {
+                console.log(`🎮 PLAYER ${index + 1} captured ${eventName}:`, e);
+                handleSmartplayerEvent(e);
+              });
             });
+
+            if (player.shadowRoot) {
+              eventVariations.forEach(eventName => {
+                player.shadowRoot.addEventListener(eventName, (e: any) => {
+                  console.log(`🌑 PLAYER ${index + 1} SHADOWROOT captured ${eventName}:`, e);
+                  handleSmartplayerEvent(e);
+                });
+              });
+            }
           });
 
-          console.log(`✅ All ${allPlayers.length} players configured`);
+          console.log(`✅ All ${allPlayers.length} players configured (all variations)`);
         }
 
         return true;
