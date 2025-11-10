@@ -504,24 +504,24 @@ function App() {
             <div className="bg-white rounded-[20px] shadow-xl p-6 md:p-12">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-auto flex-shrink-0">
-                  <div className="relative w-full max-w-md md:max-w-lg aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
-                    {currentExpert === 0 ? (
-                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', margin: '0 auto', width: '100%' }}></vturb-smartplayer>
-                    ) : (
-                      <>
-                        <img
-                          src={experts[currentExpert].video}
-                          alt="Expert video"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                          <button className="w-16 h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
-                            <Play className="w-8 h-8 text-white ml-1" fill="white" />
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                  {currentExpert === 0 ? (
+                    <div className="relative w-full max-w-md md:max-w-lg bg-black rounded-[15px] overflow-hidden shadow-lg" style={{ minHeight: '300px' }}>
+                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', margin: '0 auto', width: '100%', minHeight: '300px' }}></vturb-smartplayer>
+                    </div>
+                  ) : (
+                    <div className="relative w-full max-w-md md:max-w-lg aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
+                      <img
+                        src={experts[currentExpert].video}
+                        alt="Expert video"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                        <button className="w-16 h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
+                          <Play className="w-8 h-8 text-white ml-1" fill="white" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
