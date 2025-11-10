@@ -116,16 +116,36 @@ function App() {
     // Adicionar listeners globais IMEDIATAMENTE
     console.log('📢 Adding global event listeners...');
 
-    // INTERCEPTAR TODOS OS CUSTOM EVENTS PARA DEBUG
+    // INTERCEPTAR TODOS OS EVENTOS - SEM FILTRO
     const originalDispatchEvent = EventTarget.prototype.dispatchEvent;
+    const capturedEvents = new Set<string>();
+    const nativeEvents = ['click', 'mousemove', 'mousedown', 'mouseup', 'mouseover', 'mouseout',
+                          'keydown', 'keyup', 'keypress', 'focus', 'blur', 'change', 'input',
+                          'scroll', 'resize', 'load', 'unload', 'beforeunload', 'DOMContentLoaded',
+                          'readystatechange', 'transitionend', 'animationend', 'pointerdown',
+                          'pointerup', 'pointermove', 'pointercancel', 'touchstart', 'touchend',
+                          'touchmove', 'touchcancel', 'wheel', 'contextmenu', 'dblclick'];
+
     EventTarget.prototype.dispatchEvent = function(event: Event) {
-      if (event.type.includes('smart') || event.type.includes('scroll')) {
-        console.log('🚨 INTERCEPTED EVENT:', event.type, 'on', this, event);
+      // Log TODOS os eventos customizados (não nativos)
+      if (!nativeEvents.includes(event.type)) {
+        if (!capturedEvents.has(event.type)) {
+          console.log('🚨 NEW CUSTOM EVENT:', event.type, '| Target:', this.constructor.name, this);
+          capturedEvents.add(event.type);
+        }
+
+        // Se for relacionado ao smartplayer, trigger a ação
+        if (event.type.toLowerCase().includes('smart') ||
+            event.type.toLowerCase().includes('vturb') ||
+            (event.type.includes('scroll') && (this as any).id === 'vid-69124ec0b910e6e322c32a69')) {
+          console.log('✅✅✅ SMARTPLAYER-RELATED EVENT - TRIGGERING:', event.type);
+          setTimeout(() => handleSmartplayerEvent(event), 0);
+        }
       }
       return originalDispatchEvent.call(this, event);
     };
 
-    console.log('✅ Event interceptor installed - will log all smartplayer events');
+    console.log('✅ Universal event interceptor installed - monitoring ALL custom events');
 
     // Múltiplas variações do nome do evento
     const eventVariations = [
@@ -189,6 +209,40 @@ function App() {
           console.log('🎯 Target player found:', targetPlayer);
           console.log('🎯 Player tagName:', targetPlayer.tagName);
           console.log('🎯 Player id:', targetPlayer.id);
+
+          // INSPECIONAR O PLAYER EM BUSCA DE PROPRIEDADES/MÉTODOS
+          console.log('🔍 Inspecting player properties...');
+          const playerProps = Object.getOwnPropertyNames(targetPlayer);
+          const scrollRelatedProps = playerProps.filter((prop: string) =>
+            prop.toLowerCase().includes('scroll') ||
+            prop.toLowerCase().includes('smart') ||
+            prop.toLowerCase().includes('callback') ||
+            prop.toLowerCase().includes('event') ||
+            prop.toLowerCase().includes('on')
+          );
+          console.log('📋 Scroll/Event related properties:', scrollRelatedProps);
+
+          // Verificar o prototype também
+          if (targetPlayer.__proto__) {
+            const protoProps = Object.getOwnPropertyNames(targetPlayer.__proto__);
+            const protoScrollProps = protoProps.filter((prop: string) =>
+              prop.toLowerCase().includes('scroll') ||
+              prop.toLowerCase().includes('smart') ||
+              prop.toLowerCase().includes('callback') ||
+              prop.toLowerCase().includes('event')
+            );
+            console.log('📋 Prototype scroll/event properties:', protoScrollProps);
+          }
+
+          // Tentar definir callbacks se existirem
+          if ('onSmartplayerScroll' in targetPlayer) {
+            targetPlayer.onSmartplayerScroll = handleSmartplayerEvent;
+            console.log('✅ Set onSmartplayerScroll callback');
+          }
+          if ('onScrollEvent' in targetPlayer) {
+            targetPlayer.onScrollEvent = handleSmartplayerEvent;
+            console.log('✅ Set onScrollEvent callback');
+          }
 
           // Adicionar listener para TODAS as variações do evento
           eventVariations.forEach(eventName => {
