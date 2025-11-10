@@ -50,13 +50,7 @@ function App() {
 
     console.log('🌍 Hostname:', hostname);
     console.log('🔧 Is Bolt/Dev Environment:', isBoltEnv);
-
-    if (isBoltEnv) {
-      console.log('✅ Showing all content in dev environment');
-      setShowContent(true);
-    } else {
-      console.log('🔒 Hiding content until smartplayer event in production');
-    }
+    console.log('🔒 Content hidden - waiting for smartplayer-scroll-event from Vturb');
   }, []);
 
   useEffect(() => {
@@ -134,12 +128,10 @@ function App() {
           capturedEvents.add(event.type);
         }
 
-        // Se for relacionado ao smartplayer, trigger a ação
+        // Apenas logar eventos smartplayer (não trigger automaticamente)
         if (event.type.toLowerCase().includes('smart') ||
-            event.type.toLowerCase().includes('vturb') ||
-            (event.type.includes('scroll') && (this as any).id === 'vid-69124ec0b910e6e322c32a69')) {
-          console.log('✅✅✅ SMARTPLAYER-RELATED EVENT - TRIGGERING:', event.type);
-          setTimeout(() => handleSmartplayerEvent(event), 0);
+            event.type.toLowerCase().includes('vturb')) {
+          console.log('🎯 SMARTPLAYER-RELATED EVENT DETECTED:', event.type, '| Will be handled by listeners');
         }
       }
       return originalDispatchEvent.call(this, event);
