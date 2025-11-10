@@ -321,11 +321,16 @@ function App() {
 
     const observerCallback = (entries: IntersectionObserverEntry[]) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
           console.log('🎯🎯🎯 USER SCROLLED TO .smartplayer-scroll-event ELEMENT!');
           console.log('📍 Element:', entry.target);
           console.log('📏 Intersection ratio:', entry.intersectionRatio);
-          // NÃO trigger automaticamente, apenas logar
+          console.log('🔓 TRIGGERING CONTENT REVEAL!');
+
+          // Trigger a ação quando o usuário rola até o elemento
+          if (!showContent) {
+            handleSmartplayerEvent({ type: 'manual-scroll-trigger', target: entry.target });
+          }
         }
       });
     };
