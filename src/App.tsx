@@ -17,7 +17,11 @@ import {
 } from 'lucide-react';
 import ArticleReader from './ArticleReader';
 
+console.log('🚀🚀🚀 APP.TSX LOADED - TOP OF FILE 🚀🚀🚀');
+
 function App() {
+  console.log('🎯 APP COMPONENT RENDERING');
+
   const offersRef = useRef<HTMLDivElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -35,11 +39,14 @@ function App() {
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
   const [showContent, setShowContent] = useState(false);
 
+  console.log('📊 showContent state:', showContent);
+
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
+    console.log('🔥🔥🔥 FIRST useEffect RUNNING');
     setIsVisible(true);
 
     const hostname = window.location.hostname;
@@ -51,9 +58,12 @@ function App() {
     console.log('🌍 Hostname:', hostname);
     console.log('🔧 Is Bolt/Dev Environment:', isBoltEnv);
     console.log('🔒 Content hidden - waiting for smartplayer-scroll-event from Vturb');
+    console.log('✅ First useEffect completed');
   }, []);
 
   useEffect(() => {
+    console.log('🔥🔥🔥 SMARTPLAYER DETECTION useEffect RUNNING');
+
     const attemptScroll = (attempt = 0) => {
       const maxScrollAttempts = 5;
 
