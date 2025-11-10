@@ -1,6 +1,5 @@
 import { Play, Volume2, AlertTriangle, CheckCircle, Truck, Shield, Star } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
 
 interface UpsellProps {
   bottles: number;
@@ -13,20 +12,6 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
   const isUp3bt = location.pathname === '/up3bt';
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124ec0b910e6e322c32a69/v4/player.js';
-    script.async = true;
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50 flex flex-col">
@@ -64,18 +49,11 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           </div>
         </div>
 
-        <div className="relative w-full max-w-sm md:max-w-md mx-auto mb-4">
-          <div
-            id="vid_69124ec0b910e6e322c32a69"
-            style={{
-              position: 'relative',
-              width: '100%',
-              padding: '177.78% 0 0 0'
-            }}
-          >
-            <div dangerouslySetInnerHTML={{
-              __html: `<vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style="display: block; margin: 0 auto; width: 100%; max-width: 400px;"></vturb-smartplayer>`
-            }} />
+        <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16] mb-4">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+            <button className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
+              <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
+            </button>
           </div>
         </div>
 
