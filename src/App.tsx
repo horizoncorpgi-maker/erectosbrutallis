@@ -74,7 +74,20 @@ function App() {
         const script = document.createElement('script');
         script.src = expertVideoScript;
         script.async = true;
+        script.onload = () => {
+          console.log('Expert video script loaded');
+        };
         document.head.appendChild(script);
+      } else {
+        // Script já existe, forçar reinicialização do player
+        const playerDiv = document.getElementById('vid_69124f9036636797770589e5');
+        if (playerDiv && (window as any).SmartPlayer) {
+          (window as any).SmartPlayer.instances.forEach((instance: any) => {
+            if (instance.id === 'vid_69124f9036636797770589e5') {
+              instance.reload();
+            }
+          });
+        }
       }
     }
   }, [showExpertVideo]);
@@ -534,11 +547,11 @@ function App() {
                         </div>
                       </>
                     ) : (
-                      <div
-                        id="vid_69124f9036636797770589e5"
-                        style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}
-                      >
-                        <div id="vid_69124f9036636797770589e5_wrapper" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></div>
+                      <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
+                        <div
+                          id="vid_69124f9036636797770589e5"
+                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                        ></div>
                       </div>
                     )}
                   </div>
