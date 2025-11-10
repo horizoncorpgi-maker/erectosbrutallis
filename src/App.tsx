@@ -64,6 +64,7 @@ function App() {
       const maxScrollAttempts = 5;
 
       console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
+      console.log('🔍 Current showContent state:', showContent);
 
       const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
                            document.getElementById('six-bottle-package') ||
@@ -102,21 +103,35 @@ function App() {
       }
     };
 
+    console.log('🔧 Setting up smartplayer event listener...');
     const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
 
+    console.log('🎥 Hero player found:', !!heroPlayer);
+    console.log('🎥 Hero player element:', heroPlayer);
+
     if (heroPlayer) {
-      const handleSmartplayerEvent = () => {
-        console.log('🎬 SmartPlayer scroll event triggered');
+      const handleSmartplayerEvent = (event: any) => {
+        console.log('🎬 SmartPlayer scroll event triggered!', event);
         console.log('🔓 Revealing all content now...');
         setShowContent(true);
+        console.log('⏰ Waiting 800ms before attempting scroll...');
         setTimeout(() => attemptScroll(), 800);
       };
 
       heroPlayer.addEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
+      console.log('✅ Event listener attached to hero player');
+
+      // Também adicionar listener global para debug
+      window.addEventListener('smartplayer-scroll-event', (e) => {
+        console.log('🌍 Global smartplayer event captured:', e);
+      });
 
       return () => {
         heroPlayer.removeEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
+        console.log('🧹 Event listener removed');
       };
+    } else {
+      console.warn('⚠️ Hero player not found! ID: vid-69124ec0b910e6e322c32a69');
     }
   }, []);
 
@@ -496,6 +511,29 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* Debug Button - Remove in production */}
+      <div className="fixed bottom-4 left-4 z-50">
+        <button
+          onClick={() => {
+            console.log('🧪 Manual test: Triggering smartplayer-scroll-event');
+            const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
+            if (heroPlayer) {
+              const event = new CustomEvent('smartplayer-scroll-event');
+              heroPlayer.dispatchEvent(event);
+              console.log('✅ Event dispatched to hero player');
+            } else {
+              console.warn('⚠️ Hero player not found');
+            }
+          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
+        >
+          🧪 Test Scroll Event
+        </button>
+        <div className="mt-2 text-xs text-gray-600 bg-white px-2 py-1 rounded shadow">
+          showContent: {showContent ? '✅' : '❌'}
+        </div>
+      </div>
 
       {/* Offers Section */}
       <section ref={offersRef} className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
