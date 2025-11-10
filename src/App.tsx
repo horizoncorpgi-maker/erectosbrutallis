@@ -58,7 +58,37 @@ function App() {
     console.log('🌍 Hostname:', hostname);
     console.log('🔧 Is Bolt/Dev Environment:', isBoltEnv);
     console.log('🔒 Content hidden - waiting for smartplayer-scroll-event from Vturb');
+
+    // INTERCEPTAR scrollIntoView do Vturb
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function(...args) {
+      const element = this as HTMLElement;
+
+      console.log('🚨🚨🚨 scrollIntoView CHAMADO!');
+      console.log('📍 Elemento:', element);
+      console.log('🏷️ Classes:', element.className);
+
+      if (element.classList.contains('smartplayer-scroll-event')) {
+        console.log('✅ É UM ELEMENTO .smartplayer-scroll-event!');
+        console.log('🔓 REVELANDO CONTEÚDO AGORA!');
+
+        handleSmartplayerEvent({ type: 'vturb-scrollIntoView', target: element });
+
+        // Prevenir o scroll original do Vturb
+        return;
+      }
+
+      // Para outros elementos, executar normalmente
+      return originalScrollIntoView.apply(this, args);
+    };
+
+    console.log('✅ scrollIntoView interceptor instalado');
     console.log('✅ First useEffect completed');
+
+    return () => {
+      // Restaurar função original
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    };
   }, []);
 
   useEffect(() => {
