@@ -71,15 +71,6 @@ function App() {
       script.async = true;
       document.head.appendChild(script);
     }
-
-    const drStevenVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9a3663679777058a0c/v4/player.js';
-    const existingDrStevenScript = document.querySelector(`script[src="${drStevenVideoScript}"]`);
-    if (!existingDrStevenScript) {
-      const script = document.createElement('script');
-      script.src = drStevenVideoScript;
-      script.async = true;
-      document.head.appendChild(script);
-    }
   }, []);
 
   useEffect(() => {
@@ -111,31 +102,6 @@ function App() {
 
     pauseAllVturbVideos();
   }, [currentTestimonial]);
-
-  useEffect(() => {
-    // Pequeno delay para permitir que o novo vídeo seja carregado antes de pausar
-    const timer = setTimeout(() => {
-      const expertVideos = document.querySelectorAll('vturb-smartplayer');
-
-      expertVideos.forEach((player: any) => {
-        try {
-          // Verifica se o player não está visível na seção de experts atual
-          const playerContainer = player.closest('.flex.flex-col.md\\:flex-row.items-center');
-          if (playerContainer && player && typeof player.pause === 'function') {
-            // Pausa apenas se não for o player ativo
-            const isVisible = playerContainer.offsetParent !== null;
-            if (!isVisible) {
-              player.pause();
-            }
-          }
-        } catch (e) {
-          console.log('Erro ao pausar vídeo expert:', e);
-        }
-      });
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [currentExpert]);
 
   useEffect(() => {
     // Listener global para pausar outros vídeos quando um vTurb começa a tocar
@@ -542,12 +508,6 @@ function App() {
                     <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg">
                       <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
                         <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
-                      </div>
-                    </div>
-                  ) : currentExpert === 1 ? (
-                    <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg">
-                      <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                        <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                       </div>
                     </div>
                   ) : (
