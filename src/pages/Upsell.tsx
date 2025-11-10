@@ -49,11 +49,20 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           </div>
         </div>
 
-        <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16] mb-4">
-          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-            <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style="display: block; margin: 0 auto; width: 100%; "></vturb-smartplayer>
-            <script type="text/javascript" dangerouslySetInnerHTML={{__html: `var s=document.createElement("script"); s.src="https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9a3663679777058a0c/v4/player.js", s.async=!0,document.head.appendChild(s);`}} />
-          </div>
+        <div className="relative w-full max-w-sm md:max-w-md mx-auto rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16] mb-4">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: `
+                <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style="display: block; margin: 0 auto; width: 100%; height: 100%;"></vturb-smartplayer>
+                <script type="text/javascript">
+                  var s=document.createElement("script");
+                  s.src="https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9a3663679777058a0c/v4/player.js";
+                  s.async=true;
+                  document.head.appendChild(s);
+                </script>
+              `
+            }}
+          />
         </div>
 
         <div className="flex items-center justify-center gap-2 text-gray-700 mb-3">
