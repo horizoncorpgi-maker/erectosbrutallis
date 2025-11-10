@@ -64,6 +64,9 @@ function App() {
       document.head.appendChild(script);
     }
 
+  }, []);
+
+  useEffect(() => {
     if (showExpertVideo) {
       const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
       const existingExpertScript = document.querySelector(`script[src="${expertVideoScript}"]`);
@@ -531,7 +534,12 @@ function App() {
                         </div>
                       </>
                     ) : (
-                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', margin: '0 auto', width: '100%' }}></vturb-smartplayer>
+                      <div
+                        id="vid_69124f9036636797770589e5"
+                        style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}
+                      >
+                        <div id="vid_69124f9036636797770589e5_wrapper" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></div>
+                      </div>
                     )}
                   </div>
                 </div>
