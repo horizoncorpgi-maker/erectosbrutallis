@@ -71,6 +71,15 @@ function App() {
       script.async = true;
       document.head.appendChild(script);
     }
+
+    const expertVideoScript2 = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9a3663679777058a0c/v4/player.js';
+    const existingExpertScript2 = document.querySelector(`script[src="${expertVideoScript2}"]`);
+    if (!existingExpertScript2) {
+      const script = document.createElement('script');
+      script.src = expertVideoScript2;
+      script.async = true;
+      document.head.appendChild(script);
+    }
   }, []);
 
   useEffect(() => {
@@ -508,6 +517,12 @@ function App() {
                     <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg">
                       <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
                         <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
+                      </div>
+                    </div>
+                  ) : currentExpert === 1 ? (
+                    <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg">
+                      <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                        <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                       </div>
                     </div>
                   ) : (
