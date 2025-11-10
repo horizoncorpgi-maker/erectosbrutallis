@@ -50,10 +50,9 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
         </div>
 
         <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16] mb-4">
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-            <button className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
-              <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
-            </button>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style="display: block; margin: 0 auto; width: 100%; "></vturb-smartplayer>
+            <script type="text/javascript" dangerouslySetInnerHTML={{__html: `var s=document.createElement("script"); s.src="https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9a3663679777058a0c/v4/player.js", s.async=!0,document.head.appendChild(s);`}} />
           </div>
         </div>
 
