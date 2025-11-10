@@ -62,6 +62,15 @@ function App() {
       script.async = true;
       document.head.appendChild(script);
     }
+
+    const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
+    const existingExpertScript = document.querySelector(`script[src="${expertVideoScript}"]`);
+    if (!existingExpertScript) {
+      const script = document.createElement('script');
+      script.src = expertVideoScript;
+      script.async = true;
+      document.head.appendChild(script);
+    }
   }, []);
 
   useEffect(() => {
@@ -496,16 +505,7 @@ function App() {
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-auto flex-shrink-0">
                   <div className="relative w-full max-w-md md:max-w-lg aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
-                    <img
-                      src={experts[currentExpert].video}
-                      alt="Expert video"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <button className="w-16 h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
-                        <Play className="w-8 h-8 text-white ml-1" fill="white" />
-                      </button>
-                    </div>
+                    <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', margin: '0 auto', width: '100%' }}></vturb-smartplayer>
                   </div>
                 </div>
 
