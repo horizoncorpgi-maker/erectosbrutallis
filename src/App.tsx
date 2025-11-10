@@ -32,6 +32,7 @@ function App() {
   const [showUpsellPopup, setShowUpsellPopup] = useState(false);
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
+  const [showExpertVideo, setShowExpertVideo] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -273,8 +274,14 @@ function App() {
     "https://images.pexels.com/photos/3825517/pexels-photo-3825517.jpeg?auto=compress&cs=tinysrgb&w=800"
   ];
 
-  const nextExpert = () => setCurrentExpert((prev) => (prev + 1) % experts.length);
-  const prevExpert = () => setCurrentExpert((prev) => (prev - 1 + experts.length) % experts.length);
+  const nextExpert = () => {
+    setCurrentExpert((prev) => (prev + 1) % experts.length);
+    setShowExpertVideo(false);
+  };
+  const prevExpert = () => {
+    setCurrentExpert((prev) => (prev - 1 + experts.length) % experts.length);
+    setShowExpertVideo(false);
+  };
 
   const nextTestimonial = () => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
   const prevTestimonial = () => setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -505,7 +512,25 @@ function App() {
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-auto flex-shrink-0">
                   <div className="relative w-full max-w-md md:max-w-lg aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
-                    <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', margin: '0 auto', width: '100%' }}></vturb-smartplayer>
+                    {!showExpertVideo ? (
+                      <>
+                        <img
+                          src={experts[currentExpert].video}
+                          alt="Expert video"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                          <button
+                            onClick={() => setShowExpertVideo(true)}
+                            className="w-16 h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl"
+                          >
+                            <Play className="w-8 h-8 text-white ml-1" fill="white" />
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', margin: '0 auto', width: '100%' }}></vturb-smartplayer>
+                    )}
                   </div>
                 </div>
 
