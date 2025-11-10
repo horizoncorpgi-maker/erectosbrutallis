@@ -43,6 +43,63 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const attemptScroll = (attempt = 0) => {
+      const maxScrollAttempts = 5;
+
+      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
+
+      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
+                           document.getElementById('six-bottle-package') ||
+                           document.querySelector('[data-purchase-section="true"]') ||
+                           document.querySelector('.purchase-button-main');
+
+      if (purchaseButton) {
+        console.log('✅ Purchase button found!');
+
+        purchaseButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+
+        const element = purchaseButton as HTMLElement;
+        element.style.transition = 'all 0.8s ease';
+        element.style.transform = 'scale(1.05)';
+        element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
+        element.style.zIndex = '100';
+
+        setTimeout(() => {
+          element.style.transform = 'scale(1)';
+          element.style.boxShadow = '';
+          element.style.zIndex = '';
+        }, 4000);
+
+        console.log('✅ Scroll executado com sucesso');
+      } else if (attempt < maxScrollAttempts - 1) {
+        console.log('⏳ Botão não encontrado, tentando novamente...');
+        setTimeout(() => attemptScroll(attempt + 1), 500);
+      } else {
+        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
+      }
+    };
+
+    const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
+
+    if (heroPlayer) {
+      const handleSmartplayerEvent = () => {
+        console.log('🎬 SmartPlayer scroll event triggered');
+        setTimeout(() => attemptScroll(), 800);
+      };
+
+      heroPlayer.addEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
+
+      return () => {
+        heroPlayer.removeEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
+      };
+    }
+  }, []);
+
+  useEffect(() => {
     testimonials.forEach((testimonial) => {
       if (testimonial?.videoScript) {
         const existingScript = document.querySelector(`script[src="${testimonial.videoScript}"]`);
@@ -446,7 +503,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6 smartplayer-scroll-event"
                 >
                   CLAIM OFFER NOW
                 </button>
