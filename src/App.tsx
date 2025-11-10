@@ -113,6 +113,31 @@ function App() {
   }, [currentTestimonial]);
 
   useEffect(() => {
+    // Pequeno delay para permitir que o novo vídeo seja carregado antes de pausar
+    const timer = setTimeout(() => {
+      const expertVideos = document.querySelectorAll('vturb-smartplayer');
+
+      expertVideos.forEach((player: any) => {
+        try {
+          // Verifica se o player não está visível na seção de experts atual
+          const playerContainer = player.closest('.flex.flex-col.md\\:flex-row.items-center');
+          if (playerContainer && player && typeof player.pause === 'function') {
+            // Pausa apenas se não for o player ativo
+            const isVisible = playerContainer.offsetParent !== null;
+            if (!isVisible) {
+              player.pause();
+            }
+          }
+        } catch (e) {
+          console.log('Erro ao pausar vídeo expert:', e);
+        }
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [currentExpert]);
+
+  useEffect(() => {
     // Listener global para pausar outros vídeos quando um vTurb começa a tocar
     const handleVturbPlay = () => {
       const allPlayers = document.querySelectorAll('vturb-smartplayer');
