@@ -64,15 +64,17 @@ function App() {
       document.head.appendChild(script);
     }
 
-    const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
-    const existingExpertScript = document.querySelector(`script[src="${expertVideoScript}"]`);
-    if (!existingExpertScript) {
-      const script = document.createElement('script');
-      script.src = expertVideoScript;
-      script.async = true;
-      document.head.appendChild(script);
+    if (showExpertVideo) {
+      const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
+      const existingExpertScript = document.querySelector(`script[src="${expertVideoScript}"]`);
+      if (!existingExpertScript) {
+        const script = document.createElement('script');
+        script.src = expertVideoScript;
+        script.async = true;
+        document.head.appendChild(script);
+      }
     }
-  }, []);
+  }, [showExpertVideo]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
