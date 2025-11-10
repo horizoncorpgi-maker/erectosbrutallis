@@ -138,10 +138,12 @@ function App() {
           capturedEvents.add(event.type);
         }
 
-        // Apenas logar eventos smartplayer (não trigger automaticamente)
-        if (event.type.toLowerCase().includes('smart') ||
-            event.type.toLowerCase().includes('vturb')) {
-          console.log('🎯 SMARTPLAYER-RELATED EVENT DETECTED:', event.type, '| Will be handled by listeners');
+        // SEMPRE logar eventos relacionados a scroll/player para debug
+        if (event.type.toLowerCase().includes('scroll') ||
+            event.type.toLowerCase().includes('smart') ||
+            event.type.toLowerCase().includes('vturb') ||
+            event.type.toLowerCase().includes('player')) {
+          console.log('🎯 PLAYER EVENT:', event.type, '| Target:', this.constructor.name, '| Event:', event);
         }
       }
       return originalDispatchEvent.call(this, event);
@@ -313,6 +315,39 @@ function App() {
     }
 
     console.log('✅ Event detection system fully initialized');
+
+    // MONITORAR quando o usuário rola até o elemento com classe .smartplayer-scroll-event
+    console.log('👀 Setting up Intersection Observer for .smartplayer-scroll-event');
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          console.log('🎯🎯🎯 USER SCROLLED TO .smartplayer-scroll-event ELEMENT!');
+          console.log('📍 Element:', entry.target);
+          console.log('📏 Intersection ratio:', entry.intersectionRatio);
+          // NÃO trigger automaticamente, apenas logar
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, {
+      threshold: [0, 0.25, 0.5, 0.75, 1.0],
+      rootMargin: '0px'
+    });
+
+    // Observar todos os elementos com a classe
+    const scrollEventElements = document.querySelectorAll('.smartplayer-scroll-event');
+    console.log(`📍 Found ${scrollEventElements.length} elements with .smartplayer-scroll-event class`);
+
+    scrollEventElements.forEach((element, index) => {
+      console.log(`   - Element ${index + 1}:`, element);
+      observer.observe(element);
+    });
+
+    // Cleanup
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   useEffect(() => {
