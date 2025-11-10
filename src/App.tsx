@@ -40,6 +40,61 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
+
+    const attemptScroll = (attempt = 0) => {
+      const maxScrollAttempts = 5;
+
+      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
+
+      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
+                           document.getElementById('six-bottle-package') ||
+                           document.querySelector('[data-purchase-section="true"]') ||
+                           document.querySelector('.purchase-button-main');
+
+      if (purchaseButton) {
+        console.log('✅ Purchase button found!');
+
+        purchaseButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+
+        const element = purchaseButton as HTMLElement;
+        element.style.transition = 'all 0.8s ease';
+        element.style.transform = 'scale(1.05)';
+        element.style.boxShadow = '0 0 40px rgba(184, 0, 0, 0.6)';
+        element.style.zIndex = '100';
+
+        setTimeout(() => {
+          element.style.transform = 'scale(1)';
+          element.style.boxShadow = '';
+          element.style.zIndex = '';
+        }, 4000);
+
+        console.log('✅ Scroll executado com sucesso');
+      } else if (attempt < maxScrollAttempts - 1) {
+        console.log('⏳ Botão não encontrado, tentando novamente...');
+        setTimeout(() => attemptScroll(attempt + 1), 500);
+      } else {
+        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
+      }
+    };
+
+    const handleSmartPlayerEvent = (event: any) => {
+      if (event.detail?.name === 'smartplayer-scroll-event' || event.type === 'smartplayer-scroll-event') {
+        console.log('🎬 SmartPlayer scroll event detectado!');
+        setTimeout(() => attemptScroll(), 800);
+      }
+    };
+
+    window.addEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
+    document.addEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
+
+    return () => {
+      window.removeEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
+      document.removeEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
+    };
   }, []);
 
   useEffect(() => {
@@ -445,8 +500,10 @@ function App() {
                   YOU'RE SAVING $888
                 </div>
                 <button
+                  id="six-bottle-package"
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  className="purchase-button-main smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  data-purchase-section="true"
                 >
                   CLAIM OFFER NOW
                 </button>
