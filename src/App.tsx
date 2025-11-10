@@ -73,8 +73,6 @@ function App() {
       if (purchaseButton) {
         console.log('✅ Purchase button found!');
 
-        setShowContent(true);
-
         setTimeout(() => {
           purchaseButton.scrollIntoView({
             behavior: 'smooth',
@@ -109,6 +107,8 @@ function App() {
     if (heroPlayer) {
       const handleSmartplayerEvent = () => {
         console.log('🎬 SmartPlayer scroll event triggered');
+        console.log('🔓 Revealing all content now...');
+        setShowContent(true);
         setTimeout(() => attemptScroll(), 800);
       };
 
