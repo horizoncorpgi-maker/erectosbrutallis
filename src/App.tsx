@@ -32,6 +32,7 @@ function App() {
   const [showUpsellPopup, setShowUpsellPopup] = useState(false);
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
+  const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -291,8 +292,57 @@ function App() {
     "https://images.pexels.com/photos/3825517/pexels-photo-3825517.jpeg?auto=compress&cs=tinysrgb&w=800"
   ];
 
-  const nextExpert = () => setCurrentExpert((prev) => (prev + 1) % experts.length);
-  const prevExpert = () => setCurrentExpert((prev) => (prev - 1 + experts.length) % experts.length);
+  const nextExpert = () => {
+    pauseExpertVideo(currentExpert);
+    setExpertVideosPlaying({});
+    setCurrentExpert((prev) => (prev + 1) % experts.length);
+  };
+
+  const prevExpert = () => {
+    pauseExpertVideo(currentExpert);
+    setExpertVideosPlaying({});
+    setCurrentExpert((prev) => (prev - 1 + experts.length) % experts.length);
+  };
+
+  const pauseExpertVideo = (expertIndex: number) => {
+    const videoIds = [
+      'vid-69124f9036636797770589e5',
+      'vid-69124f9a3663679777058a0c',
+      'vid-69124f958af45b5e1aef9024'
+    ];
+
+    const player = document.getElementById(videoIds[expertIndex]) as any;
+    if (player && typeof player.pause === 'function') {
+      try {
+        player.pause();
+      } catch (e) {
+        console.log('Erro ao pausar vídeo:', e);
+      }
+    }
+  };
+
+  const toggleExpertVideo = (expertIndex: number) => {
+    const videoIds = [
+      'vid-69124f9036636797770589e5',
+      'vid-69124f9a3663679777058a0c',
+      'vid-69124f958af45b5e1aef9024'
+    ];
+
+    const player = document.getElementById(videoIds[expertIndex]) as any;
+    if (player) {
+      try {
+        if (expertVideosPlaying[expertIndex]) {
+          player.pause();
+          setExpertVideosPlaying({...expertVideosPlaying, [expertIndex]: false});
+        } else {
+          player.play();
+          setExpertVideosPlaying({...expertVideosPlaying, [expertIndex]: true});
+        }
+      } catch (e) {
+        console.log('Erro ao controlar vídeo:', e);
+      }
+    }
+  };
 
   const nextTestimonial = () => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
   const prevTestimonial = () => setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -522,20 +572,41 @@ function App() {
             <div className="bg-white rounded-[20px] shadow-xl p-6 md:p-12">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-1/2 flex-shrink-0">
-                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg" style={{ display: currentExpert === 0 ? 'block' : 'none' }}>
+                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 0 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(0)}>
                     <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
                       <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
+                    {!expertVideosPlaying[0] && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
+                          <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg" style={{ display: currentExpert === 1 ? 'block' : 'none' }}>
+                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 1 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(1)}>
                     <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
                       <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
+                    {!expertVideosPlaying[1] && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
+                          <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg" style={{ display: currentExpert === 2 ? 'block' : 'none' }}>
+                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 2 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(2)}>
                     <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
                       <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
+                    {!expertVideosPlaying[2] && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
+                        <div className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
+                          <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
