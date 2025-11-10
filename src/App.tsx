@@ -80,6 +80,15 @@ function App() {
       script.async = true;
       document.head.appendChild(script);
     }
+
+    const expertVideoScript3 = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f958af45b5e1aef9024/v4/player.js';
+    const existingExpertScript3 = document.querySelector(`script[src="${expertVideoScript3}"]`);
+    if (!existingExpertScript3) {
+      const script = document.createElement('script');
+      script.src = expertVideoScript3;
+      script.async = true;
+      document.head.appendChild(script);
+    }
   }, []);
 
   useEffect(() => {
@@ -523,20 +532,11 @@ function App() {
                       <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
                   </div>
-                  {currentExpert === 2 && (
-                    <div className="relative w-full aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
-                      <img
-                        src={experts[currentExpert].video}
-                        alt="Expert video"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                        <button className="w-16 h-16 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
-                          <Play className="w-8 h-8 text-white ml-1" fill="white" />
-                        </button>
-                      </div>
+                  <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg" style={{ display: currentExpert === 2 ? 'block' : 'none' }}>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                      <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
-                  )}
+                  </div>
                 </div>
 
                 <div className="flex-1 text-center md:text-left">
