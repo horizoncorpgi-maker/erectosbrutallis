@@ -316,43 +316,22 @@ function App() {
 
     console.log('✅ Event detection system fully initialized');
 
-    // MONITORAR quando o usuário rola até o elemento com classe .smartplayer-scroll-event
-    console.log('👀 Setting up Intersection Observer for .smartplayer-scroll-event');
-
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-          console.log('🎯🎯🎯 USER SCROLLED TO .smartplayer-scroll-event ELEMENT!');
-          console.log('📍 Element:', entry.target);
-          console.log('📏 Intersection ratio:', entry.intersectionRatio);
-          console.log('🔓 TRIGGERING CONTENT REVEAL!');
-
-          // Trigger a ação quando o usuário rola até o elemento
-          if (!showContent) {
-            handleSmartplayerEvent({ type: 'manual-scroll-trigger', target: entry.target });
-          }
-        }
-      });
-    };
-
-    const observer = new IntersectionObserver(observerCallback, {
-      threshold: [0, 0.25, 0.5, 0.75, 1.0],
-      rootMargin: '0px'
-    });
-
-    // Observar todos os elementos com a classe
-    const scrollEventElements = document.querySelectorAll('.smartplayer-scroll-event');
-    console.log(`📍 Found ${scrollEventElements.length} elements with .smartplayer-scroll-event class`);
-
-    scrollEventElements.forEach((element, index) => {
-      console.log(`   - Element ${index + 1}:`, element);
-      observer.observe(element);
-    });
-
-    // Cleanup
-    return () => {
-      observer.disconnect();
-    };
+    console.log('');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('⚠️  AGUARDANDO EVENTO DO VTURB SMARTPLAYER');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('');
+    console.log('📋 INSTRUÇÕES:');
+    console.log('   1. Verifique no painel do Vturb se o recurso');
+    console.log('      "Smartplayer Scroll Event" está ATIVADO');
+    console.log('   2. O evento deve ser disparado quando o usuário');
+    console.log('      rola até a classe .smartplayer-scroll-event');
+    console.log('');
+    console.log('🔍 EVENTOS QUE O VTURB ESTÁ DISPARANDO:');
+    console.log('   (Procure por algum evento com "scroll" no nome)');
+    console.log('');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('');
   }, []);
 
   useEffect(() => {
