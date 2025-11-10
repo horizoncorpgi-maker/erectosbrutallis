@@ -104,35 +104,100 @@ function App() {
     };
 
     console.log('🔧 Setting up smartplayer event listener...');
-    const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
 
-    console.log('🎥 Hero player found:', !!heroPlayer);
-    console.log('🎥 Hero player element:', heroPlayer);
+    const handleSmartplayerEvent = (event: any) => {
+      console.log('🎬 SmartPlayer scroll event triggered!', event);
+      console.log('🔓 Revealing all content now...');
+      setShowContent(true);
+      console.log('⏰ Waiting 800ms before attempting scroll...');
+      setTimeout(() => attemptScroll(), 800);
+    };
 
-    if (heroPlayer) {
-      const handleSmartplayerEvent = (event: any) => {
-        console.log('🎬 SmartPlayer scroll event triggered!', event);
-        console.log('🔓 Revealing all content now...');
-        setShowContent(true);
-        console.log('⏰ Waiting 800ms before attempting scroll...');
-        setTimeout(() => attemptScroll(), 800);
-      };
+    // Adicionar listeners globais IMEDIATAMENTE
+    console.log('📢 Adding global event listeners...');
 
-      heroPlayer.addEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
-      console.log('✅ Event listener attached to hero player');
+    window.addEventListener('smartplayer-scroll-event', (e) => {
+      console.log('🌍 WINDOW captured smartplayer-scroll-event:', e);
+      handleSmartplayerEvent(e);
+    }, true);
 
-      // Também adicionar listener global para debug
-      window.addEventListener('smartplayer-scroll-event', (e) => {
-        console.log('🌍 Global smartplayer event captured:', e);
-      });
+    document.addEventListener('smartplayer-scroll-event', (e) => {
+      console.log('📄 DOCUMENT captured smartplayer-scroll-event:', e);
+      handleSmartplayerEvent(e);
+    }, true);
 
-      return () => {
-        heroPlayer.removeEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
-        console.log('🧹 Event listener removed');
-      };
-    } else {
-      console.warn('⚠️ Hero player not found! ID: vid-69124ec0b910e6e322c32a69');
+    // Polling para encontrar o player
+    let pollAttempts = 0;
+    const maxPollAttempts = 30;
+
+    const setupPlayerListeners = () => {
+      pollAttempts++;
+
+      if (pollAttempts === 1 || pollAttempts % 5 === 0) {
+        console.log(`🔍 Polling attempt ${pollAttempts}/${maxPollAttempts}`);
+      }
+
+      const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
+      const vturbPlayer = document.querySelector('vturb-smartplayer') as any;
+      const allPlayers = document.querySelectorAll('vturb-smartplayer');
+
+      if (pollAttempts === 1 || (heroPlayer && pollAttempts <= 2)) {
+        console.log('🎥 Hero player by ID:', !!heroPlayer);
+        console.log('🎥 Vturb player by selector:', !!vturbPlayer);
+        console.log('🎥 Total vturb players found:', allPlayers.length);
+      }
+
+      if (heroPlayer || vturbPlayer || allPlayers.length > 0) {
+        const targetPlayer = heroPlayer || vturbPlayer;
+
+        if (targetPlayer && pollAttempts <= 2) {
+          console.log('🎯 Target player found:', targetPlayer);
+          console.log('🎯 Player tagName:', targetPlayer.tagName);
+          console.log('🎯 Player id:', targetPlayer.id);
+
+          // Adicionar listener diretamente no player
+          targetPlayer.addEventListener('smartplayer-scroll-event', (e: any) => {
+            console.log('🎮 PLAYER captured smartplayer-scroll-event:', e);
+            handleSmartplayerEvent(e);
+          });
+
+          console.log('✅ Event listener attached to player');
+        }
+
+        if (pollAttempts <= 2) {
+          // Adicionar listener a todos os players
+          allPlayers.forEach((player: any, index: number) => {
+            player.addEventListener('smartplayer-scroll-event', (e: any) => {
+              console.log(`🎮 PLAYER ${index + 1} captured smartplayer-scroll-event:`, e);
+              handleSmartplayerEvent(e);
+            });
+          });
+
+          console.log(`✅ All ${allPlayers.length} players configured`);
+        }
+
+        return true;
+      }
+
+      return false;
+    };
+
+    // Tentar setup imediatamente
+    if (!setupPlayerListeners()) {
+      // Se não encontrou, fazer polling
+      const pollInterval = setInterval(() => {
+        if (setupPlayerListeners() || pollAttempts >= maxPollAttempts) {
+          clearInterval(pollInterval);
+          if (pollAttempts >= maxPollAttempts) {
+            console.warn('⚠️ Player not found after 30 attempts (15 seconds)');
+          }
+        }
+      }, 500);
+
+      return () => clearInterval(pollInterval);
     }
+
+    console.log('✅ Event detection system fully initialized');
   }, []);
 
   useEffect(() => {
