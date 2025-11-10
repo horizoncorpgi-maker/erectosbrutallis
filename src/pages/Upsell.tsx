@@ -18,6 +18,16 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
     const script = document.createElement('script');
     script.src = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124ec0b910e6e322c32a69/v4/player.js';
     script.async = true;
+
+    script.onload = () => {
+      const player = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (player && (window as any).smartplayer) {
+        (window as any).smartplayer('vid-69124ec0b910e6e322c32a69').then((video: any) => {
+          video.play();
+        });
+      }
+    };
+
     document.head.appendChild(script);
 
     return () => {
