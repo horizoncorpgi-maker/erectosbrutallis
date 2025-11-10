@@ -503,13 +503,15 @@ function App() {
           <div className="relative px-8 md:px-0">
             <div className="bg-white rounded-[20px] shadow-xl p-6 md:p-12">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
-                <div className="w-full md:w-auto flex-shrink-0">
+                <div className="w-full md:w-1/2 flex-shrink-0">
                   {currentExpert === 0 ? (
-                    <div className="relative w-full max-w-md md:max-w-lg rounded-[15px] overflow-hidden shadow-lg">
-                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ display: 'block', width: '100%' }}></vturb-smartplayer>
+                    <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg">
+                      <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                        <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
+                      </div>
                     </div>
                   ) : (
-                    <div className="relative w-full max-w-md md:max-w-lg aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
+                    <div className="relative w-full aspect-video bg-black rounded-[15px] overflow-hidden shadow-lg">
                       <img
                         src={experts[currentExpert].video}
                         alt="Expert video"
