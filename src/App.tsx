@@ -68,27 +68,33 @@ function App() {
 
   useEffect(() => {
     if (showExpertVideo) {
+      const scriptId = 'expert-video-script';
       const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
-      const existingExpertScript = document.querySelector(`script[src="${expertVideoScript}"]`);
-      if (!existingExpertScript) {
+
+      // Remover script existente se houver
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) {
+        existingScript.remove();
+      }
+
+      // Aguardar um pouco para garantir que o DOM está pronto
+      setTimeout(() => {
         const script = document.createElement('script');
+        script.id = scriptId;
         script.src = expertVideoScript;
         script.async = true;
+        script.type = 'text/javascript';
+
         script.onload = () => {
-          console.log('Expert video script loaded');
+          console.log('Expert video script carregado com sucesso');
         };
+
+        script.onerror = () => {
+          console.error('Erro ao carregar script do vídeo');
+        };
+
         document.head.appendChild(script);
-      } else {
-        // Script já existe, forçar reinicialização do player
-        const playerDiv = document.getElementById('vid_69124f9036636797770589e5');
-        if (playerDiv && (window as any).SmartPlayer) {
-          (window as any).SmartPlayer.instances.forEach((instance: any) => {
-            if (instance.id === 'vid_69124f9036636797770589e5') {
-              instance.reload();
-            }
-          });
-        }
-      }
+      }, 100);
     }
   }, [showExpertVideo]);
 
@@ -547,12 +553,10 @@ function App() {
                         </div>
                       </>
                     ) : (
-                      <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%' }}>
-                        <div
-                          id="vid_69124f9036636797770589e5"
-                          style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                        ></div>
-                      </div>
+                      <div
+                        id="vid_69124f9036636797770589e5"
+                        style={{ width: '100%', position: 'relative' }}
+                      ></div>
                     )}
                   </div>
                 </div>
