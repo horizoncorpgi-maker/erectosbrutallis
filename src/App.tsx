@@ -206,7 +206,7 @@ function App() {
       institution: "Columbia University",
       photo: "https://i.imgur.com/oM0Uyij.jpeg",
       video: "https://images.pexels.com/photos/5215024/pexels-photo-5215024.jpeg?auto=compress&cs=tinysrgb&w=400",
-      quote: "BlueBites represents a breakthrough in natural men's health. Simple ingredients, impressive results."
+      quote: "Erectos Brutallis represents a breakthrough in natural men's health. Simple ingredients, impressive results."
     },
     {
       name: "Dr. Steven Gundry",
@@ -214,7 +214,7 @@ function App() {
       institution: "Center for Restorative Medicine",
       photo: "https://i.imgur.com/z8WR0yL.jpeg",
       video: "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=400",
-      quote: "Natural compounds like those in BlueBites restore balance from within — exactly my philosophy."
+      quote: "Natural compounds like those in Erectos Brutallis restore balance from within — exactly my philosophy."
     },
     {
       name: "Dr. Rena Malik",
@@ -222,7 +222,7 @@ function App() {
       institution: "University of Maryland",
       photo: "https://i.imgur.com/iNaQpa5.jpeg",
       video: "https://images.pexels.com/photos/5452201/pexels-photo-5452201.jpeg?auto=compress&cs=tinysrgb&w=400",
-      quote: "BlueBites offers men a promising natural alternative that supports both confidence and wellness."
+      quote: "Erectos Brutallis offers men a promising natural alternative that supports both confidence and wellness."
     }
   ];
 
