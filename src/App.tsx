@@ -176,6 +176,82 @@ function App() {
     };
   }, [currentTestimonial]);
 
+  useEffect(() => {
+    // Implementação do scroll automático para smartplayer-scroll-event
+    const attemptScroll = (attempt = 0) => {
+      const maxScrollAttempts = 5;
+
+      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
+
+      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
+                           document.getElementById('six-bottle-package') ||
+                           document.querySelector('[data-purchase-section="true"]') ||
+                           document.querySelector('.purchase-button-main');
+
+      if (purchaseButton) {
+        console.log('✅ Purchase button found!');
+
+        purchaseButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+
+        // Efeito visual de destaque
+        const element = purchaseButton as HTMLElement;
+        element.style.transition = 'all 0.8s ease';
+        element.style.transform = 'scale(1.05)';
+        element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
+        element.style.zIndex = '100';
+
+        setTimeout(() => {
+          element.style.transform = 'scale(1)';
+          element.style.boxShadow = '';
+          element.style.zIndex = '';
+        }, 4000);
+
+        console.log('✅ Scroll executado com sucesso');
+      } else if (attempt < maxScrollAttempts - 1) {
+        console.log('⏳ Botão não encontrado, tentando novamente...');
+        setTimeout(() => attemptScroll(attempt + 1), 500);
+      } else {
+        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
+      }
+    };
+
+    // Listener para o evento customizado do SmartPlayer
+    const handleSmartPlayerScrollEvent = () => {
+      console.log('🎬 SmartPlayer scroll event detectado!');
+      setTimeout(() => attemptScroll(), 800);
+    };
+
+    // Adiciona listener para o evento do SmartPlayer
+    window.addEventListener('smartplayer-scroll-event', handleSmartPlayerScrollEvent);
+
+    // Também monitora o player hero para detectar quando atingir o ponto de pitch
+    const checkHeroPlayer = setInterval(() => {
+      const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
+
+      if (heroPlayer && !heroPlayer._scrollEventListenerAdded) {
+        heroPlayer._scrollEventListenerAdded = true;
+
+        // Adiciona listener para eventos customizados do SmartPlayer
+        if (typeof heroPlayer.on === 'function') {
+          heroPlayer.on('smartplayer-scroll-event', () => {
+            console.log('🎬 Hero player scroll event triggered!');
+            setTimeout(() => attemptScroll(), 800);
+          });
+        }
+      }
+    }, 1000);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('smartplayer-scroll-event', handleSmartPlayerScrollEvent);
+      clearInterval(checkHeroPlayer);
+    };
+  }, []);
+
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
     setShowUpsellPopup(true);
