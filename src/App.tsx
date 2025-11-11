@@ -416,6 +416,22 @@ function App() {
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
+
+          <style dangerouslySetInnerHTML={{ __html: `
+            .esconder {
+              display: none;
+            }
+          ` }} />
+
+          <script dangerouslySetInnerHTML={{ __html: `
+            var delaySeconds = 10;
+            var player = document.querySelector("vturb-smartplayer");
+            player.addEventListener("player:ready", function() {
+              player.displayHiddenElements(delaySeconds, [".esconder"], {
+                persist: true
+              });
+            });
+          ` }} />
         </div>
       </section>
 
