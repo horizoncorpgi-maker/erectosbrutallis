@@ -261,11 +261,19 @@ function App() {
         isVisible: element.offsetParent !== null
       });
 
-      // Detecta se VTurb está tentando fazer scroll para .smartplayer-scroll-event
-      if (element.classList.contains('smartplayer-scroll-event') && !scrollIntercepted) {
+      // Detecta se VTurb está tentando fazer scroll para o DUMMY .smartplayer-scroll-event
+      const isDummy = element.id === 'smartplayer-scroll-target' ||
+                      (element.classList.contains('smartplayer-scroll-event') &&
+                       element.offsetParent === null);
+
+      const isRealButton = element.classList.contains('smartplayer-scroll-event') &&
+                           element.offsetParent !== null;
+
+      // Intercepta APENAS o scroll para o elemento dummy
+      if (isDummy && !scrollIntercepted) {
         scrollIntercepted = true;
 
-        console.log('🎬 INTERCEPTADO! VTurb tentou fazer scroll para .smartplayer-scroll-event');
+        console.log('🎬 INTERCEPTADO! VTurb tentou fazer scroll para elemento dummy');
         console.log('🔓 Revelando conteúdo da página...');
 
         // Revela o restante da página
@@ -276,8 +284,13 @@ function App() {
           attemptScroll();
         }, 800);
 
-        // NÃO executa o scroll original (bloqueia o scroll para o elemento oculto)
+        // NÃO executa o scroll original (bloqueia o scroll para o dummy)
         return;
+      }
+
+      // Se for o botão real, permite o scroll normalmente
+      if (isRealButton) {
+        console.log('✅ Permitindo scroll para botão REAL');
       }
 
       // Para todos os outros elementos, executa scrollIntoView normalmente
@@ -285,6 +298,21 @@ function App() {
     };
 
     console.log('✅ Interceptor instalado! Aguardando VTurb...');
+
+    // Verifica se o dummy está no DOM
+    setTimeout(() => {
+      const dummy = document.getElementById('smartplayer-scroll-target');
+      const dummyByClass = document.querySelector('.smartplayer-scroll-event');
+
+      console.log('🔍 Verificando elementos no DOM:');
+      console.log('  - Elemento dummy encontrado por ID:', dummy);
+      console.log('  - Elemento dummy encontrado por classe:', dummyByClass);
+
+      if (dummy) {
+        console.log('  - Dummy está visível?', dummy.offsetParent !== null);
+        console.log('  - Dummy computedStyle:', window.getComputedStyle(dummy).visibility);
+      }
+    }, 100);
 
     // Cleanup
     return () => {
@@ -535,6 +563,23 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* Elemento dummy VISÍVEL para VTurb encontrar */}
+      <div
+        className="smartplayer-scroll-event"
+        id="smartplayer-scroll-target"
+        style={{
+          position: 'absolute',
+          top: '100vh',
+          left: 0,
+          width: '1px',
+          height: '1px',
+          opacity: 0,
+          pointerEvents: 'none',
+          visibility: 'visible'
+        }}
+        aria-hidden="true"
+      />
 
       {/* Restante do conteúdo - oculto até evento do SmartPlayer (exceto em dev) */}
       <div
