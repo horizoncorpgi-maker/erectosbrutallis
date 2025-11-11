@@ -47,32 +47,53 @@ function App() {
     if (!pitchButton) return;
 
     let hasActivated = false;
-    let scrollTimeout: NodeJS.Timeout;
+    let isUserScrolling = false;
+    let userScrollTimeout: NodeJS.Timeout;
 
-    const handleScroll = () => {
-      if (hasActivated) return;
-
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        const rect = pitchButton.getBoundingClientRect();
-        const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
-
-        if (isInViewport && !hasActivated) {
-          hasActivated = true;
-          pitchButton.style.opacity = '1';
-          pitchButton.style.pointerEvents = 'auto';
-          pitchButton.style.backgroundColor = '#22c55e';
-          pitchButton.style.visibility = 'visible';
-          window.removeEventListener('scroll', handleScroll);
-        }
-      }, 50);
+    const handleWheel = () => {
+      isUserScrolling = true;
+      clearTimeout(userScrollTimeout);
+      userScrollTimeout = setTimeout(() => {
+        isUserScrolling = false;
+      }, 150);
     };
 
+    const handleTouchStart = () => {
+      isUserScrolling = true;
+      clearTimeout(userScrollTimeout);
+      userScrollTimeout = setTimeout(() => {
+        isUserScrolling = false;
+      }, 150);
+    };
+
+    const handleScroll = () => {
+      if (hasActivated || isUserScrolling) return;
+
+      const rect = pitchButton.getBoundingClientRect();
+      const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
+
+      if (isInViewport && !hasActivated) {
+        hasActivated = true;
+        pitchButton.style.opacity = '1';
+        pitchButton.style.pointerEvents = 'auto';
+        pitchButton.style.backgroundColor = '#22c55e';
+        pitchButton.style.visibility = 'visible';
+
+        window.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('wheel', handleWheel);
+        window.removeEventListener('touchstart', handleTouchStart);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      clearTimeout(scrollTimeout);
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('touchstart', handleTouchStart);
+      clearTimeout(userScrollTimeout);
     };
   }, []);
 
