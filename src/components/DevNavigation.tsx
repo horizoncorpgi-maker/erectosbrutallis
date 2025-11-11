@@ -1,21 +1,10 @@
 import { Link } from 'react-router-dom';
-import { Menu, PlayCircle } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { useState } from 'react';
 
 function DevNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const isDevelopment = import.meta.env.MODE === 'development';
-
-  const triggerScrollEvent = () => {
-    console.log('🧪 Simulando VTurb fazendo scrollIntoView...');
-    const button = document.querySelector('.smartplayer-scroll-event');
-    if (button) {
-      button.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    } else {
-      console.error('❌ Botão .smartplayer-scroll-event não encontrado!');
-    }
-    setIsOpen(false);
-  };
 
   if (!isDevelopment) {
     return null;
@@ -31,15 +20,8 @@ function DevNavigation() {
       </button>
 
       {isOpen && (
-        <div className="absolute top-12 left-0 bg-slate-800 text-white rounded-lg shadow-lg w-64">
+        <div className="absolute top-12 left-0 bg-slate-800 text-white rounded-lg shadow-lg w-48">
           <nav className="flex flex-col p-2 gap-1">
-            <button
-              onClick={triggerScrollEvent}
-              className="px-3 py-2 rounded hover:bg-slate-700 text-left flex items-center gap-2 border-b border-slate-600"
-            >
-              <PlayCircle size={16} />
-              Testar Scroll Event
-            </button>
             <Link
               to="/"
               className="px-3 py-2 rounded hover:bg-slate-700"

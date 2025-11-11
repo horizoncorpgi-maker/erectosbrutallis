@@ -34,32 +34,6 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
 
-  // Detecta se está em ambiente de desenvolvimento (Bolt)
-  // Permite forçar modo produção com ?preview=true na URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const isPreviewMode = urlParams.get('preview') === 'true';
-  const isDevelopment = (import.meta.env.DEV || window.location.hostname === 'localhost') && !isPreviewMode;
-
-  // Controla a visibilidade do conteúdo após o vídeo hero
-  const [showRestOfPage, setShowRestOfPage] = useState(isDevelopment);
-
-  useEffect(() => {
-    console.log('🔍 Estado inicial:');
-    console.log('  - isDevelopment:', isDevelopment);
-    console.log('  - isPreviewMode:', isPreviewMode);
-    console.log('  - showRestOfPage:', showRestOfPage);
-    console.log('  - hostname:', window.location.hostname);
-    console.log('  - DEV:', import.meta.env.DEV);
-
-    // Aguarda o DOM carregar e verifica se o elemento dummy foi criado
-    setTimeout(() => {
-      const dummyElement = document.getElementById('smartplayer-scroll-target');
-      const dummyByClass = document.querySelector('.smartplayer-scroll-event');
-      console.log('🎯 Elemento dummy encontrado por ID:', dummyElement);
-      console.log('🎯 Elemento dummy encontrado por classe:', dummyByClass);
-    }, 1000);
-  }, []);
-
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -201,125 +175,6 @@ function App() {
       clearInterval(checkForPlayers);
     };
   }, [currentTestimonial]);
-
-  useEffect(() => {
-    // INTERCEPTA quando VTurb tenta fazer scrollIntoView() no elemento .smartplayer-scroll-event
-    let scrollIntercepted = false;
-    const originalScrollIntoView = Element.prototype.scrollIntoView;
-
-    console.log('🎯 Instalando interceptor de scrollIntoView...');
-
-    // Função para fazer scroll até o botão real COM MÚLTIPLAS TENTATIVAS
-    const attemptScroll = (attempt = 0) => {
-      const maxScrollAttempts = 5;
-
-      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
-
-      // Procura o botão REAL (não o que está oculto)
-      const purchaseButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
-
-      if (purchaseButton && purchaseButton.offsetParent !== null) {
-        console.log('✅ Purchase button found and visible!');
-
-        // Usa o scrollIntoView ORIGINAL (não o interceptado)
-        originalScrollIntoView.call(purchaseButton, {
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest'
-        });
-
-        // Efeito visual de destaque
-        purchaseButton.style.transition = 'all 0.8s ease';
-        purchaseButton.style.transform = 'scale(1.05)';
-        purchaseButton.style.boxShadow = '0 0 40px rgba(198, 40, 40, 0.6)';
-        purchaseButton.style.zIndex = '100';
-
-        setTimeout(() => {
-          purchaseButton.style.transform = 'scale(1)';
-          purchaseButton.style.boxShadow = '';
-          purchaseButton.style.zIndex = '';
-        }, 4000);
-
-        console.log('✅ Scroll executado com sucesso');
-      } else if (attempt < maxScrollAttempts - 1) {
-        console.log('⏳ Botão não encontrado ou invisível, tentando novamente...');
-        setTimeout(() => attemptScroll(attempt + 1), 500);
-      } else {
-        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
-      }
-    };
-
-    // INTERCEPTOR: substitui scrollIntoView globalmente
-    Element.prototype.scrollIntoView = function(this: Element, arg?: boolean | ScrollIntoViewOptions) {
-      const element = this as HTMLElement;
-
-      // Log de TODAS as chamadas
-      console.log('🔍 scrollIntoView() chamado:', {
-        className: element.className,
-        id: element.id,
-        tagName: element.tagName,
-        isVisible: element.offsetParent !== null
-      });
-
-      // Detecta se VTurb está tentando fazer scroll para o DUMMY .smartplayer-scroll-event
-      const isDummy = element.id === 'smartplayer-scroll-target' ||
-                      (element.classList.contains('smartplayer-scroll-event') &&
-                       element.offsetParent === null);
-
-      const isRealButton = element.classList.contains('smartplayer-scroll-event') &&
-                           element.offsetParent !== null;
-
-      // Intercepta APENAS o scroll para o elemento dummy
-      if (isDummy && !scrollIntercepted) {
-        scrollIntercepted = true;
-
-        console.log('🎬 INTERCEPTADO! VTurb tentou fazer scroll para elemento dummy');
-        console.log('🔓 Revelando conteúdo da página...');
-
-        // Revela o restante da página
-        setShowRestOfPage(true);
-
-        // Aguarda renderização e tenta scroll até o botão real
-        setTimeout(() => {
-          attemptScroll();
-        }, 800);
-
-        // NÃO executa o scroll original (bloqueia o scroll para o dummy)
-        return;
-      }
-
-      // Se for o botão real, permite o scroll normalmente
-      if (isRealButton) {
-        console.log('✅ Permitindo scroll para botão REAL');
-      }
-
-      // Para todos os outros elementos, executa scrollIntoView normalmente
-      return originalScrollIntoView.call(this, arg);
-    };
-
-    console.log('✅ Interceptor instalado! Aguardando VTurb...');
-
-    // Verifica se o dummy está no DOM
-    setTimeout(() => {
-      const dummy = document.getElementById('smartplayer-scroll-target');
-      const dummyByClass = document.querySelector('.smartplayer-scroll-event');
-
-      console.log('🔍 Verificando elementos no DOM:');
-      console.log('  - Elemento dummy encontrado por ID:', dummy);
-      console.log('  - Elemento dummy encontrado por classe:', dummyByClass);
-
-      if (dummy) {
-        console.log('  - Dummy está visível?', dummy.offsetParent !== null);
-        console.log('  - Dummy computedStyle:', window.getComputedStyle(dummy).visibility);
-      }
-    }, 100);
-
-    // Cleanup
-    return () => {
-      Element.prototype.scrollIntoView = originalScrollIntoView;
-      console.log('🧹 Interceptor removido');
-    };
-  }, []);
 
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
@@ -559,30 +414,13 @@ function App() {
           </p>
 
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
-            <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }} />
+            <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
         </div>
       </section>
 
-      {/* Botão real de 6 potes - SEMPRE presente na página, mas invisível */}
-      <button
-        onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-        className="smartplayer-scroll-event fixed top-[120vh] left-1/2 -translate-x-1/2 bg-[#FFD600] text-gray-900 py-6 px-12 rounded-full font-bold text-2xl opacity-0 z-[9999]"
-        style={{ pointerEvents: 'auto' }}
-      >
-        CLAIM OFFER NOW
-      </button>
-
-      {/* Restante do conteúdo - oculto até evento do SmartPlayer (exceto em dev) */}
-      <div
-        className={`transition-all duration-500 ${
-          showRestOfPage
-            ? 'opacity-100 visible relative'
-            : 'opacity-0 invisible fixed top-[-9999px] pointer-events-none'
-        }`}
-      >
-        {/* Offers Section */}
-        <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
+      {/* Offers Section */}
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -1430,7 +1268,6 @@ function App() {
           </div>
         </div>
       )}
-      </div>
 
     </div>
   );
