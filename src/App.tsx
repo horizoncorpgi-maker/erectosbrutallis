@@ -459,8 +459,7 @@ function App() {
           </div>
 
           <button
-            className="smartplayer-scroll-event mt-4 px-6 py-3 bg-gray-900 text-white rounded-full"
-            style={{ opacity: 0, pointerEvents: 'none', visibility: 'visible' }}
+            className="smartplayer-scroll-event mt-4 px-6 py-3 bg-gray-900 text-white rounded-full opacity-0 pointer-events-none"
           >
             Pitch Button
           </button>
