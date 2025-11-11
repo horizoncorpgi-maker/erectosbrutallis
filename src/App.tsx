@@ -35,10 +35,22 @@ function App() {
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
 
   // Detecta se está em ambiente de desenvolvimento (Bolt)
-  const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost';
+  // Permite forçar modo produção com ?preview=true na URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const isPreviewMode = urlParams.get('preview') === 'true';
+  const isDevelopment = (import.meta.env.DEV || window.location.hostname === 'localhost') && !isPreviewMode;
 
   // Controla a visibilidade do conteúdo após o vídeo hero
   const [showRestOfPage, setShowRestOfPage] = useState(isDevelopment);
+
+  useEffect(() => {
+    console.log('🔍 Estado inicial:');
+    console.log('  - isDevelopment:', isDevelopment);
+    console.log('  - isPreviewMode:', isPreviewMode);
+    console.log('  - showRestOfPage:', showRestOfPage);
+    console.log('  - hostname:', window.location.hostname);
+    console.log('  - DEV:', import.meta.env.DEV);
+  }, []);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -242,15 +254,42 @@ function App() {
 
       if (heroPlayer && !heroPlayer._scrollEventListenerAdded) {
         heroPlayer._scrollEventListenerAdded = true;
+        console.log('✅ Hero player encontrado, adicionando listeners');
 
-        // Adiciona listener para eventos customizados do SmartPlayer
+        // Tenta múltiplos métodos de detecção de eventos
+
+        // Método 1: Evento customizado do SmartPlayer
         if (typeof heroPlayer.on === 'function') {
           heroPlayer.on('smartplayer-scroll-event', () => {
-            console.log('🎬 Hero player scroll event triggered!');
+            console.log('🎬 Hero player scroll event triggered (método 1)!');
             setShowRestOfPage(true);
             setTimeout(() => attemptScroll(), 800);
           });
         }
+
+        // Método 2: Listener no elemento
+        heroPlayer.addEventListener('smartplayer-scroll-event', () => {
+          console.log('🎬 Hero player scroll event triggered (método 2)!');
+          setShowRestOfPage(true);
+          setTimeout(() => attemptScroll(), 800);
+        });
+
+        // Método 3: Monitorar classes CSS que o SmartPlayer pode adicionar
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+              const classList = (mutation.target as Element).classList;
+              if (classList.contains('smartplayer-scroll-event') ||
+                  classList.contains('smartplayer-call-to-action')) {
+                console.log('🎬 Hero player class changed (método 3)!');
+                setShowRestOfPage(true);
+                setTimeout(() => attemptScroll(), 800);
+              }
+            }
+          });
+        });
+
+        observer.observe(heroPlayer, { attributes: true });
       }
     }, 1000);
 
