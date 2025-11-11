@@ -33,11 +33,6 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [contentVisible, setContentVisible] = useState(false);
-  const [shouldPulse, setShouldPulse] = useState(false);
-  const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname.includes('bolt');
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -180,42 +175,6 @@ function App() {
       clearInterval(checkForPlayers);
     };
   }, [currentTestimonial]);
-
-  useEffect(() => {
-    if (isDevelopment) {
-      setContentVisible(true);
-      return;
-    }
-
-    const handleSmartplayerScroll = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail && customEvent.detail.smartplayer_scroll_event) {
-        setContentVisible(true);
-
-        const scrollToSixBottleButton = (attempt = 0) => {
-          if (attempt >= 5) return;
-
-          setTimeout(() => {
-            if (sixBottleButtonRef.current) {
-              sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              setShouldPulse(true);
-              setTimeout(() => setShouldPulse(false), 1000);
-            } else {
-              scrollToSixBottleButton(attempt + 1);
-            }
-          }, attempt === 0 ? 100 : 500);
-        };
-
-        scrollToSixBottleButton();
-      }
-    };
-
-    document.addEventListener('smartplayer_scroll_event', handleSmartplayerScroll);
-
-    return () => {
-      document.removeEventListener('smartplayer_scroll_event', handleSmartplayerScroll);
-    };
-  }, [isDevelopment]);
 
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
@@ -447,7 +406,7 @@ function App() {
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="smartplayer-scroll-event text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
+          <h1 className="text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
             Why are men adding salt to their <span className="text-[#B80000]">morning coffee?</span>
           </h1>
           <p className="text-base sm:text-xl md:text-2xl text-gray-600 mb-6 md:mb-12 font-light px-4">
@@ -456,18 +415,18 @@ function App() {
 
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
-            <script
-              type="text/javascript"
-              dangerouslySetInnerHTML={{
-                __html: `var s=document.createElement("script"); s.src="https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124ec0b910e6e322c32a69/v4/player.js", s.async=!0,document.head.appendChild(s);`
-              }}
-            />
           </div>
+
+          <button
+            className="smartplayer-scroll-event mt-4 px-6 py-3 bg-gray-900 text-white rounded-full opacity-0 pointer-events-none"
+            aria-hidden="true"
+          >
+            Pitch Button
+          </button>
         </div>
       </section>
 
       {/* Offers Section */}
-      <div ref={contentRef} style={{ display: isDevelopment || contentVisible ? 'block' : 'none' }}>
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
@@ -493,9 +452,8 @@ function App() {
                   YOU'RE SAVING $888
                 </div>
                 <button
-                  ref={sixBottleButtonRef}
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className={`w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6 ${shouldPulse ? 'animate-pulse-once' : ''}`}
+                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
                 </button>
@@ -1247,7 +1205,6 @@ function App() {
           </div>
         </div>
       </footer>
-      </div>
 
       {selectedArticle && (
         <ArticleReader
