@@ -416,27 +416,11 @@ function App() {
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
-
-          <style dangerouslySetInnerHTML={{ __html: `
-            .esconder {
-              display: none;
-            }
-          ` }} />
-
-          <script dangerouslySetInnerHTML={{ __html: `
-            var delaySeconds = 10;
-            var player = document.querySelector("vturb-smartplayer");
-            player.addEventListener("player:ready", function() {
-              player.displayHiddenElements(delaySeconds, [".esconder"], {
-                persist: true
-              });
-            });
-          ` }} />
         </div>
       </section>
 
       {/* Offers Section */}
-      <section ref={offersRef} className="esconder py-8 md:py-20 px-4 bg-white">
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -578,7 +562,7 @@ function App() {
       </section>
 
       {/* Experts Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -686,7 +670,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -749,7 +733,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -826,7 +810,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1178,7 +1162,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className="esconder py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1193,7 +1177,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="esconder bg-black text-gray-400 py-8 px-4">
+      <footer className="bg-black text-gray-400 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
