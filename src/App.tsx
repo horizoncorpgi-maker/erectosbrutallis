@@ -277,6 +277,24 @@ function App() {
           console.log('🎯 Player tagName:', targetPlayer.tagName);
           console.log('🎯 Player id:', targetPlayer.id);
 
+          // MONITORAR EVENTO video:timeupdate para detectar quando atinge 5 segundos
+          let scrollTriggered = false;
+          targetPlayer.addEventListener('video:timeupdate', (e: any) => {
+            const currentTime = e.detail?.currentTime || 0;
+
+            // Se atingir 5 segundos (com margem de 0.3s) e ainda não revelou o conteúdo
+            if (currentTime >= 4.7 && currentTime <= 5.5 && !scrollTriggered && !showContent) {
+              scrollTriggered = true;
+              console.log('');
+              console.log('🚨🚨🚨 VÍDEO ATINGIU 5 SEGUNDOS!');
+              console.log('⏱️ Tempo atual:', currentTime);
+              console.log('🔓 REVELANDO CONTEÚDO AGORA!');
+              console.log('');
+              setShowContent(true);
+            }
+          });
+          console.log('✅ video:timeupdate listener adicionado - detectará quando atingir 5s');
+
           // INSPECIONAR O PLAYER EM BUSCA DE PROPRIEDADES/MÉTODOS
           console.log('🔍 Inspecting player properties...');
           const playerProps = Object.getOwnPropertyNames(targetPlayer);
