@@ -59,12 +59,36 @@ function App() {
     console.log('🔧 Is Bolt/Dev Environment:', isBoltEnv);
     console.log('🔒 Content hidden - waiting for smartplayer-scroll-event from Vturb');
 
-    // INTERCEPTAR scrollIntoView especificamente no elemento .smartplayer-scroll-event
+    // VERIFICAR se o elemento existe
+    console.log('🔍 Verificando se .smartplayer-scroll-event existe...');
+    const checkElement = () => {
+      const element = document.querySelector('.smartplayer-scroll-event');
+      if (element) {
+        console.log('✅ Elemento .smartplayer-scroll-event encontrado:', element);
+      } else {
+        console.log('❌ Elemento .smartplayer-scroll-event NÃO encontrado ainda');
+      }
+    };
+    checkElement();
+    setTimeout(checkElement, 1000);
+    setTimeout(checkElement, 2000);
+    setTimeout(checkElement, 3000);
+
+    // INTERCEPTAR scrollIntoView EM TODOS OS ELEMENTOS
     const originalScrollIntoView = Element.prototype.scrollIntoView;
     let vturbScrollDetected = false;
 
     Element.prototype.scrollIntoView = function(this: Element, ...args: any[]) {
       const element = this as HTMLElement;
+
+      // LOG DE TODOS OS SCROLLINTOVIEW
+      console.log('');
+      console.log('🔵 scrollIntoView foi chamado!');
+      console.log('📍 Elemento:', element);
+      console.log('🏷️ Classes:', element.className);
+      console.log('🆔 ID:', element.id);
+      console.log('📋 Tag:', element.tagName);
+      console.log('');
 
       // Se for o elemento .smartplayer-scroll-event e o conteúdo ainda não foi revelado
       if (element.classList.contains('smartplayer-scroll-event') && !showContent && !vturbScrollDetected) {
@@ -87,7 +111,7 @@ function App() {
       return originalScrollIntoView.apply(this, args);
     };
 
-    console.log('✅ scrollIntoView interceptor installed on .smartplayer-scroll-event');
+    console.log('✅ scrollIntoView interceptor installed - WILL LOG ALL scrollIntoView CALLS');
     console.log('✅ Content protection active - waiting for VTurb event');
     console.log('✅ First useEffect completed');
 
@@ -736,24 +760,52 @@ function App() {
       </section>
 
       {/* Debug Button - Remove in production */}
-      <div className="fixed bottom-4 left-4 z-50">
+      <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2">
         <button
           onClick={() => {
-            console.log('🧪 Manual test: Triggering smartplayer-scroll-event');
-            const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
-            if (heroPlayer) {
-              const event = new CustomEvent('smartplayer-scroll-event');
-              heroPlayer.dispatchEvent(event);
-              console.log('✅ Event dispatched to hero player');
+            console.log('');
+            console.log('🧪🧪🧪 TESTE MANUAL: Simulando VTurb scrollIntoView');
+            console.log('');
+            const button = document.querySelector('.smartplayer-scroll-event');
+            if (button) {
+              console.log('✅ Botão encontrado, executando scrollIntoView...');
+              button.scrollIntoView({ behavior: 'smooth' });
             } else {
-              console.warn('⚠️ Hero player not found');
+              console.warn('❌ Botão .smartplayer-scroll-event não encontrado');
             }
+          }}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
+        >
+          🧪 Test scrollIntoView
+        </button>
+
+        <button
+          onClick={() => {
+            console.log('');
+            console.log('🧪🧪🧪 TESTE MANUAL: Disparando CustomEvent');
+            console.log('');
+            const event = new CustomEvent('smartplayer-scroll-event', {
+              detail: { time: 5 }
+            });
+            document.dispatchEvent(event);
+            console.log('✅ CustomEvent disparado no document');
           }}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
         >
-          🧪 Test Scroll Event
+          🧪 Test CustomEvent
         </button>
-        <div className="mt-2 text-xs text-gray-600 bg-white px-2 py-1 rounded shadow">
+
+        <button
+          onClick={() => {
+            console.log('🔄 Forçando revelação do conteúdo...');
+            setShowContent(true);
+          }}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
+        >
+          🔓 Reveal Content
+        </button>
+
+        <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded shadow">
           showContent: {showContent ? '✅' : '❌'}
         </div>
       </div>
