@@ -458,11 +458,7 @@ function App() {
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
 
-          <button
-            className="smartplayer-scroll-event mt-4 px-6 py-3 bg-gray-900 text-white rounded-full opacity-0 pointer-events-none"
-          >
-            Pitch Button
-          </button>
+          <div className="smartplayer-scroll-event mt-8 w-full h-1"></div>
         </div>
       </section>
 

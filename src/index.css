@@ -76,8 +76,3 @@
 .animate-pulse-once {
   animation: pulseOnce 1s ease-in-out;
 }
-
-.smartplayer-scroll-event {
-  position: relative;
-  z-index: 1;
-}
