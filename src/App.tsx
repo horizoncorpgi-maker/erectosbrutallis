@@ -59,12 +59,50 @@ function App() {
     console.log('🔧 Is Bolt/Dev Environment:', isBoltEnv);
     console.log('🔒 Content hidden - waiting for smartplayer-scroll-event from Vturb');
 
+    // INTERCEPTAR scrollIntoView especificamente no elemento .smartplayer-scroll-event
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    let vturbScrollDetected = false;
+
+    Element.prototype.scrollIntoView = function(this: Element, ...args: any[]) {
+      const element = this as HTMLElement;
+
+      // Se for o elemento .smartplayer-scroll-event e o conteúdo ainda não foi revelado
+      if (element.classList.contains('smartplayer-scroll-event') && !showContent && !vturbScrollDetected) {
+        vturbScrollDetected = true;
+        console.log('');
+        console.log('🚨🚨🚨 VTURB DISPAROU scrollIntoView NO .smartplayer-scroll-event!');
+        console.log('📍 Elemento:', element);
+        console.log('🔓 REVELANDO CONTEÚDO AGORA!');
+        console.log('');
+
+        // Revelar conteúdo
+        setShowContent(true);
+
+        // NÃO executar o scroll original do VTurb ainda
+        // Vamos executar nosso próprio scroll após 800ms
+        return;
+      }
+
+      // Para todos os outros elementos, executar normalmente
+      return originalScrollIntoView.apply(this, args);
+    };
+
+    console.log('✅ scrollIntoView interceptor installed on .smartplayer-scroll-event');
     console.log('✅ Content protection active - waiting for VTurb event');
     console.log('✅ First useEffect completed');
-  }, []);
 
+    return () => {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    };
+  }, [showContent]);
+
+  // Executar scroll automático quando showContent mudar para true
   useEffect(() => {
-    console.log('🔥🔥🔥 SMARTPLAYER DETECTION useEffect RUNNING');
+    if (!showContent) return;
+
+    console.log('');
+    console.log('📢 showContent mudou para TRUE - iniciando scroll após 800ms');
+    console.log('');
 
     const attemptScroll = (attempt = 0) => {
       const maxScrollAttempts = 5;
@@ -106,14 +144,16 @@ function App() {
       }
     };
 
-    console.log('🔧 Setting up smartplayer event listener...');
+    setTimeout(() => attemptScroll(), 800);
+  }, [showContent]);
+
+  useEffect(() => {
+    console.log('🔥🔥🔥 SMARTPLAYER DETECTION useEffect RUNNING');
 
     const handleSmartplayerEvent = (event: any) => {
-      console.log('🎬 SmartPlayer scroll event triggered!', event);
+      console.log('🎬 SmartPlayer CustomEvent captured!', event);
       console.log('🔓 Revealing all content now...');
       setShowContent(true);
-      console.log('⏰ Waiting 800ms before attempting scroll...');
-      setTimeout(() => attemptScroll(), 800);
     };
 
     // Adicionar listeners globais IMEDIATAMENTE
