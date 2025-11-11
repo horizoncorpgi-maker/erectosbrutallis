@@ -43,6 +43,42 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const pitchButton = document.querySelector('.smartplayer-scroll-event');
+    if (!pitchButton) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            (entry.target as HTMLElement).style.opacity = '1';
+            (entry.target as HTMLElement).style.pointerEvents = 'auto';
+            (entry.target as HTMLElement).style.backgroundColor = '#22c55e';
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(pitchButton);
+
+    const checkScroll = setInterval(() => {
+      const rect = pitchButton.getBoundingClientRect();
+      const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+
+      if (isInView) {
+        (pitchButton as HTMLElement).style.opacity = '1';
+        (pitchButton as HTMLElement).style.pointerEvents = 'auto';
+        (pitchButton as HTMLElement).style.backgroundColor = '#22c55e';
+      }
+    }, 100);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(checkScroll);
+    };
+  }, []);
+
+  useEffect(() => {
     testimonials.forEach((testimonial) => {
       if (testimonial?.videoScript) {
         const existingScript = document.querySelector(`script[src="${testimonial.videoScript}"]`);
