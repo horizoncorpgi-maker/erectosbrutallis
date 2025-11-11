@@ -47,25 +47,29 @@ function App() {
     if (!pitchButton) return;
 
     let hasActivated = false;
-    let wasInView = false;
+    let initialCheckDone = false;
+
+    setTimeout(() => {
+      initialCheckDone = true;
+    }, 1000);
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const isNowInView = entry.isIntersecting && entry.intersectionRatio > 0;
+          if (!initialCheckDone) return;
 
-          if (isNowInView && !wasInView && !hasActivated) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0 && !hasActivated) {
             hasActivated = true;
-            (entry.target as HTMLElement).style.opacity = '1';
-            (entry.target as HTMLElement).style.pointerEvents = 'auto';
-            (entry.target as HTMLElement).style.backgroundColor = '#22c55e';
+            const element = entry.target as HTMLElement;
+            element.style.opacity = '1';
+            element.style.pointerEvents = 'auto';
+            element.style.backgroundColor = '#22c55e';
+            element.style.visibility = 'visible';
           }
-
-          wasInView = isNowInView;
         });
       },
       {
-        threshold: 0,
+        threshold: 0.01,
         rootMargin: '0px'
       }
     );
@@ -453,8 +457,13 @@ function App() {
           </div>
 
           <button
-            className="smartplayer-scroll-event mt-4 px-6 py-3 text-white rounded-full opacity-0 pointer-events-none transition-all duration-300"
-            style={{ backgroundColor: '#1f2937' }}
+            className="smartplayer-scroll-event mt-4 px-6 py-3 text-white rounded-full transition-all duration-300"
+            style={{
+              backgroundColor: '#1f2937',
+              opacity: 0,
+              pointerEvents: 'none',
+              visibility: 'hidden'
+            }}
             aria-hidden="true"
           >
             Pitch Button
