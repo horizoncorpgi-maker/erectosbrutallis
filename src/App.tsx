@@ -50,6 +50,14 @@ function App() {
     console.log('  - showRestOfPage:', showRestOfPage);
     console.log('  - hostname:', window.location.hostname);
     console.log('  - DEV:', import.meta.env.DEV);
+
+    // Aguarda o DOM carregar e verifica se o elemento dummy foi criado
+    setTimeout(() => {
+      const dummyElement = document.getElementById('smartplayer-scroll-target');
+      const dummyByClass = document.querySelector('.smartplayer-scroll-event');
+      console.log('🎯 Elemento dummy encontrado por ID:', dummyElement);
+      console.log('🎯 Elemento dummy encontrado por classe:', dummyByClass);
+    }, 1000);
   }, []);
 
   const scrollToOffers = () => {
@@ -248,6 +256,44 @@ function App() {
     // Adiciona listener para o evento do SmartPlayer
     window.addEventListener('smartplayer-scroll-event', handleSmartPlayerScrollEvent);
 
+    // Adiciona listener para TODOS os eventos personalizados possíveis do VTurb
+    const allEventNames = [
+      'smartplayer-scroll-event',
+      'smartplayer-call-to-action',
+      'smartplayer-cta',
+      'vturb-scroll-event',
+      'smartplayer:scroll',
+      'player-scroll-event'
+    ];
+
+    const universalHandler = (eventName: string) => (event: Event) => {
+      console.log(`🎬 Evento ${eventName} detectado!`, event);
+      setShowRestOfPage(true);
+      setTimeout(() => attemptScroll(), 800);
+    };
+
+    allEventNames.forEach(eventName => {
+      window.addEventListener(eventName, universalHandler(eventName));
+    });
+
+    // Listener global para capturar qualquer evento que contenha 'smart' ou 'scroll'
+    const globalEventCapture = (event: Event) => {
+      const eventType = event.type.toLowerCase();
+      if ((eventType.includes('smart') || eventType.includes('scroll') || eventType.includes('cta')) &&
+          eventType !== 'scroll') {
+        console.log('🔔 Evento global capturado:', event.type, event);
+        setShowRestOfPage(true);
+        setTimeout(() => attemptScroll(), 800);
+      }
+    };
+
+    // Intercepta TODOS os eventos customizados
+    const originalDispatch = EventTarget.prototype.dispatchEvent;
+    EventTarget.prototype.dispatchEvent = function(event: Event) {
+      globalEventCapture(event);
+      return originalDispatch.call(this, event);
+    };
+
     // Também monitora o player hero para detectar quando atingir o ponto de pitch
     const checkHeroPlayer = setInterval(() => {
       const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
@@ -296,6 +342,10 @@ function App() {
     // Cleanup
     return () => {
       window.removeEventListener('smartplayer-scroll-event', handleSmartPlayerScrollEvent);
+      allEventNames.forEach(eventName => {
+        window.removeEventListener(eventName, universalHandler(eventName));
+      });
+      EventTarget.prototype.dispatchEvent = originalDispatch;
       clearInterval(checkHeroPlayer);
     };
   }, []);
@@ -543,8 +593,22 @@ function App() {
         </div>
       </section>
 
-      {/* Elemento invisível com a classe para o SmartPlayer encontrar */}
-      <div className="smartplayer-scroll-event" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
+      {/* Elemento invisível mas RENDERIZADO no DOM para o SmartPlayer encontrar */}
+      <div
+        className="smartplayer-scroll-event"
+        id="smartplayer-scroll-target"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '1px',
+          height: '1px',
+          opacity: 0,
+          pointerEvents: 'none',
+          overflow: 'hidden',
+          zIndex: -1
+        }}
+      />
 
       {/* Restante do conteúdo - oculto até evento do SmartPlayer (exceto em dev) */}
       <div
