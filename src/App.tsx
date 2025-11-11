@@ -203,85 +203,93 @@ function App() {
   }, [currentTestimonial]);
 
   useEffect(() => {
-    // Implementação do scroll automático conforme guia smartplayer-scroll-event
+    // INTERCEPTA quando VTurb tenta fazer scrollIntoView() no elemento .smartplayer-scroll-event
+    let scrollIntercepted = false;
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+
+    console.log('🎯 Instalando interceptor de scrollIntoView...');
+
+    // Função para fazer scroll até o botão real COM MÚLTIPLAS TENTATIVAS
     const attemptScroll = (attempt = 0) => {
       const maxScrollAttempts = 5;
 
       console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
 
-      // Procura o botão com classe smartplayer-scroll-event
-      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
-                           document.getElementById('six-bottle-package') ||
-                           document.querySelector('[data-purchase-section="true"]') ||
-                           document.querySelector('.purchase-button-main');
+      // Procura o botão REAL (não o que está oculto)
+      const purchaseButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
 
-      if (purchaseButton) {
-        console.log('✅ Purchase button found!');
+      if (purchaseButton && purchaseButton.offsetParent !== null) {
+        console.log('✅ Purchase button found and visible!');
 
-        purchaseButton.scrollIntoView({
+        // Usa o scrollIntoView ORIGINAL (não o interceptado)
+        originalScrollIntoView.call(purchaseButton, {
           behavior: 'smooth',
           block: 'center',
           inline: 'nearest'
         });
 
         // Efeito visual de destaque
-        const element = purchaseButton as HTMLElement;
-        element.style.transition = 'all 0.8s ease';
-        element.style.transform = 'scale(1.05)';
-        element.style.boxShadow = '0 0 40px rgba(198, 40, 40, 0.6)';
-        element.style.zIndex = '100';
+        purchaseButton.style.transition = 'all 0.8s ease';
+        purchaseButton.style.transform = 'scale(1.05)';
+        purchaseButton.style.boxShadow = '0 0 40px rgba(198, 40, 40, 0.6)';
+        purchaseButton.style.zIndex = '100';
 
         setTimeout(() => {
-          element.style.transform = 'scale(1)';
-          element.style.boxShadow = '';
-          element.style.zIndex = '';
+          purchaseButton.style.transform = 'scale(1)';
+          purchaseButton.style.boxShadow = '';
+          purchaseButton.style.zIndex = '';
         }, 4000);
 
         console.log('✅ Scroll executado com sucesso');
       } else if (attempt < maxScrollAttempts - 1) {
-        console.log('⏳ Botão não encontrado, tentando novamente...');
+        console.log('⏳ Botão não encontrado ou invisível, tentando novamente...');
         setTimeout(() => attemptScroll(attempt + 1), 500);
       } else {
         console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
       }
     };
 
-    // Handler para o evento do SmartPlayer
-    const handleSmartPlayerEvent = () => {
-      console.log('🎬 SmartPlayer event detectado!');
-      // Revela o restante da página
-      setShowRestOfPage(true);
-      // Executa scroll após 800ms para dar tempo do React renderizar
-      setTimeout(() => attemptScroll(), 800);
+    // INTERCEPTOR: substitui scrollIntoView globalmente
+    Element.prototype.scrollIntoView = function(this: Element, arg?: boolean | ScrollIntoViewOptions) {
+      const element = this as HTMLElement;
+
+      // Log de TODAS as chamadas
+      console.log('🔍 scrollIntoView() chamado:', {
+        className: element.className,
+        id: element.id,
+        tagName: element.tagName,
+        isVisible: element.offsetParent !== null
+      });
+
+      // Detecta se VTurb está tentando fazer scroll para .smartplayer-scroll-event
+      if (element.classList.contains('smartplayer-scroll-event') && !scrollIntercepted) {
+        scrollIntercepted = true;
+
+        console.log('🎬 INTERCEPTADO! VTurb tentou fazer scroll para .smartplayer-scroll-event');
+        console.log('🔓 Revelando conteúdo da página...');
+
+        // Revela o restante da página
+        setShowRestOfPage(true);
+
+        // Aguarda renderização e tenta scroll até o botão real
+        setTimeout(() => {
+          attemptScroll();
+        }, 800);
+
+        // NÃO executa o scroll original (bloqueia o scroll para o elemento oculto)
+        return;
+      }
+
+      // Para todos os outros elementos, executa scrollIntoView normalmente
+      return originalScrollIntoView.call(this, arg);
     };
 
-    // Escuta o evento customizado do SmartPlayer
-    window.addEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
-
-    // Também monitora o player hero para detectar quando atingir o ponto de pitch
-    const checkHeroPlayer = setInterval(() => {
-      const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
-
-      if (heroPlayer && !heroPlayer._eventListenerAdded) {
-        heroPlayer._eventListenerAdded = true;
-        console.log('✅ Hero player encontrado, adicionando listeners');
-
-        // Listener direto no elemento do player
-        heroPlayer.addEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
-
-        // Se o player tiver API .on()
-        if (typeof heroPlayer.on === 'function') {
-          heroPlayer.on('smartplayer-scroll-event', handleSmartPlayerEvent);
-        }
-      }
-    }, 1000);
-
-    console.log('✅ Sistema SmartPlayer instalado e aguardando evento...');
+    console.log('✅ Interceptor instalado! Aguardando VTurb...');
 
     // Cleanup
     return () => {
-      window.removeEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
-      clearInterval(checkHeroPlayer);
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+      console.log('🧹 Interceptor removido');
     };
   }, []);
 

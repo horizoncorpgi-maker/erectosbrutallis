@@ -7,8 +7,13 @@ function DevNavigation() {
   const isDevelopment = import.meta.env.MODE === 'development';
 
   const triggerScrollEvent = () => {
-    console.log('🧪 Disparando evento smartplayer-scroll-event...');
-    window.dispatchEvent(new CustomEvent('smartplayer-scroll-event'));
+    console.log('🧪 Simulando VTurb fazendo scrollIntoView...');
+    const button = document.querySelector('.smartplayer-scroll-event');
+    if (button) {
+      button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      console.error('❌ Botão .smartplayer-scroll-event não encontrado!');
+    }
     setIsOpen(false);
   };
 
