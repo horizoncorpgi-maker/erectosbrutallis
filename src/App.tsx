@@ -447,18 +447,15 @@ function App() {
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
+          <h1 className="smartplayer-scroll-event text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
             Why are men adding salt to their <span className="text-[#B80000]">morning coffee?</span>
           </h1>
           <p className="text-base sm:text-xl md:text-2xl text-gray-600 mb-6 md:mb-12 font-light px-4">
             It sounds weird… but this simple trick is changing how guys start their day — boosting focus, drive, and energy within minutes.
           </p>
 
-          <div className="relative w-full max-w-sm md:max-w-md mx-auto">
-            <div className="bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
-              <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
-            </div>
-            <div id="pitch-button" className="smartplayer-scroll-event mt-4"></div>
+          <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
+            <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
         </div>
       </section>
