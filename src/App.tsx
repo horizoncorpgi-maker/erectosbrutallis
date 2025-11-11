@@ -144,7 +144,6 @@ function App() {
       const maxScrollAttempts = 5;
 
       console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
-      console.log('🔍 Current showContent state:', showContent);
 
       const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
                            document.getElementById('six-bottle-package') ||
@@ -154,25 +153,23 @@ function App() {
       if (purchaseButton) {
         console.log('✅ Purchase button found!');
 
+        purchaseButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+
+        const element = purchaseButton as HTMLElement;
+        element.style.transition = 'all 0.8s ease';
+        element.style.transform = 'scale(1.05)';
+        element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
+        element.style.zIndex = '100';
+
         setTimeout(() => {
-          purchaseButton.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest'
-          });
-
-          const element = purchaseButton as HTMLElement;
-          element.style.transition = 'all 0.8s ease';
-          element.style.transform = 'scale(1.05)';
-          element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
-          element.style.zIndex = '100';
-
-          setTimeout(() => {
-            element.style.transform = 'scale(1)';
-            element.style.boxShadow = '';
-            element.style.zIndex = '';
-          }, 4000);
-        }, 300);
+          element.style.transform = 'scale(1)';
+          element.style.boxShadow = '';
+          element.style.zIndex = '';
+        }, 4000);
 
         console.log('✅ Scroll executado com sucesso');
       } else if (attempt < maxScrollAttempts - 1) {
@@ -862,14 +859,14 @@ function App() {
       </div>
 
       {/* Offers Section */}
-      <section ref={offersRef} className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <section ref={offersRef} data-purchase-section="true" className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
           </h2>
 
           {/* 6-Bottle Package - Full Width */}
-          <div className="mb-4 md:mb-8">
+          <div className="mb-4 md:mb-8" id="six-bottle-package">
             <div className="relative bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-4 md:p-12 lg:p-16 shadow-2xl">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FFD600] text-gray-900 px-6 py-2 rounded-full text-sm md:text-lg font-bold shadow-lg flex items-center gap-1 md:gap-2">
                 <Star className="w-4 h-4 md:w-5 md:h-5 fill-gray-900" />
@@ -888,7 +885,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6 smartplayer-scroll-event"
+                  className="purchase-button-main checkout-button smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
                 </button>
@@ -937,7 +934,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => handlePackageClick('3-bottle')}
-                  className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4 smartplayer-scroll-event"
+                  className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
                 </button>
@@ -976,7 +973,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => handlePackageClick('1-bottle')}
-                  className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4 smartplayer-scroll-event"
+                  className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
                 </button>
