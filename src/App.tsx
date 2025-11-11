@@ -42,7 +42,6 @@ function App() {
 
   // Controla a visibilidade do conteúdo após o vídeo hero
   const [showRestOfPage, setShowRestOfPage] = useState(isDevelopment);
-  const [showFallbackButton, setShowFallbackButton] = useState(false);
 
   useEffect(() => {
     console.log('🔍 Estado inicial:');
@@ -315,18 +314,9 @@ function App() {
       }
     }, 100);
 
-    // Fallback: se VTurb não disparar em 30 segundos, mostra botão manual
-    const fallbackTimer = setTimeout(() => {
-      if (!scrollIntercepted && !isDevelopment) {
-        console.log('⏰ VTurb não disparou em 30s, mostrando botão de fallback');
-        setShowFallbackButton(true);
-      }
-    }, 30000);
-
     // Cleanup
     return () => {
       Element.prototype.scrollIntoView = originalScrollIntoView;
-      clearTimeout(fallbackTimer);
       console.log('🧹 Interceptor removido');
     };
   }, []);
@@ -571,25 +561,6 @@ function App() {
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }} />
           </div>
-
-          {/* Botão de fallback caso VTurb não dispare */}
-          {showFallbackButton && !showRestOfPage && (
-            <button
-              onClick={() => {
-                console.log('🖱️ Botão de fallback clicado');
-                setShowRestOfPage(true);
-                setTimeout(() => {
-                  const button = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
-                  if (button && button.offsetParent !== null) {
-                    button.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }
-                }, 800);
-              }}
-              className="mt-8 px-8 py-4 bg-[#C62828] hover:bg-[#B71C1C] text-white text-lg font-bold rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 animate-pulse"
-            >
-              SEE SPECIAL OFFER 👇
-            </button>
-          )}
         </div>
       </section>
 
