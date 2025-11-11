@@ -19,6 +19,7 @@ import ArticleReader from './ArticleReader';
 
 function App() {
   const offersRef = useRef<HTMLDivElement>(null);
+  const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentMedia, setCurrentMedia] = useState(0);
@@ -33,6 +34,8 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
+  const [contentVisible, setContentVisible] = useState(false);
+  const [isInBolt, setIsInBolt] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +43,9 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
+    const isBoltEnv = window.location.hostname === 'localhost' || window.location.hostname.includes('bolt');
+    setIsInBolt(isBoltEnv);
+    setContentVisible(isBoltEnv);
   }, []);
 
   useEffect(() => {
@@ -74,10 +80,23 @@ function App() {
 
       if (isInViewport && !hasActivated) {
         hasActivated = true;
-        pitchButton.style.opacity = '1';
-        pitchButton.style.pointerEvents = 'auto';
-        pitchButton.style.backgroundColor = '#22c55e';
-        pitchButton.style.visibility = 'visible';
+
+        setContentVisible(true);
+
+        setTimeout(() => {
+          sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          setTimeout(() => {
+            if (sixBottleButtonRef.current) {
+              sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
+              setTimeout(() => {
+                if (sixBottleButtonRef.current) {
+                  sixBottleButtonRef.current.style.animation = '';
+                }
+              }, 500);
+            }
+          }, 800);
+        }, 300);
 
         window.removeEventListener('scroll', handleScroll);
         window.removeEventListener('wheel', handleWheel);
@@ -487,6 +506,7 @@ function App() {
         </div>
       </section>
 
+      <div style={{ display: contentVisible ? 'block' : 'none' }}>
       {/* Offers Section */}
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -513,6 +533,7 @@ function App() {
                   YOU'RE SAVING $888
                 </div>
                 <button
+                  ref={sixBottleButtonRef}
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
                   className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
@@ -1336,6 +1357,7 @@ function App() {
           </div>
         </div>
       )}
+      </div>
 
     </div>
   );
