@@ -456,6 +456,12 @@ function App() {
 
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
+            <script
+              type="text/javascript"
+              dangerouslySetInnerHTML={{
+                __html: `var s=document.createElement("script"); s.src="https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124ec0b910e6e322c32a69/v4/player.js", s.async=!0,document.head.appendChild(s);`
+              }}
+            />
           </div>
         </div>
       </section>
