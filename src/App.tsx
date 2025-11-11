@@ -40,6 +40,17 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
+    const hostname = window.location.hostname;
+    const isDev = hostname === 'localhost' || hostname.includes('bolt.new') || hostname.includes('stackblitz') || hostname.includes('webcontainer');
+    console.log('🔍 Hostname detectado:', hostname);
+    console.log('🔍 É desenvolvimento?', isDev);
+    setIsDevelopment(isDev);
+    if (isDev) {
+      console.log('✅ Ambiente de desenvolvimento - conteúdo desbloqueado automaticamente');
+      setContentUnlocked(true);
+    } else {
+      console.log('🔒 Ambiente de produção - conteúdo bloqueado até evento do Vturb');
+    }
   }, []);
 
   useEffect(() => {
@@ -175,6 +186,67 @@ function App() {
       clearInterval(checkForPlayers);
     };
   }, [currentTestimonial]);
+
+  useEffect(() => {
+    if (isDevelopment || contentUnlocked) return;
+
+    console.log('Configurando listener do smartplayer-scroll-event');
+
+    const handleSmartplayerScroll = (e: Event) => {
+      console.log('🎯 Evento de scroll do Vturb detectado!', e);
+      setContentUnlocked(true);
+
+      let attempts = 0;
+      const maxAttempts = 6;
+
+      const tryScroll = () => {
+        console.log(`📍 Tentativa ${attempts + 1} de ${maxAttempts} para fazer scroll até o botão de 6 garrafas`);
+
+        if (sixBottleButtonRef.current) {
+          console.log('✅ Botão de 6 garrafas encontrado! Fazendo scroll...');
+          sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          setTimeout(() => {
+            if (sixBottleButtonRef.current) {
+              console.log('💫 Aplicando animação de pulse');
+              sixBottleButtonRef.current.classList.add('animate-pulse-once');
+              setTimeout(() => {
+                sixBottleButtonRef.current?.classList.remove('animate-pulse-once');
+              }, 1000);
+            }
+          }, 800);
+        } else {
+          console.log('⏳ Botão não encontrado ainda, tentando novamente...');
+          attempts++;
+          if (attempts < maxAttempts) {
+            setTimeout(tryScroll, 500);
+          } else {
+            console.log('❌ Máximo de tentativas atingido');
+          }
+        }
+      };
+
+      setTimeout(tryScroll, 500);
+    };
+
+    const checkInterval = setInterval(() => {
+      const button = document.querySelector('.smartplayer-scroll-event');
+      if (button && !(button as any)._scrollListenerAdded) {
+        console.log('✨ Listener adicionado ao botão pitch (.smartplayer-scroll-event)');
+        (button as any)._scrollListenerAdded = true;
+        button.addEventListener('click', handleSmartplayerScroll as EventListener);
+      }
+    }, 500);
+
+    return () => {
+      console.log('🧹 Limpando listeners do smartplayer-scroll-event');
+      clearInterval(checkInterval);
+      const button = document.querySelector('.smartplayer-scroll-event');
+      if (button) {
+        button.removeEventListener('click', handleSmartplayerScroll as EventListener);
+      }
+    };
+  }, [isDevelopment, contentUnlocked]);
 
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
@@ -418,14 +490,21 @@ function App() {
           </div>
 
           <button
-            className="smartplayer-scroll-event mt-4 px-6 py-3 bg-gray-900 text-white rounded-full opacity-0 pointer-events-none"
-            aria-hidden="true"
+            className="smartplayer-scroll-event mt-4 px-6 py-3 bg-gray-900 text-white rounded-full opacity-0"
+            onClick={() => {
+              console.log('🖱️ Botão pitch clicado manualmente (teste)');
+              const event = new Event('click', { bubbles: true });
+              document.querySelector('.smartplayer-scroll-event')?.dispatchEvent(event);
+            }}
+            style={{ cursor: 'pointer' }}
           >
             Pitch Button
           </button>
         </div>
       </section>
 
+      {/* Content Below Pitch Button - Hidden Until Unlocked */}
+      <div style={{ display: isDevelopment || contentUnlocked ? 'block' : 'none' }}>
       {/* Offers Section */}
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -1275,6 +1354,7 @@ function App() {
           </div>
         </div>
       )}
+      </div>
 
     </div>
   );
