@@ -564,22 +564,14 @@ function App() {
         </div>
       </section>
 
-      {/* Elemento dummy VISÍVEL para VTurb encontrar */}
-      <div
-        className="smartplayer-scroll-event"
-        id="smartplayer-scroll-target"
-        style={{
-          position: 'absolute',
-          top: '100vh',
-          left: 0,
-          width: '1px',
-          height: '1px',
-          opacity: 0,
-          pointerEvents: 'none',
-          visibility: 'visible'
-        }}
-        aria-hidden="true"
-      />
+      {/* Botão real de 6 potes - SEMPRE presente na página, mas invisível */}
+      <button
+        onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
+        className="smartplayer-scroll-event fixed top-[120vh] left-1/2 -translate-x-1/2 bg-[#FFD600] text-gray-900 py-6 px-12 rounded-full font-bold text-2xl opacity-0 z-[9999]"
+        style={{ pointerEvents: 'auto' }}
+      >
+        CLAIM OFFER NOW
+      </button>
 
       {/* Restante do conteúdo - oculto até evento do SmartPlayer (exceto em dev) */}
       <div
@@ -616,7 +608,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6 smartplayer-scroll-event opacity-0"
+                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
                 </button>
