@@ -34,6 +34,12 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
 
+  // Detecta se está em ambiente de desenvolvimento (Bolt)
+  const isDevelopment = import.meta.env.DEV || window.location.hostname === 'localhost';
+
+  // Controla a visibilidade do conteúdo após o vídeo hero
+  const [showRestOfPage, setShowRestOfPage] = useState(isDevelopment);
+
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -222,6 +228,8 @@ function App() {
     // Listener para o evento customizado do SmartPlayer
     const handleSmartPlayerScrollEvent = () => {
       console.log('🎬 SmartPlayer scroll event detectado!');
+      // Revela o restante da página
+      setShowRestOfPage(true);
       setTimeout(() => attemptScroll(), 800);
     };
 
@@ -239,6 +247,7 @@ function App() {
         if (typeof heroPlayer.on === 'function') {
           heroPlayer.on('smartplayer-scroll-event', () => {
             console.log('🎬 Hero player scroll event triggered!');
+            setShowRestOfPage(true);
             setTimeout(() => attemptScroll(), 800);
           });
         }
@@ -495,8 +504,11 @@ function App() {
         </div>
       </section>
 
-      {/* Offers Section */}
-      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
+      {/* Restante do conteúdo - visível apenas após evento do SmartPlayer ou em desenvolvimento */}
+      {showRestOfPage && (
+        <>
+          {/* Offers Section */}
+          <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -1343,6 +1355,8 @@ function App() {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
 
     </div>
