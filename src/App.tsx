@@ -59,82 +59,8 @@ function App() {
     console.log('🔧 Is Bolt/Dev Environment:', isBoltEnv);
     console.log('🔒 Content hidden - waiting for smartplayer-scroll-event from Vturb');
 
-    // INTERCEPTAR QUALQUER MÉTODO DE SCROLL
-    const originalScrollTo = window.scrollTo.bind(window);
-    const originalScroll = window.scroll.bind(window);
-    const originalScrollBy = window.scrollBy.bind(window);
-    const originalScrollIntoView = Element.prototype.scrollIntoView;
-
-    const checkIfScrollingToTarget = () => {
-      const targets = document.querySelectorAll('.smartplayer-scroll-event');
-      for (const target of targets) {
-        const rect = target.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-
-        if (rect.top < windowHeight * 1.5 && rect.bottom > -windowHeight * 0.5) {
-          console.log('');
-          console.log('🚨🚨🚨 SCROLL DIRECIONADO A .smartplayer-scroll-event!');
-          console.log('📍 Elemento:', target);
-          console.log('🔓 REVELANDO CONTEÚDO!');
-          console.log('');
-
-          handleSmartplayerEvent({ type: 'vturb-scroll-detected', target });
-          return true;
-        }
-      }
-      return false;
-    };
-
-    window.scrollTo = function(...args: any[]) {
-      console.log('📜 window.scrollTo chamado:', args);
-      if (!showContent && checkIfScrollingToTarget()) {
-        console.log('⛔ Scroll interceptado');
-        return;
-      }
-      return originalScrollTo(...args);
-    };
-
-    window.scroll = function(...args: any[]) {
-      console.log('📜 window.scroll chamado:', args);
-      if (!showContent && checkIfScrollingToTarget()) {
-        console.log('⛔ Scroll interceptado');
-        return;
-      }
-      return originalScroll(...args);
-    };
-
-    window.scrollBy = function(...args: any[]) {
-      console.log('📜 window.scrollBy chamado:', args);
-      if (!showContent && checkIfScrollingToTarget()) {
-        console.log('⛔ Scroll interceptado');
-        return;
-      }
-      return originalScrollBy(...args);
-    };
-
-    Element.prototype.scrollIntoView = function(this: Element, ...args: any[]) {
-      const element = this as HTMLElement;
-      console.log('📜 scrollIntoView chamado em:', element.className || element.tagName);
-
-      if (element.classList.contains('smartplayer-scroll-event') && !showContent) {
-        console.log('🚨🚨🚨 É O .smartplayer-scroll-event!');
-        console.log('🔓 REVELANDO CONTEÚDO!');
-        handleSmartplayerEvent({ type: 'vturb-scrollIntoView', target: element });
-        return;
-      }
-
-      return originalScrollIntoView.apply(this, args);
-    };
-
-    console.log('✅ Todos interceptores instalados (scrollTo, scroll, scrollBy, scrollIntoView)');
+    console.log('✅ Content protection active - waiting for VTurb event');
     console.log('✅ First useEffect completed');
-
-    return () => {
-      window.scrollTo = originalScrollTo;
-      window.scroll = originalScroll;
-      window.scrollBy = originalScrollBy;
-      Element.prototype.scrollIntoView = originalScrollIntoView;
-    };
   }, []);
 
   useEffect(() => {
@@ -388,74 +314,8 @@ function App() {
     }
 
     console.log('✅ Event detection system fully initialized');
-
-    // INTERCEPTAR quando o Vturb TENTA ROLAR até o elemento .smartplayer-scroll-event
+    console.log('🔒 Content will ONLY be revealed when VTurb dispatches the smartplayer-scroll-event');
     console.log('');
-    console.log('═══════════════════════════════════════════════════');
-    console.log('🎯 DETECTANDO TENTATIVA DE SCROLL DO VTURB');
-    console.log('═══════════════════════════════════════════════════');
-
-    const scrollTargets = document.querySelectorAll('.smartplayer-scroll-event');
-    console.log(`📍 Encontrados ${scrollTargets.length} elementos com .smartplayer-scroll-event`);
-
-    // Observer para detectar quando o elemento entra na viewport (tentativa de scroll)
-    const scrollObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !showContent) {
-            console.log('');
-            console.log('🚨🚨🚨 VTURB TENTOU ROLAR ATÉ .smartplayer-scroll-event!');
-            console.log('📍 Elemento:', entry.target);
-            console.log('🔓 Revelando conteúdo e rolando até o botão...');
-            console.log('');
-
-            handleSmartplayerEvent({ type: 'vturb-scroll-attempt', target: entry.target });
-          }
-        });
-      },
-      {
-        threshold: [0, 0.1, 0.5, 1.0],
-        rootMargin: '0px'
-      }
-    );
-
-    scrollTargets.forEach((target) => {
-      scrollObserver.observe(target);
-    });
-
-    // TAMBÉM detectar qualquer mudança no scroll da página
-    let lastScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    let scrollCheckInterval: NodeJS.Timeout;
-
-    const checkScroll = () => {
-      const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-      if (Math.abs(currentScrollTop - lastScrollTop) > 50 && !showContent) {
-        // Scroll significativo detectado, verificar se está indo para o target
-        scrollTargets.forEach((target) => {
-          const rect = target.getBoundingClientRect();
-          const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
-
-          if (isInViewport && !showContent) {
-            console.log('🎯 SCROLL AUTOMÁTICO DETECTADO indo para .smartplayer-scroll-event!');
-            handleSmartplayerEvent({ type: 'auto-scroll-detected', target });
-          }
-        });
-      }
-
-      lastScrollTop = currentScrollTop;
-    };
-
-    // Verificar scroll a cada 100ms
-    scrollCheckInterval = setInterval(checkScroll, 100);
-
-    console.log('✅ Scroll detection ativo - aguardando Vturb rolar até o elemento');
-    console.log('');
-
-    return () => {
-      scrollObserver.disconnect();
-      clearInterval(scrollCheckInterval);
-    };
   }, [showContent]);
 
   useEffect(() => {
