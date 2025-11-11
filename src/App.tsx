@@ -17,11 +17,7 @@ import {
 } from 'lucide-react';
 import ArticleReader from './ArticleReader';
 
-console.log('🚀🚀🚀 APP.TSX LOADED - TOP OF FILE 🚀🚀🚀');
-
 function App() {
-  console.log('🎯 APP COMPONENT RENDERING');
-
   const offersRef = useRef<HTMLDivElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -37,368 +33,14 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [showContent, setShowContent] = useState(false);
-
-  console.log('📊 showContent state:', showContent);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    console.log('🔥🔥🔥 FIRST useEffect RUNNING');
     setIsVisible(true);
-
-    const hostname = window.location.hostname;
-    const isBoltEnv = hostname.includes('bolt.new') ||
-                     hostname.includes('localhost') ||
-                     hostname.includes('stackblitz') ||
-                     hostname.includes('webcontainer');
-
-    console.log('🌍 Hostname:', hostname);
-    console.log('🔧 Is Bolt/Dev Environment:', isBoltEnv);
-    console.log('🔒 Content hidden - waiting for smartplayer-scroll-event from Vturb');
-
-    // VERIFICAR se o elemento existe
-    console.log('🔍 Verificando se .smartplayer-scroll-event existe...');
-    const checkElement = () => {
-      const element = document.querySelector('.smartplayer-scroll-event');
-      if (element) {
-        console.log('✅ Elemento .smartplayer-scroll-event encontrado:', element);
-      } else {
-        console.log('❌ Elemento .smartplayer-scroll-event NÃO encontrado ainda');
-      }
-    };
-    checkElement();
-    setTimeout(checkElement, 1000);
-    setTimeout(checkElement, 2000);
-    setTimeout(checkElement, 3000);
-
-    // INTERCEPTAR scrollIntoView EM TODOS OS ELEMENTOS
-    const originalScrollIntoView = Element.prototype.scrollIntoView;
-    let vturbScrollDetected = false;
-
-    Element.prototype.scrollIntoView = function(this: Element, ...args: any[]) {
-      const element = this as HTMLElement;
-
-      // LOG DE TODOS OS SCROLLINTOVIEW
-      console.log('');
-      console.log('🔵 scrollIntoView foi chamado!');
-      console.log('📍 Elemento:', element);
-      console.log('🏷️ Classes:', element.className);
-      console.log('🆔 ID:', element.id);
-      console.log('📋 Tag:', element.tagName);
-      console.log('');
-
-      // Se for o elemento .smartplayer-scroll-event e o conteúdo ainda não foi revelado
-      if (element.classList.contains('smartplayer-scroll-event') && !showContent && !vturbScrollDetected) {
-        vturbScrollDetected = true;
-        console.log('');
-        console.log('🚨🚨🚨 VTURB DISPAROU scrollIntoView NO .smartplayer-scroll-event!');
-        console.log('📍 Elemento:', element);
-        console.log('🔓 REVELANDO CONTEÚDO AGORA!');
-        console.log('');
-
-        // Revelar conteúdo
-        setShowContent(true);
-
-        // NÃO executar o scroll original do VTurb ainda
-        // Vamos executar nosso próprio scroll após 800ms
-        return;
-      }
-
-      // Para todos os outros elementos, executar normalmente
-      return originalScrollIntoView.apply(this, args);
-    };
-
-    console.log('✅ scrollIntoView interceptor installed - WILL LOG ALL scrollIntoView CALLS');
-    console.log('✅ Content protection active - waiting for VTurb event');
-    console.log('✅ First useEffect completed');
-
-    return () => {
-      Element.prototype.scrollIntoView = originalScrollIntoView;
-    };
-  }, [showContent]);
-
-  // Executar scroll automático quando showContent mudar para true
-  useEffect(() => {
-    if (!showContent) return;
-
-    console.log('');
-    console.log('📢 showContent mudou para TRUE - iniciando scroll após 800ms');
-    console.log('');
-
-    const attemptScroll = (attempt = 0) => {
-      const maxScrollAttempts = 5;
-
-      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
-
-      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
-                           document.getElementById('six-bottle-package') ||
-                           document.querySelector('[data-purchase-section="true"]') ||
-                           document.querySelector('.purchase-button-main');
-
-      if (purchaseButton) {
-        console.log('✅ Purchase button found!');
-
-        purchaseButton.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest'
-        });
-
-        const element = purchaseButton as HTMLElement;
-        element.style.transition = 'all 0.8s ease';
-        element.style.transform = 'scale(1.05)';
-        element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
-        element.style.zIndex = '100';
-
-        setTimeout(() => {
-          element.style.transform = 'scale(1)';
-          element.style.boxShadow = '';
-          element.style.zIndex = '';
-        }, 4000);
-
-        console.log('✅ Scroll executado com sucesso');
-      } else if (attempt < maxScrollAttempts - 1) {
-        console.log('⏳ Botão não encontrado, tentando novamente...');
-        setTimeout(() => attemptScroll(attempt + 1), 500);
-      } else {
-        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
-      }
-    };
-
-    setTimeout(() => attemptScroll(), 800);
-  }, [showContent]);
-
-  useEffect(() => {
-    console.log('🔥🔥🔥 SMARTPLAYER DETECTION useEffect RUNNING');
-
-    const handleSmartplayerEvent = (event: any) => {
-      console.log('🎬 SmartPlayer CustomEvent captured!', event);
-      console.log('🔓 Revealing all content now...');
-      setShowContent(true);
-    };
-
-    // Adicionar listeners globais IMEDIATAMENTE
-    console.log('📢 Adding global event listeners...');
-
-    // INTERCEPTAR TODOS OS EVENTOS - SEM FILTRO
-    const originalDispatchEvent = EventTarget.prototype.dispatchEvent;
-    const capturedEvents = new Set<string>();
-    const nativeEvents = ['click', 'mousemove', 'mousedown', 'mouseup', 'mouseover', 'mouseout',
-                          'keydown', 'keyup', 'keypress', 'focus', 'blur', 'change', 'input',
-                          'scroll', 'resize', 'load', 'unload', 'beforeunload', 'DOMContentLoaded',
-                          'readystatechange', 'transitionend', 'animationend', 'pointerdown',
-                          'pointerup', 'pointermove', 'pointercancel', 'touchstart', 'touchend',
-                          'touchmove', 'touchcancel', 'wheel', 'contextmenu', 'dblclick'];
-
-    EventTarget.prototype.dispatchEvent = function(event: Event) {
-      // Log TODOS os eventos customizados (não nativos)
-      if (!nativeEvents.includes(event.type)) {
-        if (!capturedEvents.has(event.type)) {
-          console.log('🚨 NEW CUSTOM EVENT:', event.type, '| Target:', this.constructor.name, this);
-          capturedEvents.add(event.type);
-        }
-
-        // SEMPRE logar eventos relacionados a scroll/player para debug
-        if (event.type.toLowerCase().includes('scroll') ||
-            event.type.toLowerCase().includes('smart') ||
-            event.type.toLowerCase().includes('vturb') ||
-            event.type.toLowerCase().includes('player')) {
-          console.log('🎯 PLAYER EVENT:', event.type, '| Target:', this.constructor.name, '| Event:', event);
-        }
-      }
-      return originalDispatchEvent.call(this, event);
-    };
-
-    console.log('✅ Universal event interceptor installed - monitoring ALL custom events');
-
-    // Múltiplas variações do nome do evento
-    const eventVariations = [
-      'smartplayer-scroll-event',
-      'smartplayerScrollEvent',
-      'smartplayer:scroll',
-      'smartplayer.scroll',
-      'scroll-event',
-      'vturb-scroll',
-      'vturb:scroll',
-    ];
-
-    eventVariations.forEach(eventName => {
-      window.addEventListener(eventName, (e) => {
-        console.log(`🌍 WINDOW captured ${eventName}:`, e);
-        handleSmartplayerEvent(e);
-      }, true);
-
-      document.addEventListener(eventName, (e) => {
-        console.log(`📄 DOCUMENT captured ${eventName}:`, e);
-        handleSmartplayerEvent(e);
-      }, true);
-
-      // Também na fase de bubble
-      window.addEventListener(eventName, (e) => {
-        console.log(`🌍 WINDOW (bubble) captured ${eventName}:`, e);
-        handleSmartplayerEvent(e);
-      }, false);
-
-      document.addEventListener(eventName, (e) => {
-        console.log(`📄 DOCUMENT (bubble) captured ${eventName}:`, e);
-        handleSmartplayerEvent(e);
-      }, false);
-    });
-
-    // Polling para encontrar o player
-    let pollAttempts = 0;
-    const maxPollAttempts = 30;
-
-    const setupPlayerListeners = () => {
-      pollAttempts++;
-
-      if (pollAttempts === 1 || pollAttempts % 5 === 0) {
-        console.log(`🔍 Polling attempt ${pollAttempts}/${maxPollAttempts}`);
-      }
-
-      const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
-      const vturbPlayer = document.querySelector('vturb-smartplayer') as any;
-      const allPlayers = document.querySelectorAll('vturb-smartplayer');
-
-      if (pollAttempts === 1 || (heroPlayer && pollAttempts <= 2)) {
-        console.log('🎥 Hero player by ID:', !!heroPlayer);
-        console.log('🎥 Vturb player by selector:', !!vturbPlayer);
-        console.log('🎥 Total vturb players found:', allPlayers.length);
-      }
-
-      if (heroPlayer || vturbPlayer || allPlayers.length > 0) {
-        const targetPlayer = heroPlayer || vturbPlayer;
-
-        if (targetPlayer && pollAttempts <= 2) {
-          console.log('🎯 Target player found:', targetPlayer);
-          console.log('🎯 Player tagName:', targetPlayer.tagName);
-          console.log('🎯 Player id:', targetPlayer.id);
-
-          // MONITORAR EVENTO video:timeupdate para detectar quando atinge 5 segundos
-          let scrollTriggered = false;
-          targetPlayer.addEventListener('video:timeupdate', (e: any) => {
-            const currentTime = e.detail?.currentTime || 0;
-
-            // Se atingir 5 segundos (com margem de 0.3s) e ainda não revelou o conteúdo
-            if (currentTime >= 4.7 && currentTime <= 5.5 && !scrollTriggered && !showContent) {
-              scrollTriggered = true;
-              console.log('');
-              console.log('🚨🚨🚨 VÍDEO ATINGIU 5 SEGUNDOS!');
-              console.log('⏱️ Tempo atual:', currentTime);
-              console.log('🔓 REVELANDO CONTEÚDO AGORA!');
-              console.log('');
-              setShowContent(true);
-            }
-          });
-          console.log('✅ video:timeupdate listener adicionado - detectará quando atingir 5s');
-
-          // INSPECIONAR O PLAYER EM BUSCA DE PROPRIEDADES/MÉTODOS
-          console.log('🔍 Inspecting player properties...');
-          const playerProps = Object.getOwnPropertyNames(targetPlayer);
-          const scrollRelatedProps = playerProps.filter((prop: string) =>
-            prop.toLowerCase().includes('scroll') ||
-            prop.toLowerCase().includes('smart') ||
-            prop.toLowerCase().includes('callback') ||
-            prop.toLowerCase().includes('event') ||
-            prop.toLowerCase().includes('on')
-          );
-          console.log('📋 Scroll/Event related properties:', scrollRelatedProps);
-
-          // Verificar o prototype também
-          if (targetPlayer.__proto__) {
-            const protoProps = Object.getOwnPropertyNames(targetPlayer.__proto__);
-            const protoScrollProps = protoProps.filter((prop: string) =>
-              prop.toLowerCase().includes('scroll') ||
-              prop.toLowerCase().includes('smart') ||
-              prop.toLowerCase().includes('callback') ||
-              prop.toLowerCase().includes('event')
-            );
-            console.log('📋 Prototype scroll/event properties:', protoScrollProps);
-          }
-
-          // Tentar definir callbacks se existirem
-          if ('onSmartplayerScroll' in targetPlayer) {
-            targetPlayer.onSmartplayerScroll = handleSmartplayerEvent;
-            console.log('✅ Set onSmartplayerScroll callback');
-          }
-          if ('onScrollEvent' in targetPlayer) {
-            targetPlayer.onScrollEvent = handleSmartplayerEvent;
-            console.log('✅ Set onScrollEvent callback');
-          }
-
-          // Adicionar listener para TODAS as variações do evento
-          eventVariations.forEach(eventName => {
-            targetPlayer.addEventListener(eventName, (e: any) => {
-              console.log(`🎮 PLAYER captured ${eventName}:`, e);
-              handleSmartplayerEvent(e);
-            });
-          });
-
-          // Também tentar acessar o shadowRoot se existir
-          if (targetPlayer.shadowRoot) {
-            console.log('🌑 Player has shadowRoot, adding listeners there too');
-            eventVariations.forEach(eventName => {
-              targetPlayer.shadowRoot.addEventListener(eventName, (e: any) => {
-                console.log(`🌑 SHADOWROOT captured ${eventName}:`, e);
-                handleSmartplayerEvent(e);
-              });
-            });
-          }
-
-          console.log('✅ Event listeners attached to player (all variations)');
-        }
-
-        if (pollAttempts <= 2) {
-          // Adicionar listener a todos os players
-          allPlayers.forEach((player: any, index: number) => {
-            eventVariations.forEach(eventName => {
-              player.addEventListener(eventName, (e: any) => {
-                console.log(`🎮 PLAYER ${index + 1} captured ${eventName}:`, e);
-                handleSmartplayerEvent(e);
-              });
-            });
-
-            if (player.shadowRoot) {
-              eventVariations.forEach(eventName => {
-                player.shadowRoot.addEventListener(eventName, (e: any) => {
-                  console.log(`🌑 PLAYER ${index + 1} SHADOWROOT captured ${eventName}:`, e);
-                  handleSmartplayerEvent(e);
-                });
-              });
-            }
-          });
-
-          console.log(`✅ All ${allPlayers.length} players configured (all variations)`);
-        }
-
-        return true;
-      }
-
-      return false;
-    };
-
-    // Tentar setup imediatamente
-    if (!setupPlayerListeners()) {
-      // Se não encontrou, fazer polling
-      const pollInterval = setInterval(() => {
-        if (setupPlayerListeners() || pollAttempts >= maxPollAttempts) {
-          clearInterval(pollInterval);
-          if (pollAttempts >= maxPollAttempts) {
-            console.warn('⚠️ Player not found after 30 attempts (15 seconds)');
-          }
-        }
-      }, 500);
-
-      return () => clearInterval(pollInterval);
-    }
-
-    console.log('✅ Event detection system fully initialized');
-    console.log('🔒 Content will ONLY be revealed when VTurb dispatches the smartplayer-scroll-event');
-    console.log('');
-  }, [showContent]);
+  }, []);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -777,66 +419,15 @@ function App() {
         </div>
       </section>
 
-      {/* Debug Button - Remove in production */}
-      <div className="fixed bottom-4 left-4 z-50 flex flex-col gap-2">
-        <button
-          onClick={() => {
-            console.log('');
-            console.log('🧪🧪🧪 TESTE MANUAL: Simulando VTurb scrollIntoView');
-            console.log('');
-            const button = document.querySelector('.smartplayer-scroll-event');
-            if (button) {
-              console.log('✅ Botão encontrado, executando scrollIntoView...');
-              button.scrollIntoView({ behavior: 'smooth' });
-            } else {
-              console.warn('❌ Botão .smartplayer-scroll-event não encontrado');
-            }
-          }}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
-        >
-          🧪 Test scrollIntoView
-        </button>
-
-        <button
-          onClick={() => {
-            console.log('');
-            console.log('🧪🧪🧪 TESTE MANUAL: Disparando CustomEvent');
-            console.log('');
-            const event = new CustomEvent('smartplayer-scroll-event', {
-              detail: { time: 5 }
-            });
-            document.dispatchEvent(event);
-            console.log('✅ CustomEvent disparado no document');
-          }}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
-        >
-          🧪 Test CustomEvent
-        </button>
-
-        <button
-          onClick={() => {
-            console.log('🔄 Forçando revelação do conteúdo...');
-            setShowContent(true);
-          }}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-medium"
-        >
-          🔓 Reveal Content
-        </button>
-
-        <div className="text-xs text-gray-600 bg-white px-2 py-1 rounded shadow">
-          showContent: {showContent ? '✅' : '❌'}
-        </div>
-      </div>
-
       {/* Offers Section */}
-      <section ref={offersRef} data-purchase-section="true" className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
           </h2>
 
           {/* 6-Bottle Package - Full Width */}
-          <div className="mb-4 md:mb-8" id="six-bottle-package">
+          <div className="mb-4 md:mb-8">
             <div className="relative bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-4 md:p-12 lg:p-16 shadow-2xl">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FFD600] text-gray-900 px-6 py-2 rounded-full text-sm md:text-lg font-bold shadow-lg flex items-center gap-1 md:gap-2">
                 <Star className="w-4 h-4 md:w-5 md:h-5 fill-gray-900" />
@@ -855,7 +446,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="purchase-button-main checkout-button smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
                 </button>
@@ -971,7 +562,7 @@ function App() {
       </section>
 
       {/* Experts Section */}
-      <section className={`py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50 transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -1079,7 +670,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -1142,7 +733,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className={`py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50 transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -1219,7 +810,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1571,7 +1162,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className={`py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000] transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1586,7 +1177,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className={`bg-black text-gray-400 py-8 px-4 transition-opacity duration-1000 ${showContent ? 'opacity-100' : 'opacity-0 pointer-events-none absolute'}`}>
+      <footer className="bg-black text-gray-400 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
