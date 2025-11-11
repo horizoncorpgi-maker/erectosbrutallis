@@ -454,11 +454,12 @@ function App() {
             It sounds weird… but this simple trick is changing how guys start their day — boosting focus, drive, and energy within minutes.
           </p>
 
-          <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
-            <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
+          <div className="relative w-full max-w-sm md:max-w-md mx-auto">
+            <div className="bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
+              <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
+            </div>
+            <div id="pitch-button" className="smartplayer-scroll-event mt-4"></div>
           </div>
-
-          <div className="smartplayer-scroll-event mt-8 w-full h-1"></div>
         </div>
       </section>
 
