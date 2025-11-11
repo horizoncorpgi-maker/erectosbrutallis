@@ -46,48 +46,34 @@ function App() {
     const pitchButton = document.querySelector('.smartplayer-scroll-event');
     if (!pitchButton) return;
 
-    let scrollDetected = false;
-    let previousScrollY = window.scrollY;
-
-    const checkScrollAttempt = setInterval(() => {
-      const currentScrollY = window.scrollY;
-      const rect = pitchButton.getBoundingClientRect();
-
-      if (currentScrollY !== previousScrollY) {
-        const isScrollingTowardsButton =
-          (currentScrollY > previousScrollY && rect.top < window.innerHeight) ||
-          (Math.abs(rect.top - window.innerHeight / 2) < 200);
-
-        if (isScrollingTowardsButton && !scrollDetected) {
-          scrollDetected = true;
-          (pitchButton as HTMLElement).style.opacity = '1';
-          (pitchButton as HTMLElement).style.pointerEvents = 'auto';
-          (pitchButton as HTMLElement).style.backgroundColor = '#22c55e';
-        }
-      }
-
-      previousScrollY = currentScrollY;
-    }, 50);
+    let hasActivated = false;
+    let wasInView = false;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.1 && !scrollDetected) {
-            scrollDetected = true;
+          const isNowInView = entry.isIntersecting && entry.intersectionRatio > 0;
+
+          if (isNowInView && !wasInView && !hasActivated) {
+            hasActivated = true;
             (entry.target as HTMLElement).style.opacity = '1';
             (entry.target as HTMLElement).style.pointerEvents = 'auto';
             (entry.target as HTMLElement).style.backgroundColor = '#22c55e';
           }
+
+          wasInView = isNowInView;
         });
       },
-      { threshold: [0.1, 0.5, 1.0] }
+      {
+        threshold: 0,
+        rootMargin: '0px'
+      }
     );
 
     observer.observe(pitchButton);
 
     return () => {
       observer.disconnect();
-      clearInterval(checkScrollAttempt);
     };
   }, []);
 
