@@ -43,41 +43,36 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const pitchButton = document.querySelector('.smartplayer-scroll-event');
+    const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
     if (!pitchButton) return;
 
     let hasActivated = false;
-    let initialCheckDone = false;
+    let scrollTimeout: NodeJS.Timeout;
 
-    setTimeout(() => {
-      initialCheckDone = true;
-    }, 1000);
+    const handleScroll = () => {
+      if (hasActivated) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!initialCheckDone) return;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        const rect = pitchButton.getBoundingClientRect();
+        const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
 
-          if (entry.isIntersecting && entry.intersectionRatio > 0 && !hasActivated) {
-            hasActivated = true;
-            const element = entry.target as HTMLElement;
-            element.style.opacity = '1';
-            element.style.pointerEvents = 'auto';
-            element.style.backgroundColor = '#22c55e';
-            element.style.visibility = 'visible';
-          }
-        });
-      },
-      {
-        threshold: 0.01,
-        rootMargin: '0px'
-      }
-    );
+        if (isInViewport && !hasActivated) {
+          hasActivated = true;
+          pitchButton.style.opacity = '1';
+          pitchButton.style.pointerEvents = 'auto';
+          pitchButton.style.backgroundColor = '#22c55e';
+          pitchButton.style.visibility = 'visible';
+          window.removeEventListener('scroll', handleScroll);
+        }
+      }, 50);
+    };
 
-    observer.observe(pitchButton);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
     };
   }, []);
 
