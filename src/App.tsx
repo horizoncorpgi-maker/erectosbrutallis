@@ -90,6 +90,57 @@ function App() {
       script.async = true;
       document.head.appendChild(script);
     }
+
+    const attemptScroll = (attempt = 0) => {
+      const maxScrollAttempts = 5;
+
+      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
+
+      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
+                           document.getElementById('six-bottle-package') ||
+                           document.querySelector('[data-purchase-section="true"]') ||
+                           document.querySelector('.purchase-button-main');
+
+      if (purchaseButton) {
+        console.log('✅ Purchase button found!');
+
+        purchaseButton.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+
+        const element = purchaseButton as HTMLElement;
+        element.style.transition = 'all 0.8s ease';
+        element.style.transform = 'scale(1.05)';
+        element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
+        element.style.zIndex = '100';
+
+        setTimeout(() => {
+          element.style.transform = 'scale(1)';
+          element.style.boxShadow = '';
+          element.style.zIndex = '';
+        }, 4000);
+
+        console.log('✅ Scroll executado com sucesso');
+      } else if (attempt < maxScrollAttempts - 1) {
+        console.log('⏳ Botão não encontrado, tentando novamente...');
+        setTimeout(() => attemptScroll(attempt + 1), 500);
+      } else {
+        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
+      }
+    };
+
+    const handleSmartplayerEvent = () => {
+      console.log('🎬 SmartPlayer scroll event triggered');
+      setTimeout(() => attemptScroll(), 800);
+    };
+
+    window.addEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
+
+    return () => {
+      window.removeEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
+    };
   }, []);
 
   useEffect(() => {
@@ -428,7 +479,7 @@ function App() {
 
           {/* 6-Bottle Package - Full Width */}
           <div className="mb-4 md:mb-8">
-            <div className="relative bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-4 md:p-12 lg:p-16 shadow-2xl">
+            <div id="six-bottle-package" className="relative bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-4 md:p-12 lg:p-16 shadow-2xl">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FFD600] text-gray-900 px-6 py-2 rounded-full text-sm md:text-lg font-bold shadow-lg flex items-center gap-1 md:gap-2">
                 <Star className="w-4 h-4 md:w-5 md:h-5 fill-gray-900" />
                 BEST VALUE
