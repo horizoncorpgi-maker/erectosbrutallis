@@ -204,56 +204,68 @@ function App() {
 
   useEffect(() => {
     // Sistema de detecção do VTurb tentando fazer scroll até .smartplayer-scroll-event
+    let scrollAttempted = false;
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
 
-    // Função para fazer scroll suave até o botão de 6 potes
-    const scrollToSixBottleButton = () => {
-      console.log('🎯 Fazendo scroll até o botão de 6 potes...');
+    // Função para fazer scroll suave até o botão de 6 potes COM MÚLTIPLAS TENTATIVAS
+    const scrollToSixBottleButton = (attempt = 0) => {
+      const maxAttempts = 5;
+      console.log(`🎯 Tentativa ${attempt + 1}/${maxAttempts} de encontrar botão de 6 potes...`);
 
-      setTimeout(() => {
-        const sixBottleButton = document.querySelector('.smartplayer-scroll-event:not(#smartplayer-scroll-target)') as HTMLElement;
+      const sixBottleButton = document.querySelector('.smartplayer-scroll-event:not(#smartplayer-scroll-target)') as HTMLElement;
 
-        if (sixBottleButton) {
-          console.log('✅ Botão de 6 potes encontrado, iniciando scroll...');
+      if (sixBottleButton) {
+        console.log('✅ Botão de 6 potes encontrado, iniciando scroll...');
 
-          sixBottleButton.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest'
-          });
+        // Usa o scrollIntoView ORIGINAL salvo (não o interceptado)
+        originalScrollIntoView.call(sixBottleButton, {
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
 
-          // Efeito visual de destaque
+        // Efeito visual de destaque
+        setTimeout(() => {
+          sixBottleButton.style.transition = 'all 0.8s ease';
+          sixBottleButton.style.transform = 'scale(1.05)';
+          sixBottleButton.style.boxShadow = '0 0 40px rgba(184, 0, 0, 0.6)';
+          sixBottleButton.style.zIndex = '100';
+
           setTimeout(() => {
-            sixBottleButton.style.transition = 'all 0.8s ease';
-            sixBottleButton.style.transform = 'scale(1.05)';
-            sixBottleButton.style.boxShadow = '0 0 40px rgba(184, 0, 0, 0.6)';
-
-            setTimeout(() => {
-              sixBottleButton.style.transform = 'scale(1)';
-              sixBottleButton.style.boxShadow = '';
-            }, 3000);
-          }, 500);
-        }
-      }, 1000);
+            sixBottleButton.style.transform = 'scale(1)';
+            sixBottleButton.style.boxShadow = '';
+            sixBottleButton.style.zIndex = '';
+          }, 3000);
+        }, 800);
+      } else if (attempt < maxAttempts - 1) {
+        console.log(`⏳ Botão não encontrado, nova tentativa em 600ms...`);
+        setTimeout(() => scrollToSixBottleButton(attempt + 1), 600);
+      } else {
+        console.warn('❌ Botão de 6 potes não encontrado após 5 tentativas');
+      }
     };
 
     // Interceptor de scroll - detecta quando VTurb tenta fazer scrollIntoView
-    const originalScrollIntoView = Element.prototype.scrollIntoView;
-
     Element.prototype.scrollIntoView = function(arg?: boolean | ScrollIntoViewOptions) {
       const element = this as HTMLElement;
 
-      console.log('🔍 scrollIntoView chamado em:', element.className, element.id);
+      console.log('🔍 scrollIntoView chamado em:', element.className || 'sem classe', element.id || 'sem id');
 
       // Detecta se é o elemento dummy com classe smartplayer-scroll-event
-      if (element.classList.contains('smartplayer-scroll-event') ||
-          element.id === 'smartplayer-scroll-target') {
+      if ((element.classList.contains('smartplayer-scroll-event') ||
+          element.id === 'smartplayer-scroll-target') && !scrollAttempted) {
+
+        scrollAttempted = true;
         console.log('🎬 VTurb tentou fazer scroll até .smartplayer-scroll-event!');
+        console.log('🔓 Revelando conteúdo da página...');
 
         // Revela o restante da página
         setShowRestOfPage(true);
 
-        // Faz scroll até o botão real
-        scrollToSixBottleButton();
+        // Aguarda um pouco para o conteúdo renderizar e depois tenta scroll
+        setTimeout(() => {
+          scrollToSixBottleButton();
+        }, 300);
 
         // NÃO executa o scroll original (para não scrollar para o elemento dummy)
         return;
@@ -263,7 +275,7 @@ function App() {
       return originalScrollIntoView.call(this, arg);
     };
 
-    console.log('✅ Interceptor de scroll instalado');
+    console.log('✅ Interceptor de scroll instalado e aguardando VTurb...');
 
     // Cleanup
     return () => {
