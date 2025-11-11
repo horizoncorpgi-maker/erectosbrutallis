@@ -203,150 +203,72 @@ function App() {
   }, [currentTestimonial]);
 
   useEffect(() => {
-    // Implementação do scroll automático para smartplayer-scroll-event
-    const attemptScroll = (attempt = 0) => {
-      const maxScrollAttempts = 5;
+    // Sistema de detecção do VTurb tentando fazer scroll até .smartplayer-scroll-event
 
-      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
+    // Função para fazer scroll suave até o botão de 6 potes
+    const scrollToSixBottleButton = () => {
+      console.log('🎯 Fazendo scroll até o botão de 6 potes...');
 
-      // Procura o botão REAL de compra (não o placeholder invisível)
-      const purchaseButton = document.getElementById('six-bottle-package') ||
-                           document.querySelector('.purchase-button-main:not([style*="opacity: 0"])') ||
-                           document.querySelector('[data-purchase-section="true"]');
+      setTimeout(() => {
+        const sixBottleButton = document.querySelector('.smartplayer-scroll-event:not(#smartplayer-scroll-target)') as HTMLElement;
 
-      if (purchaseButton) {
-        console.log('✅ Purchase button found!');
+        if (sixBottleButton) {
+          console.log('✅ Botão de 6 potes encontrado, iniciando scroll...');
 
-        purchaseButton.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-          inline: 'nearest'
-        });
-
-        // Efeito visual de destaque
-        const element = purchaseButton as HTMLElement;
-        element.style.transition = 'all 0.8s ease';
-        element.style.transform = 'scale(1.05)';
-        element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
-        element.style.zIndex = '100';
-
-        setTimeout(() => {
-          element.style.transform = 'scale(1)';
-          element.style.boxShadow = '';
-          element.style.zIndex = '';
-        }, 4000);
-
-        console.log('✅ Scroll executado com sucesso');
-      } else if (attempt < maxScrollAttempts - 1) {
-        console.log('⏳ Botão não encontrado, tentando novamente...');
-        setTimeout(() => attemptScroll(attempt + 1), 500);
-      } else {
-        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
-      }
-    };
-
-    // Listener para o evento customizado do SmartPlayer
-    const handleSmartPlayerScrollEvent = () => {
-      console.log('🎬 SmartPlayer scroll event detectado!');
-      // Revela o restante da página
-      setShowRestOfPage(true);
-      setTimeout(() => attemptScroll(), 800);
-    };
-
-    // Adiciona listener para o evento do SmartPlayer
-    window.addEventListener('smartplayer-scroll-event', handleSmartPlayerScrollEvent);
-
-    // Adiciona listener para TODOS os eventos personalizados possíveis do VTurb
-    const allEventNames = [
-      'smartplayer-scroll-event',
-      'smartplayer-call-to-action',
-      'smartplayer-cta',
-      'vturb-scroll-event',
-      'smartplayer:scroll',
-      'player-scroll-event'
-    ];
-
-    const universalHandler = (eventName: string) => (event: Event) => {
-      console.log(`🎬 Evento ${eventName} detectado!`, event);
-      setShowRestOfPage(true);
-      setTimeout(() => attemptScroll(), 800);
-    };
-
-    allEventNames.forEach(eventName => {
-      window.addEventListener(eventName, universalHandler(eventName));
-    });
-
-    // Listener global para capturar qualquer evento que contenha 'smart' ou 'scroll'
-    const globalEventCapture = (event: Event) => {
-      const eventType = event.type.toLowerCase();
-      if ((eventType.includes('smart') || eventType.includes('scroll') || eventType.includes('cta')) &&
-          eventType !== 'scroll') {
-        console.log('🔔 Evento global capturado:', event.type, event);
-        setShowRestOfPage(true);
-        setTimeout(() => attemptScroll(), 800);
-      }
-    };
-
-    // Intercepta TODOS os eventos customizados
-    const originalDispatch = EventTarget.prototype.dispatchEvent;
-    EventTarget.prototype.dispatchEvent = function(event: Event) {
-      globalEventCapture(event);
-      return originalDispatch.call(this, event);
-    };
-
-    // Também monitora o player hero para detectar quando atingir o ponto de pitch
-    const checkHeroPlayer = setInterval(() => {
-      const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
-
-      if (heroPlayer && !heroPlayer._scrollEventListenerAdded) {
-        heroPlayer._scrollEventListenerAdded = true;
-        console.log('✅ Hero player encontrado, adicionando listeners');
-
-        // Tenta múltiplos métodos de detecção de eventos
-
-        // Método 1: Evento customizado do SmartPlayer
-        if (typeof heroPlayer.on === 'function') {
-          heroPlayer.on('smartplayer-scroll-event', () => {
-            console.log('🎬 Hero player scroll event triggered (método 1)!');
-            setShowRestOfPage(true);
-            setTimeout(() => attemptScroll(), 800);
+          sixBottleButton.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest'
           });
+
+          // Efeito visual de destaque
+          setTimeout(() => {
+            sixBottleButton.style.transition = 'all 0.8s ease';
+            sixBottleButton.style.transform = 'scale(1.05)';
+            sixBottleButton.style.boxShadow = '0 0 40px rgba(184, 0, 0, 0.6)';
+
+            setTimeout(() => {
+              sixBottleButton.style.transform = 'scale(1)';
+              sixBottleButton.style.boxShadow = '';
+            }, 3000);
+          }, 500);
         }
+      }, 1000);
+    };
 
-        // Método 2: Listener no elemento
-        heroPlayer.addEventListener('smartplayer-scroll-event', () => {
-          console.log('🎬 Hero player scroll event triggered (método 2)!');
-          setShowRestOfPage(true);
-          setTimeout(() => attemptScroll(), 800);
-        });
+    // Interceptor de scroll - detecta quando VTurb tenta fazer scrollIntoView
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
 
-        // Método 3: Monitorar classes CSS que o SmartPlayer pode adicionar
-        const observer = new MutationObserver((mutations) => {
-          mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-              const classList = (mutation.target as Element).classList;
-              if (classList.contains('smartplayer-scroll-event') ||
-                  classList.contains('smartplayer-call-to-action')) {
-                console.log('🎬 Hero player class changed (método 3)!');
-                setShowRestOfPage(true);
-                setTimeout(() => attemptScroll(), 800);
-              }
-            }
-          });
-        });
+    Element.prototype.scrollIntoView = function(arg?: boolean | ScrollIntoViewOptions) {
+      const element = this as HTMLElement;
 
-        observer.observe(heroPlayer, { attributes: true });
+      console.log('🔍 scrollIntoView chamado em:', element.className, element.id);
+
+      // Detecta se é o elemento dummy com classe smartplayer-scroll-event
+      if (element.classList.contains('smartplayer-scroll-event') ||
+          element.id === 'smartplayer-scroll-target') {
+        console.log('🎬 VTurb tentou fazer scroll até .smartplayer-scroll-event!');
+
+        // Revela o restante da página
+        setShowRestOfPage(true);
+
+        // Faz scroll até o botão real
+        scrollToSixBottleButton();
+
+        // NÃO executa o scroll original (para não scrollar para o elemento dummy)
+        return;
       }
-    }, 1000);
+
+      // Para outros elementos, executa normalmente
+      return originalScrollIntoView.call(this, arg);
+    };
+
+    console.log('✅ Interceptor de scroll instalado');
 
     // Cleanup
     return () => {
-      window.removeEventListener('smartplayer-scroll-event', handleSmartPlayerScrollEvent);
-      allEventNames.forEach(eventName => {
-        window.removeEventListener(eventName, universalHandler(eventName));
-      });
-      EventTarget.prototype.dispatchEvent = originalDispatch;
-      clearInterval(checkHeroPlayer);
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+      console.log('🧹 Interceptor de scroll removido');
     };
   }, []);
 
