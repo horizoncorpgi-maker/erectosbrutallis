@@ -203,84 +203,85 @@ function App() {
   }, [currentTestimonial]);
 
   useEffect(() => {
-    // Sistema de detecção do VTurb tentando fazer scroll até .smartplayer-scroll-event
-    let scrollAttempted = false;
-    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    // Implementação do scroll automático conforme guia smartplayer-scroll-event
+    const attemptScroll = (attempt = 0) => {
+      const maxScrollAttempts = 5;
 
-    // Função para fazer scroll suave até o botão de 6 potes COM MÚLTIPLAS TENTATIVAS
-    const scrollToSixBottleButton = (attempt = 0) => {
-      const maxAttempts = 5;
-      console.log(`🎯 Tentativa ${attempt + 1}/${maxAttempts} de encontrar botão de 6 potes...`);
+      console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
 
-      const sixBottleButton = document.querySelector('.smartplayer-scroll-event:not(#smartplayer-scroll-target)') as HTMLElement;
+      // Procura o botão com classe smartplayer-scroll-event
+      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
+                           document.getElementById('six-bottle-package') ||
+                           document.querySelector('[data-purchase-section="true"]') ||
+                           document.querySelector('.purchase-button-main');
 
-      if (sixBottleButton) {
-        console.log('✅ Botão de 6 potes encontrado, iniciando scroll...');
+      if (purchaseButton) {
+        console.log('✅ Purchase button found!');
 
-        // Usa o scrollIntoView ORIGINAL salvo (não o interceptado)
-        originalScrollIntoView.call(sixBottleButton, {
+        purchaseButton.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
           inline: 'nearest'
         });
 
         // Efeito visual de destaque
-        setTimeout(() => {
-          sixBottleButton.style.transition = 'all 0.8s ease';
-          sixBottleButton.style.transform = 'scale(1.05)';
-          sixBottleButton.style.boxShadow = '0 0 40px rgba(184, 0, 0, 0.6)';
-          sixBottleButton.style.zIndex = '100';
+        const element = purchaseButton as HTMLElement;
+        element.style.transition = 'all 0.8s ease';
+        element.style.transform = 'scale(1.05)';
+        element.style.boxShadow = '0 0 40px rgba(198, 40, 40, 0.6)';
+        element.style.zIndex = '100';
 
-          setTimeout(() => {
-            sixBottleButton.style.transform = 'scale(1)';
-            sixBottleButton.style.boxShadow = '';
-            sixBottleButton.style.zIndex = '';
-          }, 3000);
-        }, 800);
-      } else if (attempt < maxAttempts - 1) {
-        console.log(`⏳ Botão não encontrado, nova tentativa em 600ms...`);
-        setTimeout(() => scrollToSixBottleButton(attempt + 1), 600);
+        setTimeout(() => {
+          element.style.transform = 'scale(1)';
+          element.style.boxShadow = '';
+          element.style.zIndex = '';
+        }, 4000);
+
+        console.log('✅ Scroll executado com sucesso');
+      } else if (attempt < maxScrollAttempts - 1) {
+        console.log('⏳ Botão não encontrado, tentando novamente...');
+        setTimeout(() => attemptScroll(attempt + 1), 500);
       } else {
-        console.warn('❌ Botão de 6 potes não encontrado após 5 tentativas');
+        console.warn('❌ Botão de compra não encontrado após múltiplas tentativas');
       }
     };
 
-    // Interceptor de scroll - detecta quando VTurb tenta fazer scrollIntoView
-    Element.prototype.scrollIntoView = function(arg?: boolean | ScrollIntoViewOptions) {
-      const element = this as HTMLElement;
-
-      console.log('🔍 scrollIntoView chamado em:', element.className || 'sem classe', element.id || 'sem id');
-
-      // Detecta se é o elemento dummy com classe smartplayer-scroll-event
-      if ((element.classList.contains('smartplayer-scroll-event') ||
-          element.id === 'smartplayer-scroll-target') && !scrollAttempted) {
-
-        scrollAttempted = true;
-        console.log('🎬 VTurb tentou fazer scroll até .smartplayer-scroll-event!');
-        console.log('🔓 Revelando conteúdo da página...');
-
-        // Revela o restante da página
-        setShowRestOfPage(true);
-
-        // Aguarda um pouco para o conteúdo renderizar e depois tenta scroll
-        setTimeout(() => {
-          scrollToSixBottleButton();
-        }, 300);
-
-        // NÃO executa o scroll original (para não scrollar para o elemento dummy)
-        return;
-      }
-
-      // Para outros elementos, executa normalmente
-      return originalScrollIntoView.call(this, arg);
+    // Handler para o evento do SmartPlayer
+    const handleSmartPlayerEvent = () => {
+      console.log('🎬 SmartPlayer event detectado!');
+      // Revela o restante da página
+      setShowRestOfPage(true);
+      // Executa scroll após 800ms para dar tempo do React renderizar
+      setTimeout(() => attemptScroll(), 800);
     };
 
-    console.log('✅ Interceptor de scroll instalado e aguardando VTurb...');
+    // Escuta o evento customizado do SmartPlayer
+    window.addEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
+
+    // Também monitora o player hero para detectar quando atingir o ponto de pitch
+    const checkHeroPlayer = setInterval(() => {
+      const heroPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69') as any;
+
+      if (heroPlayer && !heroPlayer._eventListenerAdded) {
+        heroPlayer._eventListenerAdded = true;
+        console.log('✅ Hero player encontrado, adicionando listeners');
+
+        // Listener direto no elemento do player
+        heroPlayer.addEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
+
+        // Se o player tiver API .on()
+        if (typeof heroPlayer.on === 'function') {
+          heroPlayer.on('smartplayer-scroll-event', handleSmartPlayerEvent);
+        }
+      }
+    }, 1000);
+
+    console.log('✅ Sistema SmartPlayer instalado e aguardando evento...');
 
     // Cleanup
     return () => {
-      Element.prototype.scrollIntoView = originalScrollIntoView;
-      console.log('🧹 Interceptor de scroll removido');
+      window.removeEventListener('smartplayer-scroll-event', handleSmartPlayerEvent);
+      clearInterval(checkHeroPlayer);
     };
   }, []);
 
@@ -526,23 +527,6 @@ function App() {
           </div>
         </div>
       </section>
-
-      {/* Elemento invisível mas RENDERIZADO no DOM para o SmartPlayer encontrar */}
-      <div
-        className="smartplayer-scroll-event"
-        id="smartplayer-scroll-target"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '1px',
-          height: '1px',
-          opacity: 0,
-          pointerEvents: 'none',
-          overflow: 'hidden',
-          zIndex: -1
-        }}
-      />
 
       {/* Restante do conteúdo - oculto até evento do SmartPlayer (exceto em dev) */}
       <div

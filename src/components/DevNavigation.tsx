@@ -7,11 +7,8 @@ function DevNavigation() {
   const isDevelopment = import.meta.env.MODE === 'development';
 
   const triggerScrollEvent = () => {
-    console.log('🧪 Simulando VTurb tentando fazer scroll...');
-    const dummyElement = document.getElementById('smartplayer-scroll-target');
-    if (dummyElement) {
-      dummyElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    console.log('🧪 Disparando evento smartplayer-scroll-event...');
+    window.dispatchEvent(new CustomEvent('smartplayer-scroll-event'));
     setIsOpen(false);
   };
 
