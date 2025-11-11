@@ -416,6 +416,13 @@ function App() {
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
+
+          <button
+            className="smartplayer-scroll-event mt-4 px-6 py-3 bg-gray-900 text-white rounded-full opacity-0 pointer-events-none"
+            aria-hidden="true"
+          >
+            Pitch Button
+          </button>
         </div>
       </section>
 
