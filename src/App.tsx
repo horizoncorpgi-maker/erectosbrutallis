@@ -96,8 +96,7 @@ function App() {
 
       console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
 
-      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
-                           document.getElementById('six-bottle-package') ||
+      const purchaseButton = document.getElementById('six-bottle-package') ||
                            document.querySelector('[data-purchase-section="true"]') ||
                            document.querySelector('.purchase-button-main');
 
@@ -113,7 +112,7 @@ function App() {
         const element = purchaseButton as HTMLElement;
         element.style.transition = 'all 0.8s ease';
         element.style.transform = 'scale(1.05)';
-        element.style.boxShadow = '0 0 40px rgba(59, 130, 246, 0.6)';
+        element.style.boxShadow = '0 0 40px rgba(184, 0, 0, 0.6)';
         element.style.zIndex = '100';
 
         setTimeout(() => {
@@ -131,15 +130,25 @@ function App() {
       }
     };
 
-    const handleSmartplayerEvent = () => {
-      console.log('🎬 SmartPlayer scroll event triggered');
+    const handleSmartplayerEvent = (event: any) => {
+      console.log('🎬 SmartPlayer scroll event triggered', event);
       setTimeout(() => attemptScroll(), 800);
     };
 
     window.addEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
 
+    const checkForSmartplayerElement = setInterval(() => {
+      const smartplayer = document.querySelector('.smartplayer-scroll-event');
+      if (smartplayer) {
+        console.log('✅ SmartPlayer element found with scroll-event class');
+        smartplayer.addEventListener('smartplayer-scroll-event' as any, handleSmartplayerEvent);
+        clearInterval(checkForSmartplayerElement);
+      }
+    }, 500);
+
     return () => {
       window.removeEventListener('smartplayer-scroll-event', handleSmartplayerEvent);
+      clearInterval(checkForSmartplayerElement);
     };
   }, []);
 
