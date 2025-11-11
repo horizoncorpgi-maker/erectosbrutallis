@@ -201,10 +201,10 @@ function App() {
 
       console.log(`🔄 Scroll attempt ${attempt + 1}/${maxScrollAttempts}`);
 
-      const purchaseButton = document.querySelector('.smartplayer-scroll-event') ||
-                           document.getElementById('six-bottle-package') ||
-                           document.querySelector('[data-purchase-section="true"]') ||
-                           document.querySelector('.purchase-button-main');
+      // Procura o botão REAL de compra (não o placeholder invisível)
+      const purchaseButton = document.getElementById('six-bottle-package') ||
+                           document.querySelector('.purchase-button-main:not([style*="opacity: 0"])') ||
+                           document.querySelector('[data-purchase-section="true"]');
 
       if (purchaseButton) {
         console.log('✅ Purchase button found!');
@@ -543,11 +543,19 @@ function App() {
         </div>
       </section>
 
-      {/* Restante do conteúdo - visível apenas após evento do SmartPlayer ou em desenvolvimento */}
-      {showRestOfPage && (
-        <>
-          {/* Offers Section */}
-          <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
+      {/* Elemento invisível com a classe para o SmartPlayer encontrar */}
+      <div className="smartplayer-scroll-event" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', height: 0, width: 0 }} />
+
+      {/* Restante do conteúdo - oculto até evento do SmartPlayer (exceto em dev) */}
+      <div
+        className={`transition-all duration-500 ${
+          showRestOfPage
+            ? 'opacity-100 visible relative'
+            : 'opacity-0 invisible fixed top-[-9999px] pointer-events-none'
+        }`}
+      >
+        {/* Offers Section */}
+        <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -1395,8 +1403,7 @@ function App() {
           </div>
         </div>
       )}
-        </>
-      )}
+      </div>
 
     </div>
   );
