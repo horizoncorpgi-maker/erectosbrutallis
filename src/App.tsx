@@ -33,6 +33,11 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
+  const [contentVisible, setContentVisible] = useState(false);
+  const [shouldPulse, setShouldPulse] = useState(false);
+  const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname.includes('bolt');
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -175,6 +180,42 @@ function App() {
       clearInterval(checkForPlayers);
     };
   }, [currentTestimonial]);
+
+  useEffect(() => {
+    if (isDevelopment) {
+      setContentVisible(true);
+      return;
+    }
+
+    const handleSmartplayerScroll = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail && customEvent.detail.smartplayer_scroll_event) {
+        setContentVisible(true);
+
+        const scrollToSixBottleButton = (attempt = 0) => {
+          if (attempt >= 5) return;
+
+          setTimeout(() => {
+            if (sixBottleButtonRef.current) {
+              sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              setShouldPulse(true);
+              setTimeout(() => setShouldPulse(false), 1000);
+            } else {
+              scrollToSixBottleButton(attempt + 1);
+            }
+          }, attempt === 0 ? 100 : 500);
+        };
+
+        scrollToSixBottleButton();
+      }
+    };
+
+    document.addEventListener('smartplayer_scroll_event', handleSmartplayerScroll);
+
+    return () => {
+      document.removeEventListener('smartplayer_scroll_event', handleSmartplayerScroll);
+    };
+  }, [isDevelopment]);
 
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
@@ -427,7 +468,7 @@ function App() {
       </section>
 
       {/* Offers Section */}
-      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white" style={{ display: contentVisible ? 'block' : 'none' }}>
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -452,8 +493,9 @@ function App() {
                   YOU'RE SAVING $888
                 </div>
                 <button
+                  ref={sixBottleButtonRef}
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  className={`w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6 ${shouldPulse ? 'animate-pulse-once' : ''}`}
                 >
                   CLAIM OFFER NOW
                 </button>
@@ -569,7 +611,7 @@ function App() {
       </section>
 
       {/* Experts Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: contentVisible ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -677,7 +719,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: contentVisible ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -740,7 +782,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: contentVisible ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -817,7 +859,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className="py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: contentVisible ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1169,7 +1211,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]" style={{ display: contentVisible ? 'block' : 'none' }}>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1184,7 +1226,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-gray-400 py-8 px-4">
+      <footer className="bg-black text-gray-400 py-8 px-4" style={{ display: contentVisible ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
