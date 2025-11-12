@@ -1,5 +1,6 @@
 import { Play, Volume2, AlertTriangle, CheckCircle, Truck, Shield, Star } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 interface UpsellProps {
   bottles: number;
@@ -12,6 +13,35 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
   const isUp3bt = location.pathname === '/up3bt';
+  const [contentUnlocked, setContentUnlocked] = useState(false);
+  const [pendingScrollEvent, setPendingScrollEvent] = useState(false);
+
+  useEffect(() => {
+    const handleScrollEvent = () => {
+      if (!contentUnlocked) {
+        setContentUnlocked(true);
+        setPendingScrollEvent(true);
+      }
+    };
+
+    window.addEventListener('smartplayer-scroll-event', handleScrollEvent);
+
+    return () => {
+      window.removeEventListener('smartplayer-scroll-event', handleScrollEvent);
+    };
+  }, [contentUnlocked]);
+
+  useEffect(() => {
+    if (pendingScrollEvent && contentUnlocked) {
+      const timer = setTimeout(() => {
+        const event = new Event('smartplayer-scroll-event');
+        window.dispatchEvent(event);
+        setPendingScrollEvent(false);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [pendingScrollEvent, contentUnlocked]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50 flex flex-col">
@@ -76,6 +106,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           </p>
         </div>
 
+        <div style={{ display: contentUnlocked ? 'block' : 'none' }}>
         {isUp1bt ? (
           <>
             <div className="bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-8 md:p-12 shadow-2xl mb-6 relative">
@@ -191,7 +222,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                   </div>
                   <button
                     onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197882331:1'}
-                    className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
+                    className="smartplayer-scroll-event w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                   >
                     BUY NOW
                   </button>
@@ -279,6 +310,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
             </button>
           </div>
         )}
+        </div>
         </div>
       </div>
     </div>
