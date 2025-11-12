@@ -33,6 +33,8 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
+  const [showBelowHero, setShowBelowHero] = useState(true);
+  const [pulseButton, setPulseButton] = useState(false);
 
   const isBoltEnvironment = () => {
     return window.location.hostname.includes('bolt.new') ||
@@ -41,15 +43,13 @@ function App() {
            window.location.hostname.includes('stackblitz');
   };
 
-  const [showBelowHero, setShowBelowHero] = useState(isBoltEnvironment());
-  const [pulseButton, setPulseButton] = useState(false);
-
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     if (!isBoltEnvironment()) {
+      setShowBelowHero(false);
       const timer = setTimeout(() => {
         setShowBelowHero(true);
       }, 20000);
