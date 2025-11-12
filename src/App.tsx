@@ -66,32 +66,15 @@ function App() {
     if (!pitchButton) return;
 
     let hasActivated = false;
-    let isUserScrolling = false;
-    let userScrollTimeout: NodeJS.Timeout;
 
-    const handleWheel = () => {
-      isUserScrolling = true;
-      clearTimeout(userScrollTimeout);
-      userScrollTimeout = setTimeout(() => {
-        isUserScrolling = false;
-      }, 150);
-    };
+    const checkForVturbScrollEvent = () => {
+      const vturbPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (!vturbPlayer) return;
 
-    const handleTouchStart = () => {
-      isUserScrolling = true;
-      clearTimeout(userScrollTimeout);
-      userScrollTimeout = setTimeout(() => {
-        isUserScrolling = false;
-      }, 150);
-    };
+      const handleVturbScroll = (event: any) => {
+        if (hasActivated) return;
 
-    const handleScroll = () => {
-      if (hasActivated || isUserScrolling) return;
-
-      const rect = pitchButton.getBoundingClientRect();
-      const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
-
-      if (isInViewport && !hasActivated) {
+        console.log('vTurb scroll event detected:', event);
         hasActivated = true;
 
         setContentVisible(true);
@@ -110,22 +93,25 @@ function App() {
             }
           }, 800);
         }, 300);
+      };
 
-        window.removeEventListener('scroll', handleScroll);
-        window.removeEventListener('wheel', handleWheel);
-        window.removeEventListener('touchstart', handleTouchStart);
-      }
+      vturbPlayer.addEventListener('smartplayer-scroll-event', handleVturbScroll);
+
+      return () => {
+        vturbPlayer.removeEventListener('smartplayer-scroll-event', handleVturbScroll);
+      };
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: true });
-    window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    const interval = setInterval(() => {
+      const vturbPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (vturbPlayer) {
+        checkForVturbScrollEvent();
+        clearInterval(interval);
+      }
+    }, 500);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchstart', handleTouchStart);
-      clearTimeout(userScrollTimeout);
+      clearInterval(interval);
     };
   }, []);
 
