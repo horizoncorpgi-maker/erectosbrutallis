@@ -63,21 +63,66 @@ function App() {
 
   useEffect(() => {
     let hasActivated = false;
-    let vturbScrollDetected = false;
+    let lastScrollY = window.pageYOffset;
+    let scrollVelocities: number[] = [];
+    let scrollTimestamps: number[] = [];
+
+    const detectAutomatedScroll = () => {
+      const now = Date.now();
+      const currentScrollY = window.pageYOffset;
+      const velocity = Math.abs(currentScrollY - lastScrollY);
+
+      scrollVelocities.push(velocity);
+      scrollTimestamps.push(now);
+
+      // Mantém apenas os últimos 10 eventos
+      if (scrollVelocities.length > 10) {
+        scrollVelocities.shift();
+        scrollTimestamps.shift();
+      }
+
+      // Calcula a consistência da velocidade (característica de scroll automático)
+      if (scrollVelocities.length >= 5) {
+        const avgVelocity = scrollVelocities.reduce((a, b) => a + b, 0) / scrollVelocities.length;
+        const variance = scrollVelocities.reduce((sum, v) => sum + Math.pow(v - avgVelocity, 2), 0) / scrollVelocities.length;
+        const stdDev = Math.sqrt(variance);
+
+        // Scroll automático tem velocidade muito consistente (baixo desvio padrão)
+        // e velocidade moderada (não muito rápido nem muito devagar)
+        const isConsistent = stdDev < avgVelocity * 0.3;
+        const isModerate = avgVelocity > 5 && avgVelocity < 50;
+
+        lastScrollY = currentScrollY;
+
+        return isConsistent && isModerate;
+      }
+
+      lastScrollY = currentScrollY;
+      return false;
+    };
 
     const handleScroll = () => {
-      // Só ativa se o vTurb já tiver disparado o scroll
-      if (!vturbScrollDetected || hasActivated) return;
+      if (hasActivated) return;
 
+      const isAutomated = detectAutomatedScroll();
+
+      if (!isAutomated) {
+        // Limpa o histórico se detectar scroll manual
+        scrollVelocities = [];
+        scrollTimestamps = [];
+        return;
+      }
+
+      // Verifica se o pitch button está visível
       const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
       if (!pitchButton) return;
 
       const rect = pitchButton.getBoundingClientRect();
-      const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
+      const isNearButton = rect.top >= -100 && rect.top <= window.innerHeight / 2;
 
-      if (isInViewport) {
+      if (isNearButton) {
         hasActivated = true;
-        console.log('Content revealed after vTurb scroll');
+        console.log('vTurb automated scroll detected - revealing content');
 
         setContentVisible(true);
 
@@ -100,43 +145,9 @@ function App() {
       }
     };
 
-    // Monitora quando o vTurb clica no botão (evento click programático)
-    const setupClickListener = () => {
-      const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
-      if (!pitchButton) return;
-
-      // Monitora o click event que o vTurb dispara
-      const handleClick = (e: Event) => {
-        // Verifica se é um evento programático (não originado por usuário)
-        const mouseEvent = e as MouseEvent;
-
-        // Eventos programáticos do vTurb não têm coordenadas reais do mouse
-        if (mouseEvent.clientX === 0 && mouseEvent.clientY === 0) {
-          console.log('vTurb programmatic click detected');
-          vturbScrollDetected = true;
-          window.addEventListener('scroll', handleScroll, { passive: true });
-        }
-      };
-
-      pitchButton.addEventListener('click', handleClick, true);
-
-      return () => {
-        pitchButton.removeEventListener('click', handleClick, true);
-        window.removeEventListener('scroll', handleScroll);
-      };
-    };
-
-    // Aguarda o pitch button estar disponível
-    const checkInterval = setInterval(() => {
-      const pitchButton = document.querySelector('.smartplayer-scroll-event');
-      if (pitchButton) {
-        setupClickListener();
-        clearInterval(checkInterval);
-      }
-    }, 500);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      clearInterval(checkInterval);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
