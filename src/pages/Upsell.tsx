@@ -14,34 +14,42 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const isUp1bt = location.pathname === '/up1bt';
   const isUp3bt = location.pathname === '/up3bt';
   const [contentUnlocked, setContentUnlocked] = useState(false);
-  const [pendingScrollEvent, setPendingScrollEvent] = useState(false);
 
   useEffect(() => {
-    const handleScrollEvent = () => {
+    const unlockContent = () => {
       if (!contentUnlocked) {
         setContentUnlocked(true);
-        setPendingScrollEvent(true);
       }
     };
 
-    window.addEventListener('smartplayer-scroll-event', handleScrollEvent);
+    const handleScrollEvent = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      unlockContent();
+    };
+
+    window.addEventListener('smartplayer-scroll-event', unlockContent);
+
+    const checkForScrollElements = setInterval(() => {
+      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
+
+      scrollElements.forEach((element) => {
+        if (!(element as any)._scrollListenerAdded) {
+          (element as any)._scrollListenerAdded = true;
+          element.addEventListener('click', handleScrollEvent);
+        }
+      });
+    }, 500);
 
     return () => {
-      window.removeEventListener('smartplayer-scroll-event', handleScrollEvent);
+      clearInterval(checkForScrollElements);
+      window.removeEventListener('smartplayer-scroll-event', unlockContent);
+      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
+      scrollElements.forEach((element) => {
+        element.removeEventListener('click', handleScrollEvent);
+      });
     };
   }, [contentUnlocked]);
-
-  useEffect(() => {
-    if (pendingScrollEvent && contentUnlocked) {
-      const timer = setTimeout(() => {
-        const event = new Event('smartplayer-scroll-event');
-        window.dispatchEvent(event);
-        setPendingScrollEvent(false);
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [pendingScrollEvent, contentUnlocked]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50 flex flex-col">

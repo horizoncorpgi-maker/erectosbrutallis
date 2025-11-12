@@ -34,7 +34,6 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
   const [contentUnlocked, setContentUnlocked] = useState(false);
-  const [pendingScrollEvent, setPendingScrollEvent] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,31 +44,44 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const handleScrollEvent = () => {
+    const unlockContent = () => {
       if (!contentUnlocked) {
         setContentUnlocked(true);
-        setPendingScrollEvent(true);
+
+        setTimeout(() => {
+          offersRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
       }
     };
 
-    window.addEventListener('smartplayer-scroll-event', handleScrollEvent);
+    const handleScrollEvent = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      unlockContent();
+    };
+
+    window.addEventListener('smartplayer-scroll-event', unlockContent);
+
+    const checkForScrollElements = setInterval(() => {
+      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
+
+      scrollElements.forEach((element) => {
+        if (!(element as any)._scrollListenerAdded) {
+          (element as any)._scrollListenerAdded = true;
+          element.addEventListener('click', handleScrollEvent);
+        }
+      });
+    }, 500);
 
     return () => {
-      window.removeEventListener('smartplayer-scroll-event', handleScrollEvent);
+      clearInterval(checkForScrollElements);
+      window.removeEventListener('smartplayer-scroll-event', unlockContent);
+      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
+      scrollElements.forEach((element) => {
+        element.removeEventListener('click', handleScrollEvent);
+      });
     };
   }, [contentUnlocked]);
-
-  useEffect(() => {
-    if (pendingScrollEvent && contentUnlocked) {
-      const timer = setTimeout(() => {
-        const event = new Event('smartplayer-scroll-event');
-        window.dispatchEvent(event);
-        setPendingScrollEvent(false);
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [pendingScrollEvent, contentUnlocked]);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
