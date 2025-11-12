@@ -496,8 +496,7 @@ function App() {
             style={{
               backgroundColor: '#1f2937',
               opacity: 0,
-              pointerEvents: 'none',
-              visibility: 'hidden'
+              pointerEvents: 'none'
             }}
             aria-hidden="true"
           >
