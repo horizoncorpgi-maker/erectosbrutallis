@@ -43,7 +43,20 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
-    const isBoltEnv = window.location.hostname === 'localhost' || window.location.hostname.includes('bolt');
+    const isBoltEnv =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname.includes('bolt') ||
+      window.location.hostname.includes('127.0.0.1') ||
+      window.location.port === '5173' ||
+      import.meta.env.DEV;
+
+    console.log('Environment check:', {
+      hostname: window.location.hostname,
+      port: window.location.port,
+      isDev: import.meta.env.DEV,
+      isBoltEnv
+    });
+
     setIsInBolt(isBoltEnv);
     setContentVisible(isBoltEnv);
   }, []);
