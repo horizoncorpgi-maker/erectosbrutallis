@@ -63,73 +63,81 @@ function App() {
 
   useEffect(() => {
     let hasActivated = false;
-    let intersectionObserver: IntersectionObserver | null = null;
-    let initialCheck = true;
+    let vturbScrollDetected = false;
 
-    const setupObserver = () => {
+    const handleScroll = () => {
+      // Só ativa se o vTurb já tiver disparado o scroll
+      if (!vturbScrollDetected || hasActivated) return;
+
       const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
       if (!pitchButton) return;
 
-      // Usa Intersection Observer para detectar quando o pitch button entra no viewport
-      intersectionObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            // Ignora a primeira detecção que acontece no carregamento
-            if (initialCheck) {
-              initialCheck = false;
-              return;
-            }
+      const rect = pitchButton.getBoundingClientRect();
+      const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
 
-            if (entry.isIntersecting && !hasActivated) {
-              console.log('vTurb automatic scroll detected');
-              hasActivated = true;
+      if (isInViewport) {
+        hasActivated = true;
+        console.log('Content revealed after vTurb scroll');
 
-              setContentVisible(true);
+        setContentVisible(true);
 
+        setTimeout(() => {
+          sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          setTimeout(() => {
+            if (sixBottleButtonRef.current) {
+              sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
               setTimeout(() => {
-                sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                setTimeout(() => {
-                  if (sixBottleButtonRef.current) {
-                    sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
-                    setTimeout(() => {
-                      if (sixBottleButtonRef.current) {
-                        sixBottleButtonRef.current.style.animation = '';
-                      }
-                    }, 500);
-                  }
-                }, 800);
-              }, 300);
-
-              if (intersectionObserver) {
-                intersectionObserver.disconnect();
-              }
+                if (sixBottleButtonRef.current) {
+                  sixBottleButtonRef.current.style.animation = '';
+                }
+              }, 500);
             }
-          });
-        },
-        {
-          threshold: 0.1,
-          rootMargin: '0px'
-        }
-      );
+          }, 800);
+        }, 300);
 
-      intersectionObserver.observe(pitchButton);
+        window.removeEventListener('scroll', handleScroll);
+      }
+    };
+
+    // Monitora quando o vTurb clica no botão (evento click programático)
+    const setupClickListener = () => {
+      const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
+      if (!pitchButton) return;
+
+      // Monitora o click event que o vTurb dispara
+      const handleClick = (e: Event) => {
+        // Verifica se é um evento programático (não originado por usuário)
+        const mouseEvent = e as MouseEvent;
+
+        // Eventos programáticos do vTurb não têm coordenadas reais do mouse
+        if (mouseEvent.clientX === 0 && mouseEvent.clientY === 0) {
+          console.log('vTurb programmatic click detected');
+          vturbScrollDetected = true;
+          window.addEventListener('scroll', handleScroll, { passive: true });
+        }
+      };
+
+      pitchButton.addEventListener('click', handleClick, true);
+
+      return () => {
+        pitchButton.removeEventListener('click', handleClick, true);
+        window.removeEventListener('scroll', handleScroll);
+      };
     };
 
     // Aguarda o pitch button estar disponível
     const checkInterval = setInterval(() => {
       const pitchButton = document.querySelector('.smartplayer-scroll-event');
       if (pitchButton) {
-        setupObserver();
+        setupClickListener();
         clearInterval(checkInterval);
       }
     }, 500);
 
     return () => {
       clearInterval(checkInterval);
-      if (intersectionObserver) {
-        intersectionObserver.disconnect();
-      }
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
