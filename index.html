@@ -1,13 +1,211 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bolt="true">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Erectos Brutallis Landing Page</title>
+    <style>
+/* ===== VTurb + CTA 6 Potes – Controle de exibição e animação ===== */
+:root{
+  --vt-pulse-scale: 1.07;
+  --vt-pulse-duration: 340ms;
+}
+
+/* Dentro do Bolt: sempre tudo visível */
+html[data-bolt="true"] .vt-hidden-after-hero { display: revert !important; }
+
+/* Fora do Bolt: ocultar tudo que vem depois do Hero até a detecção do VTurb */
+html:not([data-bolt="true"]) .vt-hidden-after-hero { display: none !important; }
+
+/* Sentinela mínima (fica "visível" pro DOM/VTurb) */
+.vt-sentinel{
+  display:block !important;
+  height:1px;width:1px;margin:0;padding:0;
+  opacity:0.001; pointer-events:none;
+}
+
+/* Pulso do CTA após o scroll */
+@keyframes vt-pulse {
+  0%{transform:scale(1)} 50%{transform:scale(var(--vt-pulse-scale))} 100%{transform:scale(1)}
+}
+.vt-pulse-3x{
+  animation: vt-pulse var(--vt-pulse-duration) ease-in-out 3;
+  transform-origin:center center;
+  will-change:transform;
+}
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+(function(){
+  /* ========= CONFIGS – ajuste se necessário ========= */
+  // Heurísticas comuns de "Hero" com VTurb (inclui players e wrappers):
+  const HERO_SELECTOR = [
+    '#hero','.hero','.section-hero','.video-hero','.Hero',
+    '.smartplayer','.smartplayer-video','.vturb-player',
+    'iframe[src*="vturb"]','iframe[src*="sp.vturb"]','[data-hero]'
+  ].join(',');
+
+  // Como localizar o CTA "6 potes" (por atributos ou texto):
+  const CTA6_CANDIDATE_SELECTORS = [
+    '[data-offer="6"]','.btn-6-potes','#cta-6-potes',
+    'a[href*="6-potes"]','a[href*="6potes"]',
+    'button[data-cta*="6"]','[data-cta*="6"]'
+  ];
+
+  // Palavras-chave para varrer botões/links por texto:
+  const CTA6_KEYWORDS = [
+    '6 potes','6 frascos','kit 6','6 unidades','6x','seis potes','combo 6'
+  ];
+
+  const VT_CLASS = 'smartplayer-scroll-event'; // classe exigida pelo VTurb
+  const SCROLL_BEHAVIOR = { behavior:'smooth', block:'center', inline:'nearest' };
+  const MANUAL_WINDOW_MS = 800; // janela de "anti-scroll manual"
+
+  /* ========= HELPERS ========= */
+  const $ = (s,root=document)=>root.querySelector(s);
+  const $$ = (s,root=document)=>Array.from(root.querySelectorAll(s));
+  const now = ()=>Date.now();
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+
+  function findHero(){
+    // Prioriza um container de player VTurb; cai para o primeiro que casar
+    const hero = $(HERO_SELECTOR);
+    if (hero){
+      // Se o hero for um IFRAME do VTurb, tente subir para o container pai (melhor âncora)
+      if (hero.tagName === 'IFRAME' && hero.parentElement) return hero.parentElement;
+      return hero;
+    }
+    // Fallback: primeira seção do body
+    return document.body.firstElementChild || document.body;
+  }
+
+  function textContains(el, keywords){
+    const t = norm(el.textContent || '');
+    return keywords.some(k=> t.includes(norm(k)));
+  }
+
+  function isClickable(el){
+    return el && (el.tagName==='A' || el.tagName==='BUTTON' || el.closest('a,button,[role="button"]'));
+  }
+
+  function findCTA6(){
+    // 1) Seletores diretos
+    for (const sel of CTA6_CANDIDATE_SELECTORS){
+      const el = $(sel);
+      if (el) return el;
+    }
+    // 2) Varredura por texto em botões/links comuns
+    const candidates = $$('a, button, [role="button"]');
+    return candidates.find(el => textContains(el, CTA6_KEYWORDS)) || null;
+  }
+
+  // Marca último input humano
+  let lastUserInputAt = 0;
+  ['wheel','touchstart','touchmove','keydown','pointerdown'].forEach(evt=>{
+    window.addEventListener(evt, ()=>{ lastUserInputAt = now(); }, {passive:true});
+  });
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  function init(){
+    const html = document.documentElement;
+    const inBolt = html.hasAttribute('data-bolt');
+
+    // 1) Identifica o HERO
+    const hero = findHero();
+
+    // 2) Esconde tudo que vem DEPOIS do Hero (fora do Bolt)
+    const toHide = [];
+    let reachedHero = false;
+    for (const el of Array.from(document.body.children)){
+      if (el === hero){ reachedHero = true; continue; }
+      if (reachedHero) toHide.push(el);
+    }
+    toHide.forEach(el => el.classList.add('vt-hidden-after-hero'));
+
+    // 3) Garante a classe do VTurb no CTA real
+    let cta = findCTA6();
+    if (cta){
+      cta.classList.add(VT_CLASS);
+      // se o CTA não for naturalmente "clicável", tenta promover
+      if (!isClickable(cta)) cta.setAttribute('role','button');
+    }
+
+    // 4) Sentinela com MESMA classe (precisa estar visível para o VTurb)
+    const sentinel = document.createElement('div');
+    sentinel.className = VT_CLASS + ' vt-sentinel';
+    hero.insertAdjacentElement('afterend', sentinel);
+
+    // 5) Detecção da tentativa de scroll AUTOMÁTICO (VTurb)
+    let fired = false;
+
+    const onProgrammatic = () => {
+      if (fired) return;
+      fired = true;
+      revealAndScroll();
+    };
+
+    // a) Se a sentinela entrar em viewport sem input humano recente, assume automático
+    const ioSentinel = new IntersectionObserver((entries)=>{
+      const e = entries[0];
+      if (!e) return;
+      if (e.isIntersecting && (now() - lastUserInputAt) > MANUAL_WINDOW_MS){
+        onProgrammatic();
+      }
+    }, {root:null, threshold:0});
+    requestAnimationFrame(()=> ioSentinel.observe(sentinel));
+
+    // b) Segurança extra: se o CTA real entrar em viewport sem input humano recente
+    const ioCTA = (cta) ? new IntersectionObserver((entries)=>{
+      const e = entries[0];
+      if (e && e.isIntersecting && (now() - lastUserInputAt) > MANUAL_WINDOW_MS){
+        onProgrammatic();
+      }
+    }, {root:null, threshold:0}) : null;
+    if (ioCTA && cta) ioCTA.observe(cta);
+
+    // 6) Desbloqueia, rola ao CTA e pulsa 3x
+    function revealAndScroll(){
+      // Revela tudo
+      $$('.vt-hidden-after-hero').forEach(el => el.classList.remove('vt-hidden-after-hero'));
+
+      // Define alvo final (CTA se encontrado, senão usa a sentinela)
+      const target = cta || sentinel;
+
+      // Scroll suave ao alvo
+      try { target.scrollIntoView(SCROLL_BEHAVIOR); }
+      catch(_){
+        const top = target.getBoundingClientRect().top + window.pageYOffset - 60;
+        window.scrollTo({top, behavior:'smooth'});
+      }
+
+      // Pulso 3x no CTA se houver
+      if (cta){
+        cta.classList.remove('vt-pulse-3x'); void cta.offsetWidth; // reset animação
+        cta.classList.add('vt-pulse-3x');
+      }
+    }
+
+    // 7) Hardening: se após 6s nada disparar, mas houver IFRAME VTurb carregado, revalida automático
+    setTimeout(()=>{
+      if (!fired){
+        const vtIframes = $$('iframe[src*="vturb"], iframe[src*="sp.vturb"]');
+        if (vtIframes.length && (now() - lastUserInputAt) > MANUAL_WINDOW_MS*3){
+          // o player está presente, possivelmente tentou rolar sem sucesso visual – libera
+          onProgrammatic();
+        }
+      }
+    }, 6000);
+  }
+})();
+    </script>
   </body>
 </html>
