@@ -97,19 +97,21 @@ function App() {
         setContentVisible(true);
 
         setTimeout(() => {
-          sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          requestAnimationFrame(() => {
+            sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-          setTimeout(() => {
-            if (sixBottleButtonRef.current) {
-              sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
-              setTimeout(() => {
-                if (sixBottleButtonRef.current) {
-                  sixBottleButtonRef.current.style.animation = '';
-                }
-              }, 500);
-            }
-          }, 800);
-        }, 300);
+            setTimeout(() => {
+              if (sixBottleButtonRef.current) {
+                sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
+                setTimeout(() => {
+                  if (sixBottleButtonRef.current) {
+                    sixBottleButtonRef.current.style.animation = '';
+                  }
+                }, 500);
+              }
+            }, 800);
+          });
+        }, 100);
 
         window.removeEventListener('scroll', handleScroll);
         window.removeEventListener('wheel', handleWheel);
