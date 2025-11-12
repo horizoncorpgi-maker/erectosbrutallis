@@ -1,13 +1,163 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bolt="true">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Erectos Brutallis Landing Page</title>
+    <style>
+/* ——— CONFIG GERAL ——— */
+:root {
+  --vt-pulse-scale: 1.06;
+  --vt-pulse-duration: 320ms;
+}
+
+/* Dentro do Bolt (preview/editor): sempre tudo visível */
+html[data-bolt="true"] .vt-hidden-after-hero { display: revert !important; }
+
+/* Fora do Bolt: ocultar tudo que vem depois do Hero até a detecção do VTurb */
+html:not([data-bolt="true"]) .vt-hidden-after-hero { display: none !important; }
+
+/* Âncora sentinela (fica visível no fluxo do documento, mas mínima) */
+.vt-sentinel {
+  display: block !important;
+  height: 1px;
+  width: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0.001;           /* visível ao DOM, imperceptível ao usuário */
+  pointer-events: none;
+}
+
+/* Animação de "pulsar" no CTA após o scroll */
+@keyframes vt-pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(var(--vt-pulse-scale)); }
+  100% { transform: scale(1); }
+}
+.vt-pulse-3x {
+  animation: vt-pulse var(--vt-pulse-duration) ease-in-out 3;
+  transform-origin: center center;
+  will-change: transform;
+}
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+(function(){
+  /* ——— CONFIGURÁVEIS (ajuste os seletores se necessário) ——— */
+  const HERO_SELECTOR = '#hero, .hero, .section-hero, .Hero, section[data-hero], .video-hero';
+  // Seletor do botão da oferta de 6 potes (ajuste para o seu tema):
+  const CTA6_SELECTOR = '[data-offer="6"], [href*="6-potes"], button:has(span:matches(.:contains("6 potes"),.:contains("6 Potes"))) , .btn-6-potes, #cta-6-potes';
+  const SCROLL_BEHAVIOR = { behavior: 'smooth', block: 'center' };
+  const VT_CLASS = 'smartplayer-scroll-event';
+
+  /* ——— HELPERS ——— */
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+  const now = () => Date.now();
+
+  // Marca último input do usuário para distinguir scroll manual de programático
+  let lastUserInputAt = 0;
+  ['wheel','touchstart','touchmove','keydown','pointerdown','mousemove'].forEach(evt=>{
+    window.addEventListener(evt, ()=>{ lastUserInputAt = now(); }, {passive:true});
+  });
+
+  // Aguarda DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  function init() {
+    const html = document.documentElement;
+    const inBolt = html.hasAttribute('data-bolt');
+
+    // 1) Identifica HERO
+    const hero = $(HERO_SELECTOR) || document.body.firstElementChild || document.body;
+
+    // 2) Marca todas as seções após o HERO para ocultar (fora do Bolt)
+    //    Obs.: dentro do Bolt (data-bolt="true") o CSS já garante visibilidade.
+    const toHide = [];
+    let reachedHero = false;
+    for (const el of Array.from(document.body.children)) {
+      if (el === hero) { reachedHero = true; continue; }
+      if (reachedHero) toHide.push(el);
+    }
+    toHide.forEach(el => el.classList.add('vt-hidden-after-hero'));
+
+    // 3) Garante que o CTA de 6 potes exista e receba a classe exigida pelo VTurb
+    let cta = $(CTA6_SELECTOR);
+    if (cta) cta.classList.add(VT_CLASS);
+
+    // 4) Cria uma sentinela com a MESMA classe para o VTurb "achar" e tentar scroll
+    //    Colocamos logo após o HERO para que o elemento alvo esteja visível no viewport inicial.
+    const sentinel = document.createElement('div');
+    sentinel.className = `${VT_CLASS} vt-sentinel`;
+    hero.insertAdjacentElement('afterend', sentinel);
+
+    // 5) Observa a entrada da sentinela em viewport para inferir tentativa de scroll do VTurb
+    let fired = false;
+    const io = new IntersectionObserver((entries)=>{
+      if (fired) return;
+      const e = entries[0];
+      if (!e || !e.isIntersecting) return;
+
+      // Ignora se houve interação de usuário recentemente (scroll manual)
+      const MANUAL_WINDOW_MS = 700;
+      const programmaticLikely = (now() - lastUserInputAt) > MANUAL_WINDOW_MS;
+
+      if (programmaticLikely) {
+        fired = true;
+        revealAndScroll();
+      }
+    }, { root: null, threshold: 0 });
+
+    // Assim que possível, observar a sentinela
+    requestAnimationFrame(()=> io.observe(sentinel));
+
+    // 6) Função: revelar página, rolar até o CTA verdadeiro e pulsar 3x
+    function revealAndScroll(){
+      // Revela tudo
+      $$('.vt-hidden-after-hero').forEach(el => el.classList.remove('vt-hidden-after-hero'));
+
+      // Scroll até o botão real (se existir); senão, até a sentinela mesmo
+      const target = cta || sentinel;
+      try {
+        target.scrollIntoView(SCROLL_BEHAVIOR);
+      } catch (_) {
+        window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 60, behavior: 'smooth' });
+      }
+
+      // Pulsa 3x o botão
+      if (cta) {
+        cta.classList.remove('vt-pulse-3x'); // reset de animação
+        // força reflow para reiniciar animação
+        void cta.offsetWidth;
+        cta.classList.add('vt-pulse-3x');
+      }
+    }
+
+    // 7) Segurança extra: se o próprio botão entrar em viewport sem input humano logo após load,
+    //    também consideramos como tentativa automática.
+    const ioCTA = cta ? new IntersectionObserver((entries)=>{
+      if (fired) return;
+      const e = entries[0];
+      if (e && e.isIntersecting && (now() - lastUserInputAt) > 700) {
+        fired = true;
+        revealAndScroll();
+      }
+    }, {root:null, threshold:0}) : null;
+
+    if (ioCTA && cta) ioCTA.observe(cta);
+
+    // 8) Não permitir que scroll manual dispare: listeners vazios para "scroll" apenas para timestamp
+    window.addEventListener('scroll', ()=>{}, {passive:true});
+  }
+})();
+    </script>
   </body>
 </html>
