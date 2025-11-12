@@ -19,6 +19,7 @@ import ArticleReader from './ArticleReader';
 
 function App() {
   const offersRef = useRef<HTMLDivElement>(null);
+  const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentMedia, setCurrentMedia] = useState(0);
@@ -34,6 +35,7 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
   const [showBelowHero, setShowBelowHero] = useState(false);
+  const [pulseButton, setPulseButton] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -59,6 +61,23 @@ function App() {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  useEffect(() => {
+    if (showBelowHero && !isBoltEnvironment()) {
+      setTimeout(() => {
+        sixBottleButtonRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+
+        setPulseButton(true);
+
+        setTimeout(() => {
+          setPulseButton(false);
+        }, 2000);
+      }, 1000);
+    }
+  }, [showBelowHero]);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -463,8 +482,9 @@ function App() {
                   YOU'RE SAVING $888
                 </div>
                 <button
+                  ref={sixBottleButtonRef}
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  className={`w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6 ${pulseButton ? 'animate-[customPulse_1s_ease-in-out_2]' : ''}`}
                 >
                   CLAIM OFFER NOW
                 </button>
