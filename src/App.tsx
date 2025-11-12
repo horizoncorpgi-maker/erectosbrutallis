@@ -519,10 +519,7 @@ function App() {
       </section>
 
       <div style={{
-        visibility: contentVisible || isInBolt ? 'visible' : 'hidden',
-        opacity: contentVisible || isInBolt ? 1 : 0,
-        pointerEvents: contentVisible || isInBolt ? 'auto' : 'none',
-        transition: 'opacity 0.3s ease-in-out'
+        display: contentVisible || isInBolt ? 'block' : 'none'
       }}>
       {/* Offers Section */}
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
