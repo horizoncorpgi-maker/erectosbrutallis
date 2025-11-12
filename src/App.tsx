@@ -506,7 +506,12 @@ function App() {
         </div>
       </section>
 
-      <div style={{ display: contentVisible ? 'block' : 'none' }}>
+      <div style={{
+        visibility: contentVisible || isInBolt ? 'visible' : 'hidden',
+        opacity: contentVisible || isInBolt ? 1 : 0,
+        pointerEvents: contentVisible || isInBolt ? 'auto' : 'none',
+        transition: 'opacity 0.3s ease-in-out'
+      }}>
       {/* Offers Section */}
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
