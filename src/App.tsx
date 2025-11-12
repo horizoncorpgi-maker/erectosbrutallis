@@ -26,7 +26,6 @@ function App() {
   const [dragStart, setDragStart] = useState<number | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [currentLab, setCurrentLab] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
   const [showTrustScorePopup, setShowTrustScorePopup] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<{name: string; logo: string; headline: string; description: string} | null>(null);
@@ -49,8 +48,6 @@ function App() {
   };
 
   useEffect(() => {
-    setIsVisible(true);
-
     if (isBoltEnvironment()) {
       setShowBelowHero(true);
     } else {
@@ -441,7 +438,7 @@ function App() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden w-full">
       {/* Hero / VSL Section */}
-      <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+      <section className="min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
             Why are men adding salt to their <span className="text-[#B80000]">morning coffee?</span>
