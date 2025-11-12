@@ -63,14 +63,3 @@
     transform: translateY(0);
   }
 }
-
-@keyframes customPulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  }
-  50% {
-    transform: scale(1.05);
-    box-shadow: 0 20px 25px -5px rgba(255, 214, 0, 0.5), 0 10px 10px -5px rgba(255, 214, 0, 0.4);
-  }
-}

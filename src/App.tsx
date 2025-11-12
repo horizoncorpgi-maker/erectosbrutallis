@@ -19,13 +19,13 @@ import ArticleReader from './ArticleReader';
 
 function App() {
   const offersRef = useRef<HTMLDivElement>(null);
-  const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentMedia, setCurrentMedia] = useState(0);
   const [dragStart, setDragStart] = useState<number | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [currentLab, setCurrentLab] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
   const [showTrustScorePopup, setShowTrustScorePopup] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<{name: string; logo: string; headline: string; description: string} | null>(null);
@@ -33,47 +33,14 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [showBelowHero, setShowBelowHero] = useState(true);
-  const [pulseButton, setPulseButton] = useState(false);
-
-  const isBoltEnvironment = () => {
-    return window.location.hostname.includes('bolt.new') ||
-           window.location.hostname.includes('localhost') ||
-           window.location.hostname.includes('127.0.0.1') ||
-           window.location.hostname.includes('stackblitz');
-  };
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
-    if (!isBoltEnvironment()) {
-      setShowBelowHero(false);
-      const timer = setTimeout(() => {
-        setShowBelowHero(true);
-      }, 20000);
-
-      return () => clearTimeout(timer);
-    }
+    setIsVisible(true);
   }, []);
-
-  useEffect(() => {
-    if (showBelowHero && !isBoltEnvironment()) {
-      setTimeout(() => {
-        sixBottleButtonRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
-
-        setPulseButton(true);
-
-        setTimeout(() => {
-          setPulseButton(false);
-        }, 2000);
-      }, 1000);
-    }
-  }, [showBelowHero]);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -437,7 +404,7 @@ function App() {
   return (
     <div className="min-h-screen bg-white overflow-x-hidden w-full">
       {/* Hero / VSL Section */}
-      <section className="min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50">
+      <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
             Why are men adding salt to their <span className="text-[#B80000]">morning coffee?</span>
@@ -453,7 +420,7 @@ function App() {
       </section>
 
       {/* Offers Section */}
-      <section ref={offersRef} className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showBelowHero ? 'opacity-100' : 'opacity-0 hidden'}`}>
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -478,9 +445,8 @@ function App() {
                   YOU'RE SAVING $888
                 </div>
                 <button
-                  ref={sixBottleButtonRef}
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className={`w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6 ${pulseButton ? 'animate-[customPulse_1s_ease-in-out_2]' : ''}`}
+                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
                 </button>
@@ -596,7 +562,7 @@ function App() {
       </section>
 
       {/* Experts Section */}
-      <section className={`py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50 transition-opacity duration-1000 ${showBelowHero ? 'opacity-100' : 'opacity-0 hidden'}`}>
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -704,7 +670,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showBelowHero ? 'opacity-100' : 'opacity-0 hidden'}`}>
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -767,7 +733,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className={`py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50 transition-opacity duration-1000 ${showBelowHero ? 'opacity-100' : 'opacity-0 hidden'}`}>
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -844,7 +810,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className={`py-8 md:py-20 px-4 bg-white transition-opacity duration-1000 ${showBelowHero ? 'opacity-100' : 'opacity-0 hidden'}`}>
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1196,7 +1162,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className={`py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000] transition-opacity duration-1000 ${showBelowHero ? 'opacity-100' : 'opacity-0 hidden'}`}>
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1211,7 +1177,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className={`bg-black text-gray-400 py-8 px-4 transition-opacity duration-1000 ${showBelowHero ? 'opacity-100' : 'opacity-0 hidden'}`}>
+      <footer className="bg-black text-gray-400 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
