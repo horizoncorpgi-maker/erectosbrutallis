@@ -56,7 +56,7 @@ function App() {
     } else {
       const timer = setTimeout(() => {
         setShowBelowHero(true);
-      }, 10000);
+      }, 20000);
 
       return () => clearTimeout(timer);
     }
