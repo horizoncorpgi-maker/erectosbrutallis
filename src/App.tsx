@@ -63,8 +63,8 @@ function App() {
 
   useEffect(() => {
     let hasActivated = false;
-    let mutationObserver: MutationObserver | null = null;
     let intersectionObserver: IntersectionObserver | null = null;
+    let initialCheck = true;
 
     const setupObserver = () => {
       const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
@@ -74,35 +74,35 @@ function App() {
       intersectionObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
+            // Ignora a primeira detecção que acontece no carregamento
+            if (initialCheck) {
+              initialCheck = false;
+              return;
+            }
+
             if (entry.isIntersecting && !hasActivated) {
-              // Verifica se o scroll foi iniciado programaticamente (pelo vTurb)
-              // O vTurb adiciona atributos ou dispara o scroll de forma automática
-              const isVturbScroll = entry.target.classList.contains('smartplayer-scroll-event');
+              console.log('vTurb automatic scroll detected');
+              hasActivated = true;
 
-              if (isVturbScroll) {
-                console.log('vTurb automatic scroll detected');
-                hasActivated = true;
+              setContentVisible(true);
 
-                setContentVisible(true);
+              setTimeout(() => {
+                sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                 setTimeout(() => {
-                  sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  if (sixBottleButtonRef.current) {
+                    sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
+                    setTimeout(() => {
+                      if (sixBottleButtonRef.current) {
+                        sixBottleButtonRef.current.style.animation = '';
+                      }
+                    }, 500);
+                  }
+                }, 800);
+              }, 300);
 
-                  setTimeout(() => {
-                    if (sixBottleButtonRef.current) {
-                      sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
-                      setTimeout(() => {
-                        if (sixBottleButtonRef.current) {
-                          sixBottleButtonRef.current.style.animation = '';
-                        }
-                      }, 500);
-                    }
-                  }, 800);
-                }, 300);
-
-                if (intersectionObserver) {
-                  intersectionObserver.disconnect();
-                }
+              if (intersectionObserver) {
+                intersectionObserver.disconnect();
               }
             }
           });
@@ -114,24 +114,6 @@ function App() {
       );
 
       intersectionObserver.observe(pitchButton);
-
-      // Observa mudanças no DOM para detectar quando o vTurb manipula o pitch button
-      mutationObserver = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && !hasActivated) {
-            const target = mutation.target as HTMLElement;
-            if (target.classList.contains('smartplayer-scroll-event')) {
-              // Verifica se houve mudança que indica ação do vTurb
-              console.log('vTurb interaction detected on pitch button');
-            }
-          }
-        });
-      });
-
-      mutationObserver.observe(pitchButton, {
-        attributes: true,
-        attributeOldValue: true
-      });
     };
 
     // Aguarda o pitch button estar disponível
@@ -147,9 +129,6 @@ function App() {
       clearInterval(checkInterval);
       if (intersectionObserver) {
         intersectionObserver.disconnect();
-      }
-      if (mutationObserver) {
-        mutationObserver.disconnect();
       }
     };
   }, []);
