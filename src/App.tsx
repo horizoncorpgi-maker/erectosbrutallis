@@ -33,6 +33,8 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
+  const [contentUnlocked, setContentUnlocked] = useState(false);
+  const [pendingScrollEvent, setPendingScrollEvent] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -41,6 +43,33 @@ function App() {
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  useEffect(() => {
+    const handleScrollEvent = () => {
+      if (!contentUnlocked) {
+        setContentUnlocked(true);
+        setPendingScrollEvent(true);
+      }
+    };
+
+    window.addEventListener('smartplayer-scroll-event', handleScrollEvent);
+
+    return () => {
+      window.removeEventListener('smartplayer-scroll-event', handleScrollEvent);
+    };
+  }, [contentUnlocked]);
+
+  useEffect(() => {
+    if (pendingScrollEvent && contentUnlocked) {
+      const timer = setTimeout(() => {
+        const event = new Event('smartplayer-scroll-event');
+        window.dispatchEvent(event);
+        setPendingScrollEvent(false);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [pendingScrollEvent, contentUnlocked]);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -420,7 +449,7 @@ function App() {
       </section>
 
       {/* Offers Section */}
-      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white" style={{ display: contentUnlocked ? 'block' : 'none' }}>
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -446,7 +475,7 @@ function App() {
                 </div>
                 <button
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
                 </button>
@@ -562,7 +591,7 @@ function App() {
       </section>
 
       {/* Experts Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: contentUnlocked ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -670,7 +699,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: contentUnlocked ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -733,7 +762,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: contentUnlocked ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -810,7 +839,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className="py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: contentUnlocked ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1162,7 +1191,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]" style={{ display: contentUnlocked ? 'block' : 'none' }}>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1177,7 +1206,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-gray-400 py-8 px-4">
+      <footer className="bg-black text-gray-400 py-8 px-4" style={{ display: contentUnlocked ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
