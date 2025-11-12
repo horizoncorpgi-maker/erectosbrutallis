@@ -13,7 +13,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
   const isUp3bt = location.pathname === '/up3bt';
-  const [contentUnlocked, setContentUnlocked] = useState(false);
+  const [contentUnlocked, setContentUnlocked] = useState(true);
 
   useEffect(() => {
     const unlockContent = () => {
