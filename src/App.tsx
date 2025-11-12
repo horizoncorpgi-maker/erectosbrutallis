@@ -63,7 +63,6 @@ function App() {
 
   useEffect(() => {
     const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
-    console.log('Pitch button found:', pitchButton);
     if (!pitchButton) return;
 
     let hasActivated = false;
@@ -92,31 +91,25 @@ function App() {
       const rect = pitchButton.getBoundingClientRect();
       const isInViewport = rect.top >= 0 && rect.top <= window.innerHeight;
 
-      console.log('Scroll check:', { rectTop: rect.top, isInViewport, hasActivated, isUserScrolling });
-
       if (isInViewport && !hasActivated) {
-        console.log('Activating content visibility');
         hasActivated = true;
 
         setContentVisible(true);
 
         setTimeout(() => {
-          requestAnimationFrame(() => {
-            console.log('Scrolling to six bottle button:', sixBottleButtonRef.current);
-            sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-            setTimeout(() => {
-              if (sixBottleButtonRef.current) {
-                sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
-                setTimeout(() => {
-                  if (sixBottleButtonRef.current) {
-                    sixBottleButtonRef.current.style.animation = '';
-                  }
-                }, 500);
-              }
-            }, 800);
-          });
-        }, 100);
+          setTimeout(() => {
+            if (sixBottleButtonRef.current) {
+              sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
+              setTimeout(() => {
+                if (sixBottleButtonRef.current) {
+                  sixBottleButtonRef.current.style.animation = '';
+                }
+              }, 500);
+            }
+          }, 800);
+        }, 300);
 
         window.removeEventListener('scroll', handleScroll);
         window.removeEventListener('wheel', handleWheel);
@@ -526,7 +519,10 @@ function App() {
       </section>
 
       <div style={{
-        display: contentVisible || isInBolt ? 'block' : 'none'
+        visibility: contentVisible || isInBolt ? 'visible' : 'hidden',
+        opacity: contentVisible || isInBolt ? 1 : 0,
+        pointerEvents: contentVisible || isInBolt ? 'auto' : 'none',
+        transition: 'opacity 0.3s ease-in-out'
       }}>
       {/* Offers Section */}
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
