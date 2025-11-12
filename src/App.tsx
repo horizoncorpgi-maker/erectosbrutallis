@@ -19,7 +19,6 @@ import ArticleReader from './ArticleReader';
 
 function App() {
   const offersRef = useRef<HTMLDivElement>(null);
-  const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentMedia, setCurrentMedia] = useState(0);
@@ -34,8 +33,6 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [contentVisible, setContentVisible] = useState(false);
-  const [isInBolt, setIsInBolt] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,113 +40,6 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
-    const isBoltEnv =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname.includes('bolt') ||
-      window.location.hostname.includes('127.0.0.1') ||
-      window.location.port === '5173' ||
-      import.meta.env.DEV;
-
-    console.log('Environment check:', {
-      hostname: window.location.hostname,
-      port: window.location.port,
-      isDev: import.meta.env.DEV,
-      isBoltEnv
-    });
-
-    setIsInBolt(isBoltEnv);
-    setContentVisible(isBoltEnv);
-  }, []);
-
-  useEffect(() => {
-    let hasActivated = false;
-    let lastScrollY = window.pageYOffset;
-    let scrollVelocities: number[] = [];
-    let scrollTimestamps: number[] = [];
-
-    const detectAutomatedScroll = () => {
-      const now = Date.now();
-      const currentScrollY = window.pageYOffset;
-      const velocity = Math.abs(currentScrollY - lastScrollY);
-
-      scrollVelocities.push(velocity);
-      scrollTimestamps.push(now);
-
-      // Mantém apenas os últimos 10 eventos
-      if (scrollVelocities.length > 10) {
-        scrollVelocities.shift();
-        scrollTimestamps.shift();
-      }
-
-      // Calcula a consistência da velocidade (característica de scroll automático)
-      if (scrollVelocities.length >= 5) {
-        const avgVelocity = scrollVelocities.reduce((a, b) => a + b, 0) / scrollVelocities.length;
-        const variance = scrollVelocities.reduce((sum, v) => sum + Math.pow(v - avgVelocity, 2), 0) / scrollVelocities.length;
-        const stdDev = Math.sqrt(variance);
-
-        // Scroll automático tem velocidade muito consistente (baixo desvio padrão)
-        // e velocidade moderada (não muito rápido nem muito devagar)
-        const isConsistent = stdDev < avgVelocity * 0.3;
-        const isModerate = avgVelocity > 5 && avgVelocity < 50;
-
-        lastScrollY = currentScrollY;
-
-        return isConsistent && isModerate;
-      }
-
-      lastScrollY = currentScrollY;
-      return false;
-    };
-
-    const handleScroll = () => {
-      if (hasActivated) return;
-
-      const isAutomated = detectAutomatedScroll();
-
-      if (!isAutomated) {
-        // Limpa o histórico se detectar scroll manual
-        scrollVelocities = [];
-        scrollTimestamps = [];
-        return;
-      }
-
-      // Verifica se o pitch button está visível
-      const pitchButton = document.querySelector('.smartplayer-scroll-event') as HTMLElement;
-      if (!pitchButton) return;
-
-      const rect = pitchButton.getBoundingClientRect();
-      const isNearButton = rect.top >= -100 && rect.top <= window.innerHeight / 2;
-
-      if (isNearButton) {
-        hasActivated = true;
-        console.log('vTurb automated scroll detected - revealing content');
-
-        setContentVisible(true);
-
-        setTimeout(() => {
-          sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-          setTimeout(() => {
-            if (sixBottleButtonRef.current) {
-              sixBottleButtonRef.current.style.animation = 'pulse 0.5s ease-in-out';
-              setTimeout(() => {
-                if (sixBottleButtonRef.current) {
-                  sixBottleButtonRef.current.style.animation = '';
-                }
-              }, 500);
-            }
-          }, 800);
-        }, 300);
-
-        window.removeEventListener('scroll', handleScroll);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
   }, []);
 
   useEffect(() => {
@@ -526,27 +416,9 @@ function App() {
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
-
-          <button
-            className="smartplayer-scroll-event mt-4 px-6 py-3 text-white rounded-full transition-all duration-300"
-            style={{
-              backgroundColor: '#1f2937',
-              opacity: 0,
-              pointerEvents: 'none'
-            }}
-            aria-hidden="true"
-          >
-            Pitch Button
-          </button>
         </div>
       </section>
 
-      <div style={{
-        visibility: contentVisible || isInBolt ? 'visible' : 'hidden',
-        opacity: contentVisible || isInBolt ? 1 : 0,
-        pointerEvents: contentVisible || isInBolt ? 'auto' : 'none',
-        transition: 'opacity 0.3s ease-in-out'
-      }}>
       {/* Offers Section */}
       <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -573,7 +445,6 @@ function App() {
                   YOU'RE SAVING $888
                 </div>
                 <button
-                  ref={sixBottleButtonRef}
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
                   className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
@@ -1397,7 +1268,6 @@ function App() {
           </div>
         </div>
       )}
-      </div>
 
     </div>
   );
