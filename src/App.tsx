@@ -109,6 +109,10 @@ function App() {
     console.log('%c✅ hasScrolledRef.current:', 'color: #00ff00', hasScrolledRef.current);
     console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
 
+    // 🔥 DISPARA EVENTO CUSTOMIZADO para remover todos os bloqueadores
+    console.log('%c🔥 Disparando evento de liberação total...', 'color: #ff0000; font-weight: bold');
+    window.dispatchEvent(new CustomEvent('content-revealed'));
+
     // 🔧 PASSO 2: Aguarda DOM renderizar e FAZ O SCROLL
     console.log('%c🎯 PASSO 2: Aguardando DOM renderizar para fazer scroll...', 'color: #00aaff; font-weight: bold');
 
@@ -289,36 +293,37 @@ function App() {
     // Monitora scroll com requestAnimationFrame (60 vezes por segundo)
     let rafId: number;
     const checkScroll = () => {
-      detectScrollAttempt();
-      rafId = requestAnimationFrame(checkScroll);
+      // Para de monitorar se o conteúdo já foi revelado
+      if (!hasScrolledRef.current) {
+        detectScrollAttempt();
+        rafId = requestAnimationFrame(checkScroll);
+      }
     };
     rafId = requestAnimationFrame(checkScroll);
 
     const handleVTurbScrollEvent = (e: Event) => {
+      // Se o conteúdo já foi revelado, não faz NADA - deixa o evento fluir normalmente
+      if (hasScrolledRef.current) {
+        console.log('%c✓ Conteúdo já revelado - evento VTurb liberado completamente', 'color: #00ff00');
+        return;
+      }
+
       // Só processa eventos do vídeo principal, não dos depoimentos ou experts
       const target = e.target as HTMLElement;
       const isMainVideo = target?.id === 'vid-69124ec0b910e6e322c32a69' ||
                           target?.closest('#vid-69124ec0b910e6e322c32a69');
 
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type, 'isMainVideo:', isMainVideo);
-      console.log('%c📊 Estado:', 'color: #ff9900', {
-        showRestOfContent,
-        showPurchaseButton,
-        hasScrolled: hasScrolledRef.current,
-        isMainVideo
-      });
 
       // Só bloqueia se for do vídeo principal E o conteúdo ainda não foi revelado
-      if (isMainVideo && !hasScrolledRef.current) {
+      if (isMainVideo) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         console.log('%c🛑 Evento VTurb do vídeo principal bloqueado - revelando conteúdo', 'color: #ff0000; font-weight: bold');
         handleVideoPitchReached();
-      } else if (!isMainVideo) {
-        console.log('%c✓ Evento de depoimento/expert - não bloqueia', 'color: #00ff00');
       } else {
-        console.log('%c✓ Conteúdo já revelado - não bloqueia', 'color: #00ff00');
+        console.log('%c✓ Evento de depoimento/expert - não bloqueia', 'color: #00ff00');
       }
     };
 
@@ -337,13 +342,17 @@ function App() {
 
     // 🔧 INTERCEPTADOR DE SCROLL: Detecta quando VTurb tenta fazer scroll (apenas no vídeo principal)
     const interceptScroll = (e: Event) => {
-      console.log('%c🎯 Scroll detectado - verificando se conteúdo já foi revelado', 'color: #ff00ff; font-weight: bold');
-      if (!hasScrolledRef.current) {
-        console.log('%c⚠️ Conteúdo ainda não revelado - revelando AGORA', 'color: #ff9900; font-weight: bold');
-        e.preventDefault();
-        e.stopPropagation();
-        handleVideoPitchReached();
+      // Se o conteúdo já foi revelado, não faz NADA
+      if (hasScrolledRef.current) {
+        console.log('%c✓ Conteúdo já revelado - scroll liberado completamente', 'color: #00ff00');
+        return;
       }
+
+      console.log('%c🎯 Scroll detectado - verificando se conteúdo já foi revelado', 'color: #ff00ff; font-weight: bold');
+      console.log('%c⚠️ Conteúdo ainda não revelado - revelando AGORA', 'color: #ff9900; font-weight: bold');
+      e.preventDefault();
+      e.stopPropagation();
+      handleVideoPitchReached();
     };
 
     // Monitora tentativas de scroll do VTurb apenas nos botões de oferta
@@ -424,9 +433,57 @@ function App() {
       subtree: true
     });
 
+    // 🔥 LISTENER PARA REMOVER TODOS OS BLOQUEADORES quando o conteúdo for revelado
+    const removeAllBlockers = () => {
+      console.log('%c🔥🔥🔥 REMOVENDO TODOS OS BLOQUEADORES - SCROLL TOTALMENTE LIBERADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
+
+      // Cancela o monitoramento de scroll
+      cancelAnimationFrame(rafId);
+
+      // Remove listeners de interação manual
+      window.removeEventListener('wheel', markUserInteraction);
+      window.removeEventListener('touchstart', markUserInteraction);
+      window.removeEventListener('touchmove', markUserInteraction);
+      window.removeEventListener('mousedown', markUserInteraction);
+      window.removeEventListener('keydown', markUserInteraction);
+
+      // Para os observers
+      scrollObserver.disconnect();
+
+      // Remove do mainPlayer se existir
+      const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (mainPlayer) {
+        mainPlayer.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
+        mainPlayer.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
+        mainPlayer.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
+      }
+
+      // Remove os listeners globais
+      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
+      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
+      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
+
+      // Remove todos os listeners de interceptScroll
+      const scrollEvents = document.querySelectorAll('[data-scroll-intercepted]');
+      scrollEvents.forEach((el) => {
+        el.removeEventListener('click', interceptScroll, true);
+        el.removeAttribute('data-scroll-intercepted');
+      });
+
+      console.log('%c✅ TODOS OS BLOQUEADORES REMOVIDOS - PÁGINA COMPLETAMENTE LIVRE!', 'color: #00ff00; font-weight: bold; font-size: 16px');
+    };
+
+    // Adiciona listener para o evento customizado
+    window.addEventListener('content-revealed', removeAllBlockers, { once: true });
+
     // Cleanup
     return () => {
       console.log('%c🧹 Limpando listeners e intervals...', 'color: #ff9900');
+
+      // Remove o listener do evento customizado
+      window.removeEventListener('content-revealed', removeAllBlockers);
+
+      // Limpa tudo (caso o componente seja desmontado antes da revelação)
       cancelAnimationFrame(rafId);
       window.removeEventListener('wheel', markUserInteraction);
       window.removeEventListener('touchstart', markUserInteraction);
