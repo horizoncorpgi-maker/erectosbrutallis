@@ -224,9 +224,25 @@ function App() {
     console.log('%c📡 Inicializando sistema de detecção VTurb...', 'color: #00aaff; font-weight: bold');
     console.log('%c📊 Estado inicial:', 'color: #00aaff', { showRestOfContent, showPurchaseButton, hasScrolled });
 
-    // 🔧 INTERCEPTADOR UNIVERSAL DE SCROLL
+    // 🔧 FLAG para identificar scroll do VTurb vs scroll manual
+    let isVTurbScrolling = false;
+    let vturbScrollTimeout: NodeJS.Timeout;
+
+    // 🔧 INTERCEPTADOR UNIVERSAL DE SCROLL (apenas para VTurb)
     let lastScrollY = window.scrollY;
     let scrollCheckCount = 0;
+    let lastUserInteraction = Date.now();
+
+    // Detecta interação manual do usuário
+    const markUserInteraction = () => {
+      lastUserInteraction = Date.now();
+      console.log('%c👆 Interação manual detectada', 'color: #00ff00');
+    };
+
+    // Listeners para detectar interação manual
+    window.addEventListener('wheel', markUserInteraction, { passive: true });
+    window.addEventListener('touchstart', markUserInteraction, { passive: true });
+    window.addEventListener('touchmove', markUserInteraction, { passive: true });
 
     const detectScrollAttempt = () => {
       const currentScrollY = window.scrollY;
@@ -237,20 +253,32 @@ function App() {
         console.log('%c📊 Monitorando scroll...', 'color: #888', {
           currentScrollY,
           lastScrollY,
-          hasScrolled: hasScrolledRef.current
+          hasScrolled: hasScrolledRef.current,
+          isVTurbScrolling,
+          timeSinceUserInteraction: Date.now() - lastUserInteraction
         });
       }
 
-      // Se houve mudança significativa no scroll e conteúdo não foi revelado
-      if (Math.abs(currentScrollY - lastScrollY) > 10 && !hasScrolledRef.current) {
-        console.log('%c🎯 SCROLL DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
+      const scrollDiff = Math.abs(currentScrollY - lastScrollY);
+      const timeSinceInteraction = Date.now() - lastUserInteraction;
+
+      // Se houve mudança significativa no scroll E não foi interação manual do usuário (mais de 500ms desde última interação)
+      if (scrollDiff > 10 && !hasScrolledRef.current && timeSinceInteraction > 500) {
+        console.log('%c🎯 SCROLL AUTOMÁTICO (VTurb) DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
         console.log('%c📊 ScrollY anterior:', 'color: #ff9900', lastScrollY);
         console.log('%c📊 ScrollY atual:', 'color: #ff9900', currentScrollY);
-        console.log('%c📊 Diferença:', 'color: #ff9900', Math.abs(currentScrollY - lastScrollY));
+        console.log('%c📊 Diferença:', 'color: #ff9900', scrollDiff);
+        console.log('%c📊 Tempo desde interação:', 'color: #ff9900', timeSinceInteraction + 'ms');
         console.log('%c🚨 REVELANDO CONTEÚDO AGORA!', 'color: #ff0000; font-weight: bold; font-size: 16px');
 
         // Revela o conteúdo IMEDIATAMENTE
+        isVTurbScrolling = true;
         handleVideoPitchReached();
+      } else if (scrollDiff > 10 && timeSinceInteraction <= 500) {
+        console.log('%c👆 Scroll manual ignorado', 'color: #ffaa00', {
+          scrollDiff,
+          timeSinceInteraction
+        });
       }
 
       lastScrollY = currentScrollY;
@@ -263,13 +291,6 @@ function App() {
       rafId = requestAnimationFrame(checkScroll);
     };
     rafId = requestAnimationFrame(checkScroll);
-
-    // Listener de scroll como backup
-    const scrollListener = () => {
-      console.log('%c📍 Evento scroll disparado', 'color: #00aaff');
-      detectScrollAttempt();
-    };
-    window.addEventListener('scroll', scrollListener, { passive: true });
 
     const handleVTurbScrollEvent = (e: Event) => {
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
@@ -379,7 +400,9 @@ function App() {
     return () => {
       console.log('%c🧹 Limpando listeners e intervals...', 'color: #ff9900');
       cancelAnimationFrame(rafId);
-      window.removeEventListener('scroll', scrollListener);
+      window.removeEventListener('wheel', markUserInteraction);
+      window.removeEventListener('touchstart', markUserInteraction);
+      window.removeEventListener('touchmove', markUserInteraction);
       clearInterval(playerCheckInterval);
       observer.disconnect();
       scrollObserver.disconnect();
