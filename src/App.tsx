@@ -263,14 +263,28 @@ function App() {
       const timeSinceUserInteraction = Date.now() - lastUserInteractionTime;
       const timeSinceScrollEvent = Date.now() - lastScrollEventTime;
 
-      // Só revela se:
-      // 1. Houve scroll > 3px
+      // Verifica se está no limite inferior da página
+      const isAtBottom = (window.innerHeight + currentScrollY) >= (document.documentElement.scrollHeight - 5);
+
+      // CONDIÇÃO 1: Scroll normal do VTurb (> 1px de movimento)
+      // 1. Houve scroll > 1px (sensibilidade reduzida)
       // 2. Passou mais de 500ms desde última interação do usuário
       // 3. E há eventos de scroll acontecendo (< 100ms desde último evento de scroll)
-      // Isso garante que é scroll automático do VTurb, não inércia do scroll manual
-      if (scrollDiff > 3 && timeSinceUserInteraction > 500 && timeSinceScrollEvent < 100) {
+      const isNormalVTurbScroll = scrollDiff > 1 && timeSinceUserInteraction > 500 && timeSinceScrollEvent < 100;
+
+      // CONDIÇÃO 2: Tentativa de scroll do VTurb no limite da página
+      // O VTurb tenta fazer scroll mas está no limite, então:
+      // 1. Está no limite inferior da página
+      // 2. Houve evento de scroll recente (< 50ms)
+      // 3. Passou mais de 500ms desde última interação do usuário
+      // 4. Movimento mínimo ou nenhum (scrollDiff <= 1px)
+      const isVTurbAtBottom = isAtBottom && timeSinceScrollEvent < 50 && timeSinceUserInteraction > 500 && scrollDiff <= 1;
+
+      if (isNormalVTurbScroll || isVTurbAtBottom) {
         console.log('%c🎯 SCROLL AUTOMÁTICO DO VTURB DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
-        console.log('%c📊 Scroll de:', lastScrollY, 'para:', currentScrollY, '| Diferença:', scrollDiff);
+        console.log('%c📊 Tipo:', isVTurbAtBottom ? 'No limite da página' : 'Scroll normal');
+        console.log('%c📊 Scroll de:', lastScrollY, 'para:', currentScrollY, '| Diferença:', scrollDiff + 'px');
+        console.log('%c📊 No limite?', isAtBottom);
         console.log('%c⏱️ Tempo desde última interação:', timeSinceUserInteraction + 'ms');
         console.log('%c⏱️ Tempo desde último scroll event:', timeSinceScrollEvent + 'ms');
         handleVideoPitchReached();
