@@ -78,6 +78,16 @@ function App() {
     console.log('[APP] Adicionando listener para smartplayer-scroll-event...');
     window.addEventListener('smartplayer-scroll-event', unlockContent);
 
+    // Listener alternativo para eventos do VTurb
+    const handleVTurbEvent = (e: Event) => {
+      console.log('[APP] Evento do VTurb detectado:', e.type);
+      unlockContent();
+    };
+
+    window.addEventListener('smartplayer:video:ended', handleVTurbEvent);
+    window.addEventListener('smartplayer:cta:show', handleVTurbEvent);
+    console.log('[APP] Listeners alternativos do VTurb adicionados');
+
     const checkForScrollElements = setInterval(() => {
       const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
       console.log('[APP] Verificando elementos .smartplayer-scroll-event. Encontrados:', scrollElements.length);
@@ -95,6 +105,8 @@ function App() {
       console.log('[APP] Limpando listeners...');
       clearInterval(checkForScrollElements);
       window.removeEventListener('smartplayer-scroll-event', unlockContent);
+      window.removeEventListener('smartplayer:video:ended', handleVTurbEvent);
+      window.removeEventListener('smartplayer:cta:show', handleVTurbEvent);
       const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
       scrollElements.forEach((element) => {
         element.removeEventListener('click', handleScrollEvent);
