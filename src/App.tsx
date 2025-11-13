@@ -255,9 +255,9 @@ function App() {
       const scrollDiff = Math.abs(currentScrollY - lastScrollY);
       const timeSinceUserInteraction = Date.now() - lastUserInteractionTime;
 
-      // Se houve scroll significativo E foi há mais de 300ms da última interação do usuário
+      // Se houve scroll (mesmo que pequeno - 3px) E foi há mais de 300ms da última interação do usuário
       // Isso indica que é scroll automático do VTurb, não do usuário
-      if (scrollDiff > 50 && timeSinceUserInteraction > 300) {
+      if (scrollDiff > 3 && timeSinceUserInteraction > 300) {
         console.log('%c🎯 SCROLL AUTOMÁTICO DO VTURB DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
         console.log('%c📊 Scroll de:', lastScrollY, 'para:', currentScrollY, '| Diferença:', scrollDiff);
         console.log('%c⏱️ Tempo desde última interação:', timeSinceUserInteraction + 'ms');
