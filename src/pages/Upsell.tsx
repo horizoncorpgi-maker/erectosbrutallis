@@ -79,16 +79,16 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
       const scrollDiff = Math.abs(currentScrollY - lastScrollY);
       const timeSinceInteraction = Date.now() - lastUserInteraction;
 
-      // Se houve mudança significativa no scroll E não foi interação manual do usuário
-      if (scrollDiff > 10 && !contentUnlockedRef.current && timeSinceInteraction > 500) {
+      // APENAS desbloqueia se for scroll automático (SEM interação manual recente)
+      if (scrollDiff > 10 && !contentUnlockedRef.current && timeSinceInteraction > 1000) {
         console.log('%c🎯 SCROLL AUTOMÁTICO (VTurb) DETECTADO! (Upsell)', 'color: #ff0000; font-weight: bold; font-size: 16px');
         console.log('%c📊 ScrollY anterior:', 'color: #ff9900', lastScrollY);
         console.log('%c📊 ScrollY atual:', 'color: #ff9900', currentScrollY);
         console.log('%c📊 Diferença:', 'color: #ff9900', scrollDiff);
         console.log('%c📊 Tempo desde interação:', 'color: #ff9900', timeSinceInteraction + 'ms');
         unlockContent();
-      } else if (scrollDiff > 10 && timeSinceInteraction <= 500) {
-        console.log('%c👆 Scroll manual ignorado (Upsell)', 'color: #ffaa00', {
+      } else if (scrollDiff > 10 && timeSinceInteraction <= 1000) {
+        console.log('%c🚫 Scroll manual BLOQUEADO - não revela conteúdo (Upsell)', 'color: #ff0000', {
           scrollDiff,
           timeSinceInteraction
         });
