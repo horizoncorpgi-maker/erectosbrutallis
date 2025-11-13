@@ -702,27 +702,19 @@ function App() {
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
 
-          {/* 🔧 CORREÇÃO: Botão SEMPRE renderizado, apenas visibilidade controlada */}
-          <button
-            className="smartplayer-scroll-event"
+          {/* 🔧 CORREÇÃO: Botão invisível removido - não precisa da classe de scroll */}
+          <div
             style={{
               position: 'absolute',
               bottom: '-50px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '200px',
-              height: '200px',
+              width: '1px',
+              height: '1px',
               opacity: 0,
-              pointerEvents: 'auto',
-              cursor: 'default',
-              zIndex: 9999,
-              border: 'none',
-              background: 'transparent',
-              padding: 0,
-              visibility: 'visible' // 🔧 SEMPRE visível no DOM
+              pointerEvents: 'none'
             }}
             aria-hidden="true"
-            tabIndex={-1}
           />
         </div>
       </section>
