@@ -242,7 +242,7 @@ function App() {
       }
 
       // Se houve mudança significativa no scroll e conteúdo não foi revelado
-      if (Math.abs(currentScrollY - lastScrollY) > 50 && !hasScrolledRef.current) {
+      if (Math.abs(currentScrollY - lastScrollY) > 10 && !hasScrolledRef.current) {
         console.log('%c🎯 SCROLL DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
         console.log('%c📊 ScrollY anterior:', 'color: #ff9900', lastScrollY);
         console.log('%c📊 ScrollY atual:', 'color: #ff9900', currentScrollY);
