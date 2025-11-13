@@ -48,33 +48,49 @@ function App() {
     console.log('[APP] useEffect iniciado. contentUnlocked:', contentUnlocked);
 
     const unlockContent = () => {
-      console.log('[APP] unlockContent chamado. contentUnlocked atual:', contentUnlocked);
+      console.log('[APP] ========================================');
+      console.log('[APP] unlockContent DISPARADO!');
+      console.log('[APP] contentUnlocked atual:', contentUnlocked);
+      console.log('[APP] ========================================');
+
       if (!contentUnlocked) {
         console.log('[APP] Desbloqueando conteúdo...');
         setContentUnlocked(true);
 
-        // Aguarda o DOM renderizar completamente antes de fazer scroll
-        setTimeout(() => {
-          console.log('[APP] Primeira tentativa de scroll...');
-          const tryScroll = (attempts = 0) => {
-            console.log('[APP] Tentativa', attempts + 1, 'de scroll');
-            console.log('[APP] sixBottleButtonRef.current:', sixBottleButtonRef.current);
+        // Usa requestAnimationFrame + setTimeout para garantir re-render
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            console.log('[APP] Iniciando tentativas de scroll...');
 
-            if (sixBottleButtonRef.current) {
-              console.log('[APP] Botão encontrado! Fazendo scroll...');
-              sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else if (attempts < 5) {
-              console.log('[APP] Botão ainda não renderizado, tentando novamente em 200ms...');
-              setTimeout(() => tryScroll(attempts + 1), 200);
-            } else {
-              console.log('[APP] ERRO: Botão não encontrado após 5 tentativas!');
-            }
-          };
+            const tryScroll = (attempts = 0) => {
+              console.log('[APP] ========================================');
+              console.log('[APP] Tentativa', attempts + 1, 'de 10');
+              console.log('[APP] sixBottleButtonRef.current:', sixBottleButtonRef.current);
 
-          tryScroll();
-        }, 100);
+              // Verifica também por querySelector como backup
+              const buttonById = document.getElementById('six-bottle-button');
+              console.log('[APP] Botão por ID:', buttonById);
+              console.log('[APP] ========================================');
+
+              if (sixBottleButtonRef.current) {
+                console.log('[APP] ✓ SUCESSO! Botão encontrado via ref! Fazendo scroll...');
+                sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else if (buttonById) {
+                console.log('[APP] ✓ SUCESSO! Botão encontrado via ID! Fazendo scroll...');
+                buttonById.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              } else if (attempts < 10) {
+                console.log('[APP] ⏳ Botão ainda não renderizado, tentando novamente em 300ms...');
+                setTimeout(() => tryScroll(attempts + 1), 300);
+              } else {
+                console.log('[APP] ✗ ERRO: Botão não encontrado após 10 tentativas (3 segundos)!');
+              }
+            };
+
+            tryScroll();
+          }, 200);
+        });
       } else {
-        console.log('[APP] Conteúdo já estava desbloqueado, ignorando...');
+        console.log('[APP] ⚠ Conteúdo já estava desbloqueado, ignorando...');
       }
     };
 
