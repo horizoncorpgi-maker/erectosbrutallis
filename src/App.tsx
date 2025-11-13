@@ -592,7 +592,8 @@ function App() {
       rating: 5,
       videoId: "vid-69093a615431bed16ae4af02",
       videoScript: "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a615431bed16ae4af02/v4/player.js",
-      quote: "After 6 weeks, I feel like I'm in my 20s again. My confidence is through the roof and my partner has noticed the difference."
+      quote: "After 6 weeks, I feel like I'm in my 20s again. My confidence is through the roof and my partner has noticed the difference.",
+      thumbnail: "/Captura de Tela 2025-11-13 às 19.38.49 copy.png"
     },
     {
       name: "David R.",
@@ -1128,11 +1129,18 @@ function App() {
                 {testimonials.map((testimonial, index) => (
                   <div
                     key={testimonial.videoId}
-                    style={{ display: index === currentTestimonial ? 'block' : 'none' }}
+                    style={{ display: index === currentTestimonial ? 'block' : 'none', position: 'relative', width: '100%', height: '100%' }}
                   >
+                    {testimonial.thumbnail && (
+                      <img
+                        src={testimonial.thumbnail}
+                        alt="Video thumbnail"
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    )}
                     <vturb-smartplayer
                       id={testimonial.videoId}
-                      style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
+                      style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px', position: 'relative', zIndex: 1 }}
                     ></vturb-smartplayer>
                   </div>
                 ))}
