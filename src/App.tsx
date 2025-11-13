@@ -228,8 +228,67 @@ function App() {
     console.log('%c📡 Inicializando sistema de detecção VTurb...', 'color: #00aaff; font-weight: bold');
     console.log('%c📊 Estado inicial:', 'color: #00aaff', { showRestOfContent, showPurchaseButton, hasScrolled });
 
-    // NÃO monitoramos scroll genérico - APENAS eventos diretos do VTurb
-    console.log('%c✅ Sistema configurado para responder APENAS a eventos do VTurb', 'color: #00ff00; font-weight: bold');
+    // Sistema HÍBRIDO: monitora scroll automático MAS permite scroll manual
+    let lastScrollY = window.scrollY;
+    let isUserScrolling = false;
+    let userScrollTimeout: number;
+
+    // Marca quando usuário ESTÁ fazendo scroll ativamente
+    const markUserScrollStart = () => {
+      isUserScrolling = true;
+      clearTimeout(userScrollTimeout);
+      console.log('%c👆 USUÁRIO INICIOU SCROLL MANUAL', 'color: #00ff00; font-weight: bold');
+    };
+
+    // Marca quando usuário PAROU de fazer scroll
+    const markUserScrollEnd = () => {
+      clearTimeout(userScrollTimeout);
+      userScrollTimeout = window.setTimeout(() => {
+        isUserScrolling = false;
+        console.log('%c✋ Usuário parou de fazer scroll', 'color: #ffaa00');
+      }, 150);
+    };
+
+    // Listeners que detectam INÍCIO do scroll do usuário
+    window.addEventListener('touchstart', markUserScrollStart, { passive: true });
+    window.addEventListener('mousedown', markUserScrollStart, { passive: true });
+    window.addEventListener('wheel', markUserScrollStart, { passive: true });
+
+    // Listeners que detectam CONTINUAÇÃO do scroll
+    window.addEventListener('touchmove', markUserScrollEnd, { passive: true });
+    window.addEventListener('mousemove', markUserScrollEnd, { passive: true });
+    window.addEventListener('wheel', markUserScrollEnd, { passive: true });
+
+    // Listener que detecta FIM do scroll
+    window.addEventListener('touchend', markUserScrollEnd, { passive: true });
+    window.addEventListener('mouseup', markUserScrollEnd, { passive: true });
+
+    // Monitora mudanças de scroll para detectar scroll programático do VTurb
+    let rafId: number;
+    const checkScroll = () => {
+      if (hasScrolledRef.current) {
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+      const scrollDiff = Math.abs(currentScrollY - lastScrollY);
+
+      // Se houve scroll E o usuário NÃO está fazendo scroll manualmente
+      // Então é scroll PROGRAMÁTICO do VTurb!
+      if (scrollDiff > 3 && !isUserScrolling) {
+        console.log('%c🎯 SCROLL PROGRAMÁTICO DO VTURB DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
+        console.log('%c📊 Scroll de:', lastScrollY, 'para:', currentScrollY, '| Diferença:', scrollDiff + 'px');
+        console.log('%c📊 isUserScrolling:', isUserScrolling);
+        handleVideoPitchReached();
+        return;
+      }
+
+      lastScrollY = currentScrollY;
+      rafId = requestAnimationFrame(checkScroll);
+    };
+
+    rafId = requestAnimationFrame(checkScroll);
+    console.log('%c✅ Sistema HÍBRIDO ativo: scroll manual livre + detecção de scroll programático', 'color: #00ff00; font-weight: bold');
 
     const handleVTurbScrollEvent = (e: Event) => {
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
@@ -419,6 +478,19 @@ function App() {
     const removeAllBlockers = () => {
       console.log('%c🔥🔥🔥 REMOVENDO TODOS OS BLOQUEADORES - SCROLL TOTALMENTE LIBERADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
 
+      // Cancela o monitoramento
+      cancelAnimationFrame(rafId);
+      clearTimeout(userScrollTimeout);
+
+      // Remove listeners
+      window.removeEventListener('touchstart', markUserScrollStart);
+      window.removeEventListener('mousedown', markUserScrollStart);
+      window.removeEventListener('wheel', markUserScrollStart);
+      window.removeEventListener('touchmove', markUserScrollEnd);
+      window.removeEventListener('mousemove', markUserScrollEnd);
+      window.removeEventListener('touchend', markUserScrollEnd);
+      window.removeEventListener('mouseup', markUserScrollEnd);
+
       // Para os observers
       scrollObserver.disconnect();
       playerObserver.disconnect();
@@ -467,6 +539,15 @@ function App() {
       window.removeEventListener('content-revealed', removeAllBlockers);
 
       // Limpa tudo (caso o componente seja desmontado antes da revelação)
+      cancelAnimationFrame(rafId);
+      clearTimeout(userScrollTimeout);
+      window.removeEventListener('touchstart', markUserScrollStart);
+      window.removeEventListener('mousedown', markUserScrollStart);
+      window.removeEventListener('wheel', markUserScrollStart);
+      window.removeEventListener('touchmove', markUserScrollEnd);
+      window.removeEventListener('mousemove', markUserScrollEnd);
+      window.removeEventListener('touchend', markUserScrollEnd);
+      window.removeEventListener('mouseup', markUserScrollEnd);
       clearInterval(playerCheckInterval);
       observer.disconnect();
       scrollObserver.disconnect();
