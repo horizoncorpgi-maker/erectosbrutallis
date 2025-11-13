@@ -228,7 +228,48 @@ function App() {
     console.log('%c📡 Inicializando sistema de detecção VTurb...', 'color: #00aaff; font-weight: bold');
     console.log('%c📊 Estado inicial:', 'color: #00aaff', { showRestOfContent, showPurchaseButton, hasScrolled });
 
-    // Não há mais bloqueio de scroll manual - o usuário pode fazer scroll livremente
+    // Sistema de detecção de scroll do VTurb - NÃO bloqueia scroll manual
+    let lastScrollY = window.scrollY;
+    let lastUserInteractionTime = 0;
+
+    // Marca quando o usuário interage (para diferenciar de scroll automático do VTurb)
+    const markUserInteraction = () => {
+      lastUserInteractionTime = Date.now();
+    };
+
+    // Listeners passivos - apenas marcam interação, não bloqueiam nada
+    window.addEventListener('wheel', markUserInteraction, { passive: true });
+    window.addEventListener('touchstart', markUserInteraction, { passive: true });
+    window.addEventListener('touchmove', markUserInteraction, { passive: true });
+    window.addEventListener('mousedown', markUserInteraction, { passive: true });
+
+    // Detecta scroll automático do VTurb
+    let rafId: number;
+    const checkScroll = () => {
+      // Para de monitorar se o conteúdo já foi revelado
+      if (hasScrolledRef.current) {
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+      const scrollDiff = Math.abs(currentScrollY - lastScrollY);
+      const timeSinceUserInteraction = Date.now() - lastUserInteractionTime;
+
+      // Se houve scroll significativo E foi há mais de 300ms da última interação do usuário
+      // Isso indica que é scroll automático do VTurb, não do usuário
+      if (scrollDiff > 50 && timeSinceUserInteraction > 300) {
+        console.log('%c🎯 SCROLL AUTOMÁTICO DO VTURB DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
+        console.log('%c📊 Scroll de:', lastScrollY, 'para:', currentScrollY, '| Diferença:', scrollDiff);
+        console.log('%c⏱️ Tempo desde última interação:', timeSinceUserInteraction + 'ms');
+        handleVideoPitchReached();
+        return; // Para de monitorar após revelar
+      }
+
+      lastScrollY = currentScrollY;
+      rafId = requestAnimationFrame(checkScroll);
+    };
+
+    rafId = requestAnimationFrame(checkScroll);
 
     const handleVTurbScrollEvent = (e: Event) => {
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
@@ -418,6 +459,15 @@ function App() {
     const removeAllBlockers = () => {
       console.log('%c🔥🔥🔥 REMOVENDO TODOS OS BLOQUEADORES - SCROLL TOTALMENTE LIBERADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
 
+      // Cancela o monitoramento de scroll
+      cancelAnimationFrame(rafId);
+
+      // Remove listeners de interação
+      window.removeEventListener('wheel', markUserInteraction);
+      window.removeEventListener('touchstart', markUserInteraction);
+      window.removeEventListener('touchmove', markUserInteraction);
+      window.removeEventListener('mousedown', markUserInteraction);
+
       // Para os observers
       scrollObserver.disconnect();
       playerObserver.disconnect();
@@ -466,6 +516,11 @@ function App() {
       window.removeEventListener('content-revealed', removeAllBlockers);
 
       // Limpa tudo (caso o componente seja desmontado antes da revelação)
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('wheel', markUserInteraction);
+      window.removeEventListener('touchstart', markUserInteraction);
+      window.removeEventListener('touchmove', markUserInteraction);
+      window.removeEventListener('mousedown', markUserInteraction);
       clearInterval(playerCheckInterval);
       observer.disconnect();
       scrollObserver.disconnect();
