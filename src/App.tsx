@@ -34,7 +34,15 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [contentUnlocked, setContentUnlocked] = useState(false);
+  const [showRestOfContent, setShowRestOfContent] = useState(false);
+  const [showPurchaseButton, setShowPurchaseButton] = useState(false);
+  const [hasVideoTriggeredContent, setHasVideoTriggeredContent] = useState(false);
+
+  // Detectar ambiente
+  const isAdmin = window.location.search.includes('admin=true');
+  const isBoltEnvironment = window.location.hostname.includes('bolt') ||
+                            window.location.hostname.includes('stackblitz') ||
+                            window.location.hostname === 'localhost';
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,98 +50,70 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
-  }, []);
 
+    // Ambiente Bolt/Dev: mostra tudo imediatamente
+    if (isAdmin || isBoltEnvironment) {
+      setShowRestOfContent(true);
+      setShowPurchaseButton(true);
+    }
+  }, [isAdmin, isBoltEnvironment]);
+
+  // Persistência: verifica se usuário já viu o conteúdo antes
   useEffect(() => {
-    console.log('[APP] useEffect iniciado. contentUnlocked:', contentUnlocked);
+    if (!isAdmin && !isBoltEnvironment) {
+      const hasSeenContent = sessionStorage.getItem('has_seen_content') === 'true';
 
-    const unlockContent = () => {
-      console.log('[APP] ========================================');
-      console.log('[APP] unlockContent DISPARADO!');
-      console.log('[APP] contentUnlocked atual:', contentUnlocked);
-      console.log('[APP] ========================================');
-
-      if (!contentUnlocked) {
-        console.log('[APP] Desbloqueando conteúdo...');
-        setContentUnlocked(true);
-
-        // Usa requestAnimationFrame + setTimeout para garantir re-render
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            console.log('[APP] Iniciando tentativas de scroll...');
-
-            const tryScroll = (attempts = 0) => {
-              console.log('[APP] ========================================');
-              console.log('[APP] Tentativa', attempts + 1, 'de 10');
-              console.log('[APP] sixBottleButtonRef.current:', sixBottleButtonRef.current);
-
-              // Verifica também por querySelector como backup
-              const buttonById = document.getElementById('six-bottle-button');
-              console.log('[APP] Botão por ID:', buttonById);
-              console.log('[APP] ========================================');
-
-              if (sixBottleButtonRef.current) {
-                console.log('[APP] ✓ SUCESSO! Botão encontrado via ref! Fazendo scroll...');
-                sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              } else if (buttonById) {
-                console.log('[APP] ✓ SUCESSO! Botão encontrado via ID! Fazendo scroll...');
-                buttonById.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              } else if (attempts < 10) {
-                console.log('[APP] ⏳ Botão ainda não renderizado, tentando novamente em 300ms...');
-                setTimeout(() => tryScroll(attempts + 1), 300);
-              } else {
-                console.log('[APP] ✗ ERRO: Botão não encontrado após 10 tentativas (3 segundos)!');
-              }
-            };
-
-            tryScroll();
-          }, 200);
-        });
-      } else {
-        console.log('[APP] ⚠ Conteúdo já estava desbloqueado, ignorando...');
+      if (hasSeenContent) {
+        console.log('👤 Usuário já viu o conteúdo antes - mostrando tudo');
+        setShowRestOfContent(true);
+        setShowPurchaseButton(true);
       }
-    };
+    }
+  }, [isAdmin, isBoltEnvironment]);
 
-    // Listener AUTOMÁTICO para evento customizado do VTurb
-    // O VTurb dispara este evento quando detecta o elemento .smartplayer-scroll-event
+  // Callback que revela o conteúdo quando VTurb chega no pitch
+  const handleVideoPitchReached = () => {
+    console.log('🎬 VTurb video triggered content reveal');
+
+    // ✅ ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA
+    setShowRestOfContent(true);
+    setShowPurchaseButton(true);
+    setHasVideoTriggeredContent(true);
+
+    // 💾 Salva no sessionStorage (apenas usuários normais)
+    if (!isAdmin && !isBoltEnvironment) {
+      sessionStorage.setItem('has_seen_content', 'true');
+    }
+
+    // Scroll suave até o botão de compra
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const tryScroll = (attempts = 0) => {
+          if (sixBottleButtonRef.current) {
+            console.log('✓ Fazendo scroll até botão de compra');
+            sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (attempts < 10) {
+            setTimeout(() => tryScroll(attempts + 1), 300);
+          }
+        };
+        tryScroll();
+      }, 200);
+    });
+  };
+
+  // Listener para detectar tentativa de scroll do VTurb
+  useEffect(() => {
     const handleVTurbScrollEvent = (e: Event) => {
-      console.log('[APP] ✓ Evento smartplayer-scroll-event AUTOMÁTICO detectado!', e);
-      unlockContent();
+      console.log('🎯 VTurb tentou fazer scroll - detectado pelo sistema');
+      handleVideoPitchReached();
     };
 
-    console.log('[APP] Adicionando listener para evento automático do VTurb...');
     window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
 
-    // Listeners alternativos para outros eventos do VTurb
-    const handleVTurbEndEvent = (e: Event) => {
-      console.log('[APP] Evento smartplayer:video:ended detectado:', e.type);
-      unlockContent();
-    };
-
-    const handleVTurbCTAEvent = (e: Event) => {
-      console.log('[APP] Evento smartplayer:cta:show detectado:', e.type);
-      unlockContent();
-    };
-
-    window.addEventListener('smartplayer:video:ended', handleVTurbEndEvent);
-    window.addEventListener('smartplayer:cta:show', handleVTurbCTAEvent);
-
-    // Log periódico para verificar se o botão está presente
-    const checkInterval = setInterval(() => {
-      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
-      if (scrollElements.length > 0) {
-        console.log('[APP] ✓ Botão .smartplayer-scroll-event encontrado! Total:', scrollElements.length);
-      }
-    }, 2000);
-
     return () => {
-      console.log('[APP] Limpando listeners...');
-      clearInterval(checkInterval);
       window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-      window.removeEventListener('smartplayer:video:ended', handleVTurbEndEvent);
-      window.removeEventListener('smartplayer:cta:show', handleVTurbCTAEvent);
     };
-  }, [contentUnlocked]);
+  }, []);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -535,7 +515,7 @@ function App() {
       </section>
 
       {/* Offers Section */}
-      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white" style={{ display: contentUnlocked ? 'block' : 'none' }}>
+      <section ref={offersRef} className="py-8 md:py-20 px-4 bg-white" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Choose Your Transformation Package
@@ -678,7 +658,7 @@ function App() {
       </section>
 
       {/* Experts Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: contentUnlocked ? 'block' : 'none' }}>
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -786,7 +766,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: contentUnlocked ? 'block' : 'none' }}>
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -849,7 +829,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: contentUnlocked ? 'block' : 'none' }}>
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -926,7 +906,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: contentUnlocked ? 'block' : 'none' }}>
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1278,7 +1258,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]" style={{ display: contentUnlocked ? 'block' : 'none' }}>
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1293,7 +1273,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-gray-400 py-8 px-4" style={{ display: contentUnlocked ? 'block' : 'none' }}>
+      <footer className="bg-black text-gray-400 py-8 px-4" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
