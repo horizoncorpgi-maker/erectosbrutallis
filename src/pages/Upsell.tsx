@@ -13,11 +13,26 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
   const isUp3bt = location.pathname === '/up3bt';
-  const [contentUnlocked, setContentUnlocked] = useState(false);
-  const contentUnlockedRef = useRef(false);
+
+  // Detecta ambiente Bolt
+  const isBoltEnvironment = window.location.hostname.includes('bolt.new') ||
+                           window.location.hostname.includes('stackblitz') ||
+                           window.location.hostname.includes('webcontainer') ||
+                           window.location.hostname === 'localhost' ||
+                           window.location.hostname === '127.0.0.1';
+
+  const [contentUnlocked, setContentUnlocked] = useState(isBoltEnvironment);
+  const contentUnlockedRef = useRef(isBoltEnvironment);
 
   useEffect(() => {
     console.log('%c📡 Inicializando detector VTurb (Upsell)...', 'color: #00aaff; font-weight: bold');
+    console.log('%c🔍 Ambiente Bolt detectado:', 'color: #00aaff', isBoltEnvironment);
+
+    // Se estiver no Bolt, já mostra o conteúdo
+    if (isBoltEnvironment) {
+      console.log('%c✅ Ambiente Bolt - conteúdo sempre visível', 'color: #00ff00; font-weight: bold');
+      return;
+    }
 
     const unlockContent = () => {
       if (!contentUnlockedRef.current) {
@@ -100,16 +115,18 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
     window.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
 
     return () => {
-      console.log('%c🧹 Limpando listeners (Upsell)...', 'color: #ff9900');
-      cancelAnimationFrame(rafId);
-      window.removeEventListener('wheel', markUserInteraction);
-      window.removeEventListener('touchstart', markUserInteraction);
-      window.removeEventListener('touchmove', markUserInteraction);
-      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
-      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
-      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
+      if (!isBoltEnvironment) {
+        console.log('%c🧹 Limpando listeners (Upsell)...', 'color: #ff9900');
+        cancelAnimationFrame(rafId);
+        window.removeEventListener('wheel', markUserInteraction);
+        window.removeEventListener('touchstart', markUserInteraction);
+        window.removeEventListener('touchmove', markUserInteraction);
+        window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
+        window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
+        window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
+      }
     };
-  }, []);
+  }, [isBoltEnvironment]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50 flex flex-col">
