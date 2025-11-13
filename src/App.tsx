@@ -295,19 +295,30 @@ function App() {
     rafId = requestAnimationFrame(checkScroll);
 
     const handleVTurbScrollEvent = (e: Event) => {
-      console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
-      console.log('%c📊 Estado ANTES do handleVideoPitchReached:', 'color: #ff9900', { showRestOfContent, showPurchaseButton, hasScrolled: hasScrolledRef.current });
+      // Só processa eventos do vídeo principal, não dos depoimentos ou experts
+      const target = e.target as HTMLElement;
+      const isMainVideo = target?.id === 'vid-69124ec0b910e6e322c32a69' ||
+                          target?.closest('#vid-69124ec0b910e6e322c32a69');
 
-      // Sempre previne o scroll padrão do VTurb
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
+      console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type, 'isMainVideo:', isMainVideo);
+      console.log('%c📊 Estado:', 'color: #ff9900', {
+        showRestOfContent,
+        showPurchaseButton,
+        hasScrolled: hasScrolledRef.current,
+        isMainVideo
+      });
 
-      if (!hasScrolledRef.current) {
-        console.log('%c🛑 Evento VTurb bloqueado - revelando conteúdo primeiro', 'color: #ff0000; font-weight: bold');
+      // Só bloqueia se for do vídeo principal E o conteúdo ainda não foi revelado
+      if (isMainVideo && !hasScrolledRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        console.log('%c🛑 Evento VTurb do vídeo principal bloqueado - revelando conteúdo', 'color: #ff0000; font-weight: bold');
         handleVideoPitchReached();
+      } else if (!isMainVideo) {
+        console.log('%c✓ Evento de depoimento/expert - não bloqueia', 'color: #00ff00');
       } else {
-        console.log('%c✓ Conteúdo já revelado, VTurb bloqueado mas sem ação', 'color: #00ff00');
+        console.log('%c✓ Conteúdo já revelado - não bloqueia', 'color: #00ff00');
       }
     };
 
