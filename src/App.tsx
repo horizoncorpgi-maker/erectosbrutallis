@@ -592,8 +592,7 @@ function App() {
       rating: 5,
       videoId: "vid-69093a615431bed16ae4af02",
       videoScript: "https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69093a615431bed16ae4af02/v4/player.js",
-      quote: "After 6 weeks, I feel like I'm in my 20s again. My confidence is through the roof and my partner has noticed the difference.",
-      thumbnail: "/Captura de Tela 2025-11-13 às 19.38.49 copy.png"
+      quote: "After 6 weeks, I feel like I'm in my 20s again. My confidence is through the roof and my partner has noticed the difference."
     },
     {
       name: "David R.",
@@ -1000,16 +999,11 @@ function App() {
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-1/2 flex-shrink-0">
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 0 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(0)}>
-                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', backgroundColor: '#000' }}>
-                      <img
-                        src={experts[0].video}
-                        alt="Video thumbnail"
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}></vturb-smartplayer>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[0] && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none', zIndex: 2 }}>
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
                           <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
                         </div>
@@ -1017,16 +1011,11 @@ function App() {
                     )}
                   </div>
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 1 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(1)}>
-                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', backgroundColor: '#000' }}>
-                      <img
-                        src={experts[1].video}
-                        alt="Video thumbnail"
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                      <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}></vturb-smartplayer>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                      <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[1] && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none', zIndex: 2 }}>
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
                           <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
                         </div>
@@ -1034,16 +1023,11 @@ function App() {
                     )}
                   </div>
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 2 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(2)}>
-                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', backgroundColor: '#000' }}>
-                      <img
-                        src={experts[2].video}
-                        alt="Video thumbnail"
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                      <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1 }}></vturb-smartplayer>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+                      <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[2] && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none', zIndex: 2 }}>
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
                         <div className="w-16 h-16 md:w-20 md:h-20 bg-[#B80000] rounded-full flex items-center justify-center hover:bg-[#900000] transition-all hover:scale-110 shadow-xl">
                           <Play className="w-8 h-8 md:w-10 md:h-10 text-white ml-1" fill="white" />
                         </div>
@@ -1129,18 +1113,11 @@ function App() {
                 {testimonials.map((testimonial, index) => (
                   <div
                     key={testimonial.videoId}
-                    style={{ display: index === currentTestimonial ? 'block' : 'none', position: 'relative', width: '100%', height: '100%' }}
+                    style={{ display: index === currentTestimonial ? 'block' : 'none' }}
                   >
-                    {testimonial.thumbnail && (
-                      <img
-                        src={testimonial.thumbnail}
-                        alt="Video thumbnail"
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    )}
                     <vturb-smartplayer
                       id={testimonial.videoId}
-                      style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px', position: 'relative', zIndex: 1 }}
+                      style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
                     ></vturb-smartplayer>
                   </div>
                 ))}
