@@ -231,10 +231,16 @@ function App() {
     // Sistema de detecção de scroll do VTurb - NÃO bloqueia scroll manual
     let lastScrollY = window.scrollY;
     let lastUserInteractionTime = 0;
+    let lastScrollEventTime = 0;
 
     // Marca quando o usuário interage (para diferenciar de scroll automático do VTurb)
     const markUserInteraction = () => {
       lastUserInteractionTime = Date.now();
+    };
+
+    // Marca quando há evento de scroll (atualiza durante scroll manual)
+    const markScrollEvent = () => {
+      lastScrollEventTime = Date.now();
     };
 
     // Listeners passivos - apenas marcam interação, não bloqueiam nada
@@ -242,6 +248,7 @@ function App() {
     window.addEventListener('touchstart', markUserInteraction, { passive: true });
     window.addEventListener('touchmove', markUserInteraction, { passive: true });
     window.addEventListener('mousedown', markUserInteraction, { passive: true });
+    window.addEventListener('scroll', markScrollEvent, { passive: true });
 
     // Detecta scroll automático do VTurb
     let rafId: number;
@@ -254,13 +261,18 @@ function App() {
       const currentScrollY = window.scrollY;
       const scrollDiff = Math.abs(currentScrollY - lastScrollY);
       const timeSinceUserInteraction = Date.now() - lastUserInteractionTime;
+      const timeSinceScrollEvent = Date.now() - lastScrollEventTime;
 
-      // Se houve scroll (3px) E foi há mais de 300ms da última interação do usuário
-      // Isso indica que é scroll automático do VTurb, não do usuário
-      if (scrollDiff > 3 && timeSinceUserInteraction > 300) {
+      // Só revela se:
+      // 1. Houve scroll > 3px
+      // 2. Passou mais de 500ms desde última interação do usuário
+      // 3. E há eventos de scroll acontecendo (< 100ms desde último evento de scroll)
+      // Isso garante que é scroll automático do VTurb, não inércia do scroll manual
+      if (scrollDiff > 3 && timeSinceUserInteraction > 500 && timeSinceScrollEvent < 100) {
         console.log('%c🎯 SCROLL AUTOMÁTICO DO VTURB DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
         console.log('%c📊 Scroll de:', lastScrollY, 'para:', currentScrollY, '| Diferença:', scrollDiff);
         console.log('%c⏱️ Tempo desde última interação:', timeSinceUserInteraction + 'ms');
+        console.log('%c⏱️ Tempo desde último scroll event:', timeSinceScrollEvent + 'ms');
         handleVideoPitchReached();
         return; // Para de monitorar após revelar
       }
@@ -467,6 +479,7 @@ function App() {
       window.removeEventListener('touchstart', markUserInteraction);
       window.removeEventListener('touchmove', markUserInteraction);
       window.removeEventListener('mousedown', markUserInteraction);
+      window.removeEventListener('scroll', markScrollEvent);
 
       // Para os observers
       scrollObserver.disconnect();
@@ -521,6 +534,7 @@ function App() {
       window.removeEventListener('touchstart', markUserInteraction);
       window.removeEventListener('touchmove', markUserInteraction);
       window.removeEventListener('mousedown', markUserInteraction);
+      window.removeEventListener('scroll', markScrollEvent);
       clearInterval(playerCheckInterval);
       observer.disconnect();
       scrollObserver.disconnect();
