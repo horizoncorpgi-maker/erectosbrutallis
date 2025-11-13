@@ -75,14 +75,29 @@ function App() {
     }
   }, [isDevelopment]);
 
+  // 🔧 DEBUG: Monitora mudanças no estado showRestOfContent
+  useEffect(() => {
+    console.log('%c📊 Estado showRestOfContent mudou:', 'color: #00aaff; font-weight: bold; font-size: 14px', showRestOfContent);
+    console.log('%c📊 Estado showPurchaseButton:', 'color: #00aaff', showPurchaseButton);
+  }, [showRestOfContent, showPurchaseButton]);
+
   // 🔧 CORREÇÃO 1: Callback que revela o conteúdo quando VTurb chega no pitch
   const handleVideoPitchReached = () => {
+    console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
     console.log('%c🎬 VTurb video triggered content reveal', 'color: #ff00ff; font-weight: bold; font-size: 14px');
+    console.log('%cEstado ANTES:', 'color: #ff9900', {
+      showRestOfContent,
+      showPurchaseButton,
+      hasScrolled
+    });
 
     // ✅ ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA
     setShowRestOfContent(true);
     setShowPurchaseButton(true);
     setHasVideoTriggeredContent(true);
+
+    console.log('%c✅ Estados atualizados para TRUE', 'color: #00ff00; font-weight: bold');
+    console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
 
     // 💾 Salva no sessionStorage (apenas usuários normais)
     if (!isDevelopment) {
@@ -616,6 +631,38 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden w-full">
+      {/* 🔧 DEBUG: Botão de teste para forçar reveal */}
+      {isDevelopment && (
+        <div style={{ position: 'fixed', top: '10px', right: '10px', zIndex: 9999, display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => {
+              console.log('🧪 Teste manual: Forçando reveal do conteúdo');
+              handleVideoPitchReached();
+            }}
+            style={{
+              padding: '10px 20px',
+              background: '#00ff00',
+              color: '#000',
+              border: 'none',
+              borderRadius: '5px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            🧪 TESTAR REVEAL
+          </button>
+          <div style={{
+            padding: '10px',
+            background: showRestOfContent ? '#00ff00' : '#ff0000',
+            color: '#000',
+            borderRadius: '5px',
+            fontWeight: 'bold'
+          }}>
+            {showRestOfContent ? '✅ VISÍVEL' : '❌ OCULTO'}
+          </div>
+        </div>
+      )}
+
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
@@ -658,12 +705,12 @@ function App() {
       {/* 🔧 CORREÇÃO 2: Section SEMPRE no DOM, controle via visibility ao invés de display */}
       <section
         ref={offersRef}
-        className="py-8 md:py-20 px-4 bg-white"
+        className="py-8 md:py-20 px-4 bg-white transition-all duration-500"
         style={{
-          visibility: showRestOfContent ? 'visible' : 'hidden',
-          height: showRestOfContent ? 'auto' : '0',
+          maxHeight: showRestOfContent ? '10000px' : '0',
           overflow: showRestOfContent ? 'visible' : 'hidden',
           opacity: showRestOfContent ? 1 : 0,
+          visibility: showRestOfContent ? 'visible' : 'hidden',
           pointerEvents: showRestOfContent ? 'auto' : 'none'
         }}
       >
