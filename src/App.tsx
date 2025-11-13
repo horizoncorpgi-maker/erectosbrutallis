@@ -224,6 +224,53 @@ function App() {
     console.log('%c📡 Inicializando sistema de detecção VTurb...', 'color: #00aaff; font-weight: bold');
     console.log('%c📊 Estado inicial:', 'color: #00aaff', { showRestOfContent, showPurchaseButton, hasScrolled });
 
+    // 🔧 INTERCEPTADOR UNIVERSAL DE SCROLL
+    let lastScrollY = window.scrollY;
+    let scrollCheckCount = 0;
+
+    const detectScrollAttempt = () => {
+      const currentScrollY = window.scrollY;
+      scrollCheckCount++;
+
+      // Log a cada 60 verificações (aproximadamente 1 segundo)
+      if (scrollCheckCount % 60 === 0) {
+        console.log('%c📊 Monitorando scroll...', 'color: #888', {
+          currentScrollY,
+          lastScrollY,
+          hasScrolled: hasScrolledRef.current
+        });
+      }
+
+      // Se houve mudança significativa no scroll e conteúdo não foi revelado
+      if (Math.abs(currentScrollY - lastScrollY) > 50 && !hasScrolledRef.current) {
+        console.log('%c🎯 SCROLL DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
+        console.log('%c📊 ScrollY anterior:', 'color: #ff9900', lastScrollY);
+        console.log('%c📊 ScrollY atual:', 'color: #ff9900', currentScrollY);
+        console.log('%c📊 Diferença:', 'color: #ff9900', Math.abs(currentScrollY - lastScrollY));
+        console.log('%c🚨 REVELANDO CONTEÚDO AGORA!', 'color: #ff0000; font-weight: bold; font-size: 16px');
+
+        // Revela o conteúdo IMEDIATAMENTE
+        handleVideoPitchReached();
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    // Monitora scroll com requestAnimationFrame (60 vezes por segundo)
+    let rafId: number;
+    const checkScroll = () => {
+      detectScrollAttempt();
+      rafId = requestAnimationFrame(checkScroll);
+    };
+    rafId = requestAnimationFrame(checkScroll);
+
+    // Listener de scroll como backup
+    const scrollListener = () => {
+      console.log('%c📍 Evento scroll disparado', 'color: #00aaff');
+      detectScrollAttempt();
+    };
+    window.addEventListener('scroll', scrollListener, { passive: true });
+
     const handleVTurbScrollEvent = (e: Event) => {
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
       console.log('%c📊 Estado ANTES do handleVideoPitchReached:', 'color: #ff9900', { showRestOfContent, showPurchaseButton, hasScrolled: hasScrolledRef.current });
@@ -331,6 +378,8 @@ function App() {
     // Cleanup
     return () => {
       console.log('%c🧹 Limpando listeners e intervals...', 'color: #ff9900');
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('scroll', scrollListener);
       clearInterval(playerCheckInterval);
       observer.disconnect();
       scrollObserver.disconnect();
