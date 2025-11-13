@@ -34,8 +34,17 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [contentUnlocked, setContentUnlocked] = useState(false);
-  const [hasScrolled, setHasScrolled] = useState(false); // 🔧 NOVO: Flag para controlar se já fez scroll
+
+  // Detecta se está em ambiente de desenvolvimento
+  const isDevelopment = import.meta.env.DEV ||
+                       window.location.hostname === 'localhost' ||
+                       window.location.hostname.includes('bolt') ||
+                       window.location.hostname.includes('stackblitz') ||
+                       window.location.hostname.includes('webcontainer');
+
+  const [showRestOfContent, setShowRestOfContent] = useState(isDevelopment);
+  const [showPurchaseButton, setShowPurchaseButton] = useState(isDevelopment);
+  const [hasVideoTriggeredContent, setHasVideoTriggeredContent] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -43,213 +52,71 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
-  }, []);
 
-  // 🔧 CORREÇÃO PRINCIPAL: useEffect separado e otimizado
+    // Ambiente Bolt/Dev: mostra tudo imediatamente
+    if (isDevelopment) {
+      console.log('🔧 Ambiente de desenvolvimento detectado - mostrando tudo');
+      setShowRestOfContent(true);
+      setShowPurchaseButton(true);
+    }
+  }, [isDevelopment]);
+
+  // Persistência: verifica se usuário já viu o conteúdo antes
   useEffect(() => {
-    console.log('%c[APP] 🚀 Sistema de scroll inicializado', 'color: #00ff00; font-weight: bold; font-size: 14px');
+    if (!isDevelopment) {
+      const hasSeenContent = sessionStorage.getItem('has_seen_content') === 'true';
 
-    const unlockContent = () => {
-      console.log('%c[APP] ========================================', 'color: #ffaa00; font-weight: bold');
-      console.log('%c[APP] 🔓 unlockContent CHAMADO!', 'color: #ffaa00; font-weight: bold; font-size: 16px');
-      console.log('%c[APP] Estado atual:', 'color: #ffaa00', {
-        contentUnlocked,
-        hasScrolled
-      });
-      console.log('%c[APP] ========================================', 'color: #ffaa00; font-weight: bold');
-
-      if (!contentUnlocked) {
-        console.log('%c[APP] ✅ Desbloqueando conteúdo...', 'color: #00ff00; font-weight: bold');
-        setContentUnlocked(true);
-
-        // 🔧 CORREÇÃO: Aguarda DOM atualizar completamente
-        requestAnimationFrame(() => {
-          setTimeout(() => {
-            if (!hasScrolled) {
-              console.log('%c[APP] 🎯 Iniciando processo de scroll...', 'color: #00aaff; font-weight: bold; font-size: 14px');
-              setHasScrolled(true);
-              executeScroll();
-            }
-          }, 300); // 🔧 Aumentado de 200ms para 300ms
-        });
-      } else {
-        console.log('%c[APP] ⚠️ Conteúdo já estava desbloqueado', 'color: #ff9900');
+      if (hasSeenContent) {
+        console.log('👤 Usuário já viu o conteúdo antes - mostrando tudo');
+        setShowRestOfContent(true);
+        setShowPurchaseButton(true);
       }
-    };
+    }
+  }, [isDevelopment]);
 
-    // 🔧 NOVA FUNÇÃO: Sistema de scroll com fallback robusto
-    const executeScroll = () => {
-      console.log('%c[APP] 📍 executeScroll iniciado', 'color: #0099ff; font-weight: bold');
+  // Callback que revela o conteúdo quando VTurb chega no pitch
+  const handleVideoPitchReached = () => {
+    console.log('🎬 VTurb video triggered content reveal');
 
-      const tryScroll = (attempts = 0) => {
-        console.log('%c[APP] ========================================', 'color: #00aaff');
-        console.log(`%c[APP] 🔄 Tentativa ${attempts + 1} de 20`, 'color: #00aaff; font-weight: bold');
+    // ✅ ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA
+    setShowRestOfContent(true);
+    setShowPurchaseButton(true);
+    setHasVideoTriggeredContent(true);
 
-        // 🔧 Múltiplas estratégias de busca
-        const strategies = [
-          { name: 'ref', element: sixBottleButtonRef.current },
-          { name: 'id', element: document.getElementById('six-bottle-button') },
-          { name: 'class', element: document.querySelector('.smartplayer-scroll-event') },
-          { name: 'data-attr', element: document.querySelector('[data-scroll-target="offers"]') }
-        ];
+    // 💾 Salva no sessionStorage (apenas usuários normais)
+    if (!isDevelopment) {
+      sessionStorage.setItem('has_seen_content', 'true');
+    }
 
-        let foundElement = null;
-        let foundStrategy = '';
-
-        for (const strategy of strategies) {
-          if (strategy.element) {
-            foundElement = strategy.element;
-            foundStrategy = strategy.name;
-            console.log(`%c[APP] ✓ Elemento encontrado via ${strategy.name}!`, 'color: #00ff00; font-weight: bold');
-            break;
+    // Scroll suave até o botão de compra
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        const tryScroll = (attempts = 0) => {
+          if (sixBottleButtonRef.current) {
+            console.log('✓ Fazendo scroll até botão de compra');
+            sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (attempts < 10) {
+            setTimeout(() => tryScroll(attempts + 1), 300);
           }
-        }
+        };
+        tryScroll();
+      }, 200);
+    });
+  };
 
-        console.log('%c[APP] Elementos verificados:', 'color: #00aaff', {
-          ref: !!sixBottleButtonRef.current,
-          byId: !!document.getElementById('six-bottle-button'),
-          byClass: !!document.querySelector('.smartplayer-scroll-event'),
-          offersSection: !!offersRef.current
-        });
-
-        if (foundElement) {
-          console.log(`%c[APP] 🎉 SUCESSO! Fazendo scroll via ${foundStrategy}...`, 'color: #00ff00; font-weight: bold; font-size: 16px');
-          
-          // 🔧 Verifica se elemento está visível
-          const rect = foundElement.getBoundingClientRect();
-          const isVisible = rect.width > 0 && rect.height > 0;
-          
-          console.log('%c[APP] Dimensões do elemento:', 'color: #00aaff', {
-            width: rect.width,
-            height: rect.height,
-            top: rect.top,
-            isVisible
-          });
-
-          if (isVisible) {
-            foundElement.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center',
-              inline: 'nearest'
-            });
-            
-            // 🔧 Feedback visual opcional
-            setTimeout(() => {
-              console.log('%c[APP] ✅ Scroll completado com sucesso!', 'color: #00ff00; font-weight: bold; font-size: 18px');
-            }, 1000);
-          } else {
-            console.log('%c[APP] ⚠️ Elemento encontrado mas não está visível, tentando fallback...', 'color: #ff9900');
-            scrollToOffersSection();
-          }
-        } else if (attempts < 20) { // 🔧 Aumentado de 10 para 20 tentativas
-          console.log('%c[APP] ⏳ Elemento não encontrado, aguardando...', 'color: #ff9900');
-          setTimeout(() => tryScroll(attempts + 1), 500); // 🔧 Aumentado de 300ms para 500ms
-        } else {
-          console.log('%c[APP] ❌ Limite de tentativas atingido, usando fallback...', 'color: #ff0000; font-weight: bold');
-          scrollToOffersSection();
-        }
-
-        console.log('%c[APP] ========================================', 'color: #00aaff');
-      };
-
-      // 🔧 NOVA FUNÇÃO: Fallback para scroll da section
-      const scrollToOffersSection = () => {
-        console.log('%c[APP] 🔄 Executando fallback: scroll para section de ofertas', 'color: #ff9900; font-weight: bold');
-        
-        if (offersRef.current) {
-          console.log('%c[APP] ✓ Section encontrada, fazendo scroll...', 'color: #00ff00');
-          offersRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
-          });
-          
-          setTimeout(() => {
-            console.log('%c[APP] ✅ Scroll para section completado!', 'color: #00ff00; font-weight: bold');
-          }, 1000);
-        } else {
-          console.log('%c[APP] ❌ ERRO: Section de ofertas não encontrada!', 'color: #ff0000; font-weight: bold');
-        }
-      };
-
-      tryScroll();
-    };
-
-    // 🔧 MELHORADO: Listeners para eventos do VTurb
+  // Listener para detectar tentativa de scroll do VTurb
+  useEffect(() => {
     const handleVTurbScrollEvent = (e: Event) => {
-      console.log('%c[APP] 🎬 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
-      unlockContent();
+      console.log('🎯 VTurb tentou fazer scroll - detectado pelo sistema');
+      handleVideoPitchReached();
     };
 
-    // 🔧 Eventos principais
-    console.log('%c[APP] 📡 Registrando listeners de eventos...', 'color: #00aaff');
     window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-    window.addEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
-    window.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
 
-    // 🔧 NOVO: Listener alternativo para timeupdate (quando vídeo atinge certo ponto)
-    const checkVideoProgress = () => {
-      const players = document.querySelectorAll('vturb-smartplayer');
-      players.forEach((player: any) => {
-        if (player && !player._progressListenerAdded) {
-          player._progressListenerAdded = true;
-          
-          // Tenta adicionar listener de timeupdate
-          try {
-            player.addEventListener('timeupdate', (e: any) => {
-              const currentTime = e.detail?.currentTime || 0;
-              const duration = e.detail?.duration || 0;
-              
-              // Desbloqueia quando passar de 80% do vídeo
-              if (duration > 0 && (currentTime / duration) > 0.8 && !contentUnlocked) {
-                console.log('%c[APP] 🎬 Vídeo atingiu 80%, desbloqueando...', 'color: #ff00ff; font-weight: bold');
-                unlockContent();
-              }
-            });
-          } catch (error) {
-            console.log('%c[APP] ⚠️ Não foi possível adicionar listener de progresso:', 'color: #ff9900', error);
-          }
-        }
-      });
-    };
-
-    // 🔧 Verifica players periodicamente
-    const playerCheckInterval = setInterval(() => {
-      const players = document.querySelectorAll('vturb-smartplayer');
-      if (players.length > 0) {
-        console.log(`%c[APP] ✓ ${players.length} player(s) VTurb encontrado(s)`, 'color: #00ff00');
-        checkVideoProgress();
-      }
-    }, 2000);
-
-    // 🔧 NOVO: Observer para mudanças no DOM
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.addedNodes.length > 0) {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeName === 'VTURB-SMARTPLAYER') {
-              console.log('%c[APP] 🎬 Novo player VTurb detectado no DOM', 'color: #ff00ff; font-weight: bold');
-              checkVideoProgress();
-            }
-          });
-        }
-      });
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-
-    // Cleanup
     return () => {
-      console.log('%c[APP] 🧹 Limpando listeners e intervals...', 'color: #ff9900');
-      clearInterval(playerCheckInterval);
-      observer.disconnect();
       window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
-      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
     };
-  }, []); // 🔧 IMPORTANTE: Array vazio - executa apenas uma vez
+  }, []);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -642,13 +509,8 @@ function App() {
       {/* 🔧 CORREÇÃO: Section sempre no DOM, controle via visibility e height */}
       <section 
         ref={offersRef} 
-        className="py-8 md:py-20 px-4 bg-white transition-all duration-500" 
-        style={{ 
-          maxHeight: contentUnlocked ? '10000px' : '0',
-          overflow: contentUnlocked ? 'visible' : 'hidden',
-          opacity: contentUnlocked ? 1 : 0,
-          visibility: contentUnlocked ? 'visible' : 'hidden'
-        }}
+        className="py-8 md:py-20 px-4 bg-white"
+        style={{ display: showRestOfContent ? 'block' : 'none' }}
       >
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
@@ -796,7 +658,6 @@ function App() {
 
       {/* Resto do código continua igual... */}
       {/* Por questões de espaço, as demais sections continuam iguais ao código original */}
-      {/* Apenas adicione style={{ display: contentUnlocked ? 'block' : 'none' }} em cada section que deve aparecer após unlock */}
 
       {/* Experts Section */}
       <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: showRestOfContent ? 'block' : 'none' }}>
