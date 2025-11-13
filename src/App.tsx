@@ -226,14 +226,48 @@ function App() {
 
     const handleVTurbScrollEvent = (e: Event) => {
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
-      console.log('%c📊 Estado ANTES do handleVideoPitchReached:', 'color: #ff9900', { showRestOfContent, showPurchaseButton, hasScrolled });
+      console.log('%c📊 Estado ANTES do handleVideoPitchReached:', 'color: #ff9900', { showRestOfContent, showPurchaseButton, hasScrolled: hasScrolledRef.current });
+
+      // Previne o scroll padrão do VTurb
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      console.log('%c🛑 Evento VTurb bloqueado - revelando conteúdo primeiro', 'color: #ff0000; font-weight: bold');
       handleVideoPitchReached();
     };
 
-    // Eventos principais do VTurb
-    window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-    window.addEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
-    window.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
+    // Eventos principais do VTurb - captura na fase de captura (antes de bubbling)
+    window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
+    window.addEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
+    window.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
+
+    // 🔧 INTERCEPTADOR DE SCROLL: Detecta quando VTurb tenta fazer scroll
+    const interceptScroll = () => {
+      console.log('%c🎯 Scroll detectado - verificando se conteúdo já foi revelado', 'color: #ff00ff; font-weight: bold');
+      if (!hasScrolledRef.current) {
+        console.log('%c⚠️ Conteúdo ainda não revelado - revelando AGORA', 'color: #ff9900; font-weight: bold');
+        handleVideoPitchReached();
+      }
+    };
+
+    // Monitora tentativas de scroll do VTurb
+    const scrollObserver = new MutationObserver(() => {
+      const scrollEvents = document.querySelectorAll('.smartplayer-scroll-event');
+      scrollEvents.forEach((el) => {
+        if (!el.hasAttribute('data-scroll-intercepted')) {
+          el.setAttribute('data-scroll-intercepted', 'true');
+          el.addEventListener('click', interceptScroll, true);
+        }
+      });
+    });
+
+    scrollObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
 
     // 🔧 NOVO: Listener alternativo para timeupdate (quando vídeo atinge certo ponto)
     const checkVideoProgress = () => {
@@ -299,9 +333,10 @@ function App() {
       console.log('%c🧹 Limpando listeners e intervals...', 'color: #ff9900');
       clearInterval(playerCheckInterval);
       observer.disconnect();
-      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
-      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
+      scrollObserver.disconnect();
+      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
+      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
+      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
     };
   }, []);
 
