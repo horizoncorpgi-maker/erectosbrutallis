@@ -1000,7 +1000,7 @@ function App() {
                 <div className="w-full md:w-1/2 flex-shrink-0">
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 0 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(0)}>
                     <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
+                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} preload="metadata"></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[0] && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
@@ -1012,7 +1012,7 @@ function App() {
                   </div>
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 1 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(1)}>
                     <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                      <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
+                      <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} preload="metadata"></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[1] && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
@@ -1024,7 +1024,7 @@ function App() {
                   </div>
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 2 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(2)}>
                     <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                      <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
+                      <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} preload="metadata"></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[2] && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
@@ -1118,6 +1118,7 @@ function App() {
                     <vturb-smartplayer
                       id={testimonial.videoId}
                       style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
+                      preload="metadata"
                     ></vturb-smartplayer>
                   </div>
                 ))}
