@@ -53,16 +53,26 @@ function App() {
         console.log('[APP] Desbloqueando conteúdo...');
         setContentUnlocked(true);
 
+        // Aguarda o DOM renderizar completamente antes de fazer scroll
         setTimeout(() => {
-          console.log('[APP] Tentando fazer scroll para o botão de 6 garrafas...');
-          console.log('[APP] sixBottleButtonRef.current:', sixBottleButtonRef.current);
-          if (sixBottleButtonRef.current) {
-            console.log('[APP] Botão encontrado! Fazendo scroll...');
-            sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else {
-            console.log('[APP] ERRO: Botão não encontrado!');
-          }
-        }, 300);
+          console.log('[APP] Primeira tentativa de scroll...');
+          const tryScroll = (attempts = 0) => {
+            console.log('[APP] Tentativa', attempts + 1, 'de scroll');
+            console.log('[APP] sixBottleButtonRef.current:', sixBottleButtonRef.current);
+
+            if (sixBottleButtonRef.current) {
+              console.log('[APP] Botão encontrado! Fazendo scroll...');
+              sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else if (attempts < 5) {
+              console.log('[APP] Botão ainda não renderizado, tentando novamente em 200ms...');
+              setTimeout(() => tryScroll(attempts + 1), 200);
+            } else {
+              console.log('[APP] ERRO: Botão não encontrado após 5 tentativas!');
+            }
+          };
+
+          tryScroll();
+        }, 100);
       } else {
         console.log('[APP] Conteúdo já estava desbloqueado, ignorando...');
       }
