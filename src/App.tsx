@@ -239,10 +239,12 @@ function App() {
       console.log('%c👆 Interação manual detectada', 'color: #00ff00');
     };
 
-    // Listeners para detectar interação manual
+    // Listeners para detectar interação manual - sempre passivo para não bloquear o scroll
     window.addEventListener('wheel', markUserInteraction, { passive: true });
-    window.addEventListener('touchstart', markUserInteraction, { passive: true, capture: false });
-    window.addEventListener('touchmove', markUserInteraction, { passive: true, capture: false });
+    window.addEventListener('touchstart', markUserInteraction, { passive: true });
+    window.addEventListener('touchmove', markUserInteraction, { passive: true });
+    window.addEventListener('mousedown', markUserInteraction, { passive: true });
+    window.addEventListener('keydown', markUserInteraction, { passive: true });
 
     const detectScrollAttempt = () => {
       const currentScrollY = window.scrollY;
@@ -296,12 +298,16 @@ function App() {
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
       console.log('%c📊 Estado ANTES do handleVideoPitchReached:', 'color: #ff9900', { showRestOfContent, showPurchaseButton, hasScrolled: hasScrolledRef.current });
 
+      // Sempre previne o scroll padrão do VTurb
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
       if (!hasScrolledRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
         console.log('%c🛑 Evento VTurb bloqueado - revelando conteúdo primeiro', 'color: #ff0000; font-weight: bold');
         handleVideoPitchReached();
+      } else {
+        console.log('%c✓ Conteúdo já revelado, VTurb bloqueado mas sem ação', 'color: #00ff00');
       }
     };
 
@@ -414,6 +420,8 @@ function App() {
       window.removeEventListener('wheel', markUserInteraction);
       window.removeEventListener('touchstart', markUserInteraction);
       window.removeEventListener('touchmove', markUserInteraction);
+      window.removeEventListener('mousedown', markUserInteraction);
+      window.removeEventListener('keydown', markUserInteraction);
       clearInterval(playerCheckInterval);
       observer.disconnect();
       scrollObserver.disconnect();
