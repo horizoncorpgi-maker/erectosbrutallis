@@ -45,6 +45,7 @@ function App() {
   const [showRestOfContent, setShowRestOfContent] = useState(isDevelopment);
   const [showPurchaseButton, setShowPurchaseButton] = useState(isDevelopment);
   const [hasVideoTriggeredContent, setHasVideoTriggeredContent] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -74,9 +75,9 @@ function App() {
     }
   }, [isDevelopment]);
 
-  // Callback que revela o conteúdo quando VTurb chega no pitch
+  // 🔧 CORREÇÃO 1: Callback que revela o conteúdo quando VTurb chega no pitch
   const handleVideoPitchReached = () => {
-    console.log('🎬 VTurb video triggered content reveal');
+    console.log('%c🎬 VTurb video triggered content reveal', 'color: #ff00ff; font-weight: bold; font-size: 14px');
 
     // ✅ ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA
     setShowRestOfContent(true);
@@ -88,35 +89,183 @@ function App() {
       sessionStorage.setItem('has_seen_content', 'true');
     }
 
-    // Scroll suave até o botão de compra
+    // 🔧 CORREÇÃO 3: Sistema de scroll robusto com múltiplas tentativas
+    if (!hasScrolled) {
+      console.log('%c🎯 Iniciando processo de scroll...', 'color: #00aaff; font-weight: bold');
+      setHasScrolled(true);
+      executeScroll();
+    }
+  };
+
+  // 🔧 CORREÇÃO 4: Função de scroll com fallback
+  const executeScroll = () => {
+    console.log('%c📍 executeScroll iniciado', 'color: #0099ff; font-weight: bold');
+
+    const tryScroll = (attempts = 0) => {
+      console.log(`%c🔄 Tentativa ${attempts + 1} de 20`, 'color: #00aaff; font-weight: bold');
+
+      // 🔧 Múltiplas estratégias de busca
+      const strategies = [
+        { name: 'ref', element: sixBottleButtonRef.current },
+        { name: 'id', element: document.getElementById('six-bottle-button') },
+        { name: 'class', element: document.querySelector('.smartplayer-scroll-event') },
+        { name: 'data-attr', element: document.querySelector('[data-scroll-target="offers"]') }
+      ];
+
+      let foundElement = null;
+      let foundStrategy = '';
+
+      for (const strategy of strategies) {
+        if (strategy.element) {
+          foundElement = strategy.element;
+          foundStrategy = strategy.name;
+          console.log(`%c✓ Elemento encontrado via ${strategy.name}!`, 'color: #00ff00; font-weight: bold');
+          break;
+        }
+      }
+
+      if (foundElement) {
+        // 🔧 CORREÇÃO 2: Verifica se elemento está visível
+        const rect = foundElement.getBoundingClientRect();
+        const isVisible = rect.width > 0 && rect.height > 0;
+
+        console.log('%cDimensões do elemento:', 'color: #00aaff', {
+          width: rect.width,
+          height: rect.height,
+          top: rect.top,
+          isVisible
+        });
+
+        if (isVisible) {
+          console.log(`%c✅ Fazendo scroll via ${foundStrategy}...`, 'color: #00ff00; font-weight: bold; font-size: 16px');
+          foundElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest'
+          });
+        } else {
+          console.log('%c⚠️ Elemento encontrado mas não está visível, tentando fallback...', 'color: #ff9900');
+          scrollToOffersSection();
+        }
+      } else if (attempts < 20) {
+        console.log('%c⏳ Elemento não encontrado, aguardando...', 'color: #ff9900');
+        setTimeout(() => tryScroll(attempts + 1), 500);
+      } else {
+        console.log('%c❌ Limite de tentativas atingido, usando fallback...', 'color: #ff0000; font-weight: bold');
+        scrollToOffersSection();
+      }
+    };
+
+    // 🔧 CORREÇÃO 4: Fallback para scroll da section
+    const scrollToOffersSection = () => {
+      console.log('%c🔄 Executando fallback: scroll para section de ofertas', 'color: #ff9900; font-weight: bold');
+
+      if (offersRef.current) {
+        console.log('%c✓ Section encontrada, fazendo scroll...', 'color: #00ff00');
+
+        const offsetTop = offersRef.current.offsetTop - 100;
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        });
+
+        setTimeout(() => {
+          console.log('%c✅ Scroll para section completado!', 'color: #00ff00; font-weight: bold');
+        }, 1000);
+      } else {
+        console.log('%c❌ ERRO: Section de ofertas não encontrada!', 'color: #ff0000; font-weight: bold');
+      }
+    };
+
+    // 🔧 Aguarda DOM atualizar completamente antes de tentar scroll
     requestAnimationFrame(() => {
-      setTimeout(() => {
-        const tryScroll = (attempts = 0) => {
-          if (sixBottleButtonRef.current) {
-            console.log('✓ Fazendo scroll até botão de compra');
-            sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else if (attempts < 10) {
-            setTimeout(() => tryScroll(attempts + 1), 300);
-          }
-        };
-        tryScroll();
-      }, 200);
+      setTimeout(() => tryScroll(), 300);
     });
   };
 
-  // Listener para detectar tentativa de scroll do VTurb
+  // 🔧 CORREÇÃO 5: Sistema melhorado de detecção de eventos do VTurb
   useEffect(() => {
+    console.log('%c📡 Inicializando sistema de detecção VTurb...', 'color: #00aaff; font-weight: bold');
+
     const handleVTurbScrollEvent = (e: Event) => {
-      console.log('🎯 VTurb tentou fazer scroll - detectado pelo sistema');
+      console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
       handleVideoPitchReached();
     };
 
+    // Eventos principais do VTurb
     window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
+    window.addEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
+    window.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
 
-    return () => {
-      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
+    // 🔧 NOVO: Listener alternativo para timeupdate (quando vídeo atinge certo ponto)
+    const checkVideoProgress = () => {
+      const players = document.querySelectorAll('vturb-smartplayer');
+      players.forEach((player: any) => {
+        if (player && !player._progressListenerAdded) {
+          player._progressListenerAdded = true;
+
+          try {
+            player.addEventListener('timeupdate', (e: any) => {
+              const currentTime = e.detail?.currentTime || 0;
+              const duration = e.detail?.duration || 0;
+
+              // Desbloqueia quando passar de 80% do vídeo
+              if (duration > 0 && (currentTime / duration) > 0.8 && !showRestOfContent) {
+                console.log('%c🎬 Vídeo atingiu 80%, desbloqueando...', 'color: #ff00ff; font-weight: bold');
+                handleVideoPitchReached();
+              }
+            });
+
+            // Adiciona listener para ended
+            player.addEventListener('ended', () => {
+              console.log('%c🎬 Vídeo terminou, desbloqueando...', 'color: #ff00ff; font-weight: bold');
+              handleVideoPitchReached();
+            });
+          } catch (error) {
+            console.log('%c⚠️ Não foi possível adicionar listener de progresso:', 'color: #ff9900', error);
+          }
+        }
+      });
     };
-  }, []);
+
+    // Verifica players periodicamente
+    const playerCheckInterval = setInterval(() => {
+      const players = document.querySelectorAll('vturb-smartplayer');
+      if (players.length > 0) {
+        console.log(`%c✓ ${players.length} player(s) VTurb encontrado(s)`, 'color: #00ff00');
+        checkVideoProgress();
+      }
+    }, 2000);
+
+    // Observer para mudanças no DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeName === 'VTURB-SMARTPLAYER') {
+              console.log('%c🎬 Novo player VTurb detectado no DOM', 'color: #ff00ff; font-weight: bold');
+              checkVideoProgress();
+            }
+          });
+        }
+      });
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Cleanup
+    return () => {
+      console.log('%c🧹 Limpando listeners e intervals...', 'color: #ff9900');
+      clearInterval(playerCheckInterval);
+      observer.disconnect();
+      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
+      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
+      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
+    };
+  }, [showRestOfContent]);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -506,11 +655,17 @@ function App() {
         </div>
       </section>
 
-      {/* 🔧 CORREÇÃO: Section sempre no DOM, controle via visibility e height */}
-      <section 
-        ref={offersRef} 
+      {/* 🔧 CORREÇÃO 2: Section SEMPRE no DOM, controle via visibility ao invés de display */}
+      <section
+        ref={offersRef}
         className="py-8 md:py-20 px-4 bg-white"
-        style={{ display: showRestOfContent ? 'block' : 'none' }}
+        style={{
+          visibility: showRestOfContent ? 'visible' : 'hidden',
+          height: showRestOfContent ? 'auto' : '0',
+          overflow: showRestOfContent ? 'visible' : 'hidden',
+          opacity: showRestOfContent ? 1 : 0,
+          pointerEvents: showRestOfContent ? 'auto' : 'none'
+        }}
       >
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
@@ -535,13 +690,17 @@ function App() {
                 <div className="text-2xl md:text-4xl font-bold text-[#FFD600] mb-3 md:mb-6">
                   YOU'RE SAVING $888
                 </div>
-                {/* 🔧 CORREÇÃO: Múltiplos atributos para identificação */}
+                {/* 🔧 CORREÇÃO 2: Botão SEMPRE no DOM com visibility */}
                 <button
                   ref={sixBottleButtonRef}
                   id="six-bottle-button"
                   data-scroll-target="offers"
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
                   className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  style={{
+                    visibility: showPurchaseButton ? 'visible' : 'hidden',
+                    pointerEvents: showPurchaseButton ? 'auto' : 'none'
+                  }}
                 >
                   CLAIM OFFER NOW
                 </button>
