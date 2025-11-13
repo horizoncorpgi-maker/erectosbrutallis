@@ -34,15 +34,32 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [showRestOfContent, setShowRestOfContent] = useState(false);
-  const [showPurchaseButton, setShowPurchaseButton] = useState(false);
+
+  // Detecta se está em ambiente de desenvolvimento
+  const isDevelopment = import.meta.env.DEV ||
+                       window.location.hostname === 'localhost' ||
+                       window.location.hostname.includes('bolt') ||
+                       window.location.hostname.includes('stackblitz') ||
+                       window.location.hostname.includes('webcontainer');
+
+  const [showRestOfContent, setShowRestOfContent] = useState(isDevelopment);
+  const [showPurchaseButton, setShowPurchaseButton] = useState(isDevelopment);
   const [hasVideoTriggeredContent, setHasVideoTriggeredContent] = useState(false);
 
   // Detectar ambiente
   const isAdmin = window.location.search.includes('admin=true');
   const isBoltEnvironment = window.location.hostname.includes('bolt') ||
                             window.location.hostname.includes('stackblitz') ||
-                            window.location.hostname === 'localhost';
+                            window.location.hostname.includes('webcontainer') ||
+                            window.location.hostname === 'localhost' ||
+                            process.env.NODE_ENV === 'development';
+
+  // Debug logs
+  console.log('🔍 Debug Info:');
+  console.log('  hostname:', window.location.hostname);
+  console.log('  isAdmin:', isAdmin);
+  console.log('  isBoltEnvironment:', isBoltEnvironment);
+  console.log('  NODE_ENV:', process.env.NODE_ENV);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
