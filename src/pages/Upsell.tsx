@@ -26,11 +26,15 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
 
   useEffect(() => {
     console.log('%c📡 Inicializando detector VTurb (Upsell)...', 'color: #00aaff; font-weight: bold');
+    console.log('%c🔍 Hostname atual:', 'color: #00aaff', window.location.hostname);
     console.log('%c🔍 Ambiente Bolt detectado:', 'color: #00aaff', isBoltEnvironment);
+    console.log('%c🔍 contentUnlocked:', 'color: #00aaff', contentUnlocked);
+    console.log('%c🔍 contentUnlockedRef.current:', 'color: #00aaff', contentUnlockedRef.current);
 
     // Se estiver no Bolt, já mostra o conteúdo
     if (isBoltEnvironment) {
       console.log('%c✅ Ambiente Bolt - conteúdo sempre visível', 'color: #00ff00; font-weight: bold');
+      console.log('%c✅ contentUnlocked está setado como:', 'color: #00ff00', contentUnlocked);
       return;
     }
 
@@ -190,6 +194,12 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
             Once you leave this page, this offer will never be available again
           </p>
         </div>
+
+        {isBoltEnvironment && (
+          <div className="bg-blue-500 text-white p-2 rounded mb-4 text-center text-sm">
+            🔧 DEBUG: Ambiente Bolt detectado - Conteúdo visível | contentUnlocked: {contentUnlocked.toString()}
+          </div>
+        )}
 
         <div style={{ display: contentUnlocked ? 'block' : 'none' }}>
         {isUp1bt ? (
