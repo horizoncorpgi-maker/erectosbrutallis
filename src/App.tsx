@@ -168,10 +168,20 @@ function App() {
 
         if (isVisible) {
           console.log(`%c✅ Fazendo scroll via ${foundStrategy}...`, 'color: #00ff00; font-weight: bold; font-size: 16px');
-          foundElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'nearest'
+
+          const elementTop = foundElement.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementTop - (window.innerHeight / 2) + (rect.height / 2);
+
+          console.log('%c📍 Posições:', 'color: #00aaff', {
+            elementTop,
+            windowHeight: window.innerHeight,
+            elementHeight: rect.height,
+            scrollTo: offsetPosition
+          });
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
           });
         } else {
           console.log('%c⚠️ Elemento encontrado mas não está visível, tentando fallback...', 'color: #ff9900');
