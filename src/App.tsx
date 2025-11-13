@@ -42,8 +42,8 @@ function App() {
                        window.location.hostname.includes('stackblitz') ||
                        window.location.hostname.includes('webcontainer');
 
-  const [showRestOfContent, setShowRestOfContent] = useState(true);
-  const [showPurchaseButton, setShowPurchaseButton] = useState(true);
+  const [showRestOfContent, setShowRestOfContent] = useState(false);
+  const [showPurchaseButton, setShowPurchaseButton] = useState(false);
   const [hasVideoTriggeredContent, setHasVideoTriggeredContent] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
 
