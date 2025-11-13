@@ -120,9 +120,26 @@ function App() {
 
       scrollElements.forEach((element, index) => {
         if (!(element as any)._scrollListenerAdded) {
-          console.log(`[APP] Adicionando listener de click ao elemento ${index}`);
+          console.log(`[APP] Adicionando listeners ao elemento ${index}`, element);
           (element as any)._scrollListenerAdded = true;
-          element.addEventListener('click', handleScrollEvent);
+
+          // Adiciona múltiplos tipos de listeners para garantir captura
+          element.addEventListener('click', (e) => {
+            console.log('[APP] ✓ CLICK detectado no elemento!', e);
+            handleScrollEvent(e);
+          }, true); // useCapture = true para capturar antes
+
+          element.addEventListener('mousedown', (e) => {
+            console.log('[APP] ✓ MOUSEDOWN detectado no elemento!', e);
+            handleScrollEvent(e);
+          }, true);
+
+          element.addEventListener('touchstart', (e) => {
+            console.log('[APP] ✓ TOUCHSTART detectado no elemento!', e);
+            handleScrollEvent(e);
+          }, true);
+
+          console.log(`[APP] ✓ Todos os listeners adicionados ao elemento ${index}`);
         }
       });
     }, 500);
