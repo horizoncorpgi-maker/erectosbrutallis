@@ -45,29 +45,46 @@ function App() {
   }, []);
 
   useEffect(() => {
+    console.log('[APP] useEffect iniciado. contentUnlocked:', contentUnlocked);
+
     const unlockContent = () => {
+      console.log('[APP] unlockContent chamado. contentUnlocked atual:', contentUnlocked);
       if (!contentUnlocked) {
+        console.log('[APP] Desbloqueando conteúdo...');
         setContentUnlocked(true);
 
         setTimeout(() => {
-          sixBottleButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          console.log('[APP] Tentando fazer scroll para o botão de 6 garrafas...');
+          console.log('[APP] sixBottleButtonRef.current:', sixBottleButtonRef.current);
+          if (sixBottleButtonRef.current) {
+            console.log('[APP] Botão encontrado! Fazendo scroll...');
+            sixBottleButtonRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            console.log('[APP] ERRO: Botão não encontrado!');
+          }
         }, 300);
+      } else {
+        console.log('[APP] Conteúdo já estava desbloqueado, ignorando...');
       }
     };
 
     const handleScrollEvent = (e: Event) => {
+      console.log('[APP] handleScrollEvent disparado via click:', e);
       e.preventDefault();
       e.stopPropagation();
       unlockContent();
     };
 
+    console.log('[APP] Adicionando listener para smartplayer-scroll-event...');
     window.addEventListener('smartplayer-scroll-event', unlockContent);
 
     const checkForScrollElements = setInterval(() => {
       const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
+      console.log('[APP] Verificando elementos .smartplayer-scroll-event. Encontrados:', scrollElements.length);
 
-      scrollElements.forEach((element) => {
+      scrollElements.forEach((element, index) => {
         if (!(element as any)._scrollListenerAdded) {
+          console.log(`[APP] Adicionando listener de click ao elemento ${index}`);
           (element as any)._scrollListenerAdded = true;
           element.addEventListener('click', handleScrollEvent);
         }
@@ -75,6 +92,7 @@ function App() {
     }, 500);
 
     return () => {
+      console.log('[APP] Limpando listeners...');
       clearInterval(checkForScrollElements);
       window.removeEventListener('smartplayer-scroll-event', unlockContent);
       const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
