@@ -94,66 +94,44 @@ function App() {
       }
     };
 
-    const handleScrollEvent = (e: Event) => {
-      console.log('[APP] handleScrollEvent disparado via click:', e);
-      e.preventDefault();
-      e.stopPropagation();
+    // Listener AUTOMÁTICO para evento customizado do VTurb
+    // O VTurb dispara este evento quando detecta o elemento .smartplayer-scroll-event
+    const handleVTurbScrollEvent = (e: Event) => {
+      console.log('[APP] ✓ Evento smartplayer-scroll-event AUTOMÁTICO detectado!', e);
       unlockContent();
     };
 
-    console.log('[APP] Adicionando listener para smartplayer-scroll-event...');
-    window.addEventListener('smartplayer-scroll-event', unlockContent);
+    console.log('[APP] Adicionando listener para evento automático do VTurb...');
+    window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
 
-    // Listener alternativo para eventos do VTurb
-    const handleVTurbEvent = (e: Event) => {
-      console.log('[APP] Evento do VTurb detectado:', e.type);
+    // Listeners alternativos para outros eventos do VTurb
+    const handleVTurbEndEvent = (e: Event) => {
+      console.log('[APP] Evento smartplayer:video:ended detectado:', e.type);
       unlockContent();
     };
 
-    window.addEventListener('smartplayer:video:ended', handleVTurbEvent);
-    window.addEventListener('smartplayer:cta:show', handleVTurbEvent);
-    console.log('[APP] Listeners alternativos do VTurb adicionados');
+    const handleVTurbCTAEvent = (e: Event) => {
+      console.log('[APP] Evento smartplayer:cta:show detectado:', e.type);
+      unlockContent();
+    };
 
-    const checkForScrollElements = setInterval(() => {
+    window.addEventListener('smartplayer:video:ended', handleVTurbEndEvent);
+    window.addEventListener('smartplayer:cta:show', handleVTurbCTAEvent);
+
+    // Log periódico para verificar se o botão está presente
+    const checkInterval = setInterval(() => {
       const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
-      console.log('[APP] Verificando elementos .smartplayer-scroll-event. Encontrados:', scrollElements.length);
-
-      scrollElements.forEach((element, index) => {
-        if (!(element as any)._scrollListenerAdded) {
-          console.log(`[APP] Adicionando listeners ao elemento ${index}`, element);
-          (element as any)._scrollListenerAdded = true;
-
-          // Adiciona múltiplos tipos de listeners para garantir captura
-          element.addEventListener('click', (e) => {
-            console.log('[APP] ✓ CLICK detectado no elemento!', e);
-            handleScrollEvent(e);
-          }, true); // useCapture = true para capturar antes
-
-          element.addEventListener('mousedown', (e) => {
-            console.log('[APP] ✓ MOUSEDOWN detectado no elemento!', e);
-            handleScrollEvent(e);
-          }, true);
-
-          element.addEventListener('touchstart', (e) => {
-            console.log('[APP] ✓ TOUCHSTART detectado no elemento!', e);
-            handleScrollEvent(e);
-          }, true);
-
-          console.log(`[APP] ✓ Todos os listeners adicionados ao elemento ${index}`);
-        }
-      });
-    }, 500);
+      if (scrollElements.length > 0) {
+        console.log('[APP] ✓ Botão .smartplayer-scroll-event encontrado! Total:', scrollElements.length);
+      }
+    }, 2000);
 
     return () => {
       console.log('[APP] Limpando listeners...');
-      clearInterval(checkForScrollElements);
-      window.removeEventListener('smartplayer-scroll-event', unlockContent);
-      window.removeEventListener('smartplayer:video:ended', handleVTurbEvent);
-      window.removeEventListener('smartplayer:cta:show', handleVTurbEvent);
-      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
-      scrollElements.forEach((element) => {
-        element.removeEventListener('click', handleScrollEvent);
-      });
+      clearInterval(checkInterval);
+      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
+      window.removeEventListener('smartplayer:video:ended', handleVTurbEndEvent);
+      window.removeEventListener('smartplayer:cta:show', handleVTurbCTAEvent);
     };
   }, [contentUnlocked]);
 
