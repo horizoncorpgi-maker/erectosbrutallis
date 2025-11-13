@@ -53,14 +53,7 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
-
-    // Ambiente Bolt/Dev: mostra tudo imediatamente
-    if (isDevelopment) {
-      console.log('🔧 Ambiente de desenvolvimento detectado - mostrando tudo');
-      setShowRestOfContent(true);
-      setShowPurchaseButton(true);
-    }
-  }, [isDevelopment]);
+  }, []);
 
   // Persistência: verifica se usuário já viu o conteúdo antes
   useEffect(() => {
