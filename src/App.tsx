@@ -34,7 +34,7 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [contentUnlocked, setContentUnlocked] = useState(true);
+  const [contentUnlocked, setContentUnlocked] = useState(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
