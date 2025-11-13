@@ -1,6 +1,6 @@
 import { Play, Volume2, AlertTriangle, CheckCircle, Truck, Shield, Star } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UpsellProps {
   bottles: number;
@@ -14,42 +14,102 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const isUp1bt = location.pathname === '/up1bt';
   const isUp3bt = location.pathname === '/up3bt';
   const [contentUnlocked, setContentUnlocked] = useState(false);
+  const contentUnlockedRef = useRef(false);
 
   useEffect(() => {
+    console.log('%c📡 Inicializando detector VTurb (Upsell)...', 'color: #00aaff; font-weight: bold');
+
     const unlockContent = () => {
-      if (!contentUnlocked) {
+      if (!contentUnlockedRef.current) {
+        console.log('%c🔓 Desbloqueando conteúdo (Upsell)', 'color: #00ff00; font-weight: bold');
+        contentUnlockedRef.current = true;
         setContentUnlocked(true);
       }
     };
 
-    const handleScrollEvent = (e: Event) => {
+    // 🔧 FLAG para identificar scroll do VTurb vs scroll manual
+    let lastScrollY = window.scrollY;
+    let scrollCheckCount = 0;
+    let lastUserInteraction = Date.now();
+
+    // Detecta interação manual do usuário
+    const markUserInteraction = () => {
+      lastUserInteraction = Date.now();
+      console.log('%c👆 Interação manual detectada (Upsell)', 'color: #00ff00');
+    };
+
+    // Listeners para detectar interação manual
+    window.addEventListener('wheel', markUserInteraction, { passive: true });
+    window.addEventListener('touchstart', markUserInteraction, { passive: true });
+    window.addEventListener('touchmove', markUserInteraction, { passive: true });
+
+    const detectScrollAttempt = () => {
+      const currentScrollY = window.scrollY;
+      scrollCheckCount++;
+
+      // Log a cada 60 verificações
+      if (scrollCheckCount % 60 === 0) {
+        console.log('%c📊 Monitorando scroll (Upsell)...', 'color: #888', {
+          currentScrollY,
+          lastScrollY,
+          contentUnlocked: contentUnlockedRef.current,
+          timeSinceUserInteraction: Date.now() - lastUserInteraction
+        });
+      }
+
+      const scrollDiff = Math.abs(currentScrollY - lastScrollY);
+      const timeSinceInteraction = Date.now() - lastUserInteraction;
+
+      // Se houve mudança significativa no scroll E não foi interação manual do usuário
+      if (scrollDiff > 10 && !contentUnlockedRef.current && timeSinceInteraction > 500) {
+        console.log('%c🎯 SCROLL AUTOMÁTICO (VTurb) DETECTADO! (Upsell)', 'color: #ff0000; font-weight: bold; font-size: 16px');
+        console.log('%c📊 ScrollY anterior:', 'color: #ff9900', lastScrollY);
+        console.log('%c📊 ScrollY atual:', 'color: #ff9900', currentScrollY);
+        console.log('%c📊 Diferença:', 'color: #ff9900', scrollDiff);
+        console.log('%c📊 Tempo desde interação:', 'color: #ff9900', timeSinceInteraction + 'ms');
+        unlockContent();
+      } else if (scrollDiff > 10 && timeSinceInteraction <= 500) {
+        console.log('%c👆 Scroll manual ignorado (Upsell)', 'color: #ffaa00', {
+          scrollDiff,
+          timeSinceInteraction
+        });
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    // Monitora scroll com requestAnimationFrame
+    let rafId: number;
+    const checkScroll = () => {
+      detectScrollAttempt();
+      rafId = requestAnimationFrame(checkScroll);
+    };
+    rafId = requestAnimationFrame(checkScroll);
+
+    const handleVTurbScrollEvent = (e: Event) => {
+      console.log('%c🎯 Evento VTurb detectado! (Upsell)', 'color: #ff00ff; font-weight: bold', e.type);
       e.preventDefault();
       e.stopPropagation();
+      e.stopImmediatePropagation();
       unlockContent();
     };
 
-    window.addEventListener('smartplayer-scroll-event', unlockContent);
-
-    const checkForScrollElements = setInterval(() => {
-      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
-
-      scrollElements.forEach((element) => {
-        if (!(element as any)._scrollListenerAdded) {
-          (element as any)._scrollListenerAdded = true;
-          element.addEventListener('click', handleScrollEvent);
-        }
-      });
-    }, 500);
+    // Eventos principais do VTurb
+    window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
+    window.addEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
+    window.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
 
     return () => {
-      clearInterval(checkForScrollElements);
-      window.removeEventListener('smartplayer-scroll-event', unlockContent);
-      const scrollElements = document.querySelectorAll('.smartplayer-scroll-event');
-      scrollElements.forEach((element) => {
-        element.removeEventListener('click', handleScrollEvent);
-      });
+      console.log('%c🧹 Limpando listeners (Upsell)...', 'color: #ff9900');
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('wheel', markUserInteraction);
+      window.removeEventListener('touchstart', markUserInteraction);
+      window.removeEventListener('touchmove', markUserInteraction);
+      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
+      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
+      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
     };
-  }, [contentUnlocked]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50 flex flex-col">
@@ -135,7 +195,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
 
               <button
                 onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/201842174:1'}
-                className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-xl md:text-2xl"
+                className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-xl md:text-2xl"
               >
                 UPGRADE MY ORDER NOW
               </button>
@@ -183,7 +243,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                   </div>
                   <button
                     onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/198160252:1'}
-                    className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                    className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                   >
                     CLAIM OFFER NOW
                   </button>
