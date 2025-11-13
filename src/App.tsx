@@ -231,6 +231,8 @@ function App() {
     // Não há mais bloqueio de scroll manual - o usuário pode fazer scroll livremente
 
     const handleVTurbScrollEvent = (e: Event) => {
+      console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
+
       // Se o conteúdo já foi revelado, não faz NADA - deixa o evento fluir normalmente
       if (hasScrolledRef.current) {
         console.log('%c✓ Conteúdo já revelado - evento VTurb liberado completamente', 'color: #00ff00');
@@ -242,7 +244,12 @@ function App() {
       const isMainVideo = target?.id === 'vid-69124ec0b910e6e322c32a69' ||
                           target?.closest('#vid-69124ec0b910e6e322c32a69');
 
-      console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type, 'isMainVideo:', isMainVideo);
+      console.log('%c📊 Detalhes:', 'color: #00aaff', {
+        eventType: e.type,
+        targetId: target?.id,
+        isMainVideo,
+        hasScrolled: hasScrolledRef.current
+      });
 
       // Só bloqueia se for do vídeo principal E o conteúdo ainda não foi revelado
       if (isMainVideo) {
@@ -252,22 +259,67 @@ function App() {
         console.log('%c🛑 Evento VTurb do vídeo principal bloqueado - revelando conteúdo', 'color: #ff0000; font-weight: bold');
         handleVideoPitchReached();
       } else {
-        console.log('%c✓ Evento de depoimento/expert - não bloqueia', 'color: #00ff00');
+        console.log('%c✓ Evento de outro vídeo - não bloqueia', 'color: #00ff00');
       }
     };
 
-    // Eventos principais do VTurb - apenas para o vídeo principal
+    // Função para adicionar listeners ao player principal
+    const attachListenersToMainPlayer = (player: HTMLElement) => {
+      if (player.hasAttribute('data-listeners-attached')) {
+        return;
+      }
+
+      console.log('%c🎬 Adicionando listeners ao player principal', 'color: #00ff00; font-weight: bold');
+      player.setAttribute('data-listeners-attached', 'true');
+
+      // Todos os eventos possíveis do VTurb
+      const vturbEvents = [
+        'smartplayer-scroll-event',
+        'smartplayer:video:ended',
+        'smartplayer:cta:show',
+        'smartplayer:scroll',
+        'smartplayer-cta-show',
+        'cta-show',
+        'scroll-event'
+      ];
+
+      vturbEvents.forEach(eventName => {
+        player.addEventListener(eventName, handleVTurbScrollEvent, { capture: true });
+      });
+    };
+
+    // Tenta adicionar listeners ao player principal se ele já existe
     const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
     if (mainPlayer) {
-      mainPlayer.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-      mainPlayer.addEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
-      mainPlayer.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
+      attachListenersToMainPlayer(mainPlayer);
     }
 
-    // Fallback global caso o player não seja encontrado ainda
-    window.addEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
-    window.addEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
-    window.addEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
+    // Observer para detectar quando o player principal for adicionado ao DOM
+    const playerObserver = new MutationObserver((mutations) => {
+      const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (mainPlayer && !mainPlayer.hasAttribute('data-listeners-attached')) {
+        console.log('%c🎬 Player principal detectado no DOM!', 'color: #ff00ff; font-weight: bold');
+        attachListenersToMainPlayer(mainPlayer);
+      }
+    });
+
+    playerObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Fallback global caso os eventos não sejam capturados no player
+    const vturbGlobalEvents = [
+      'smartplayer-scroll-event',
+      'smartplayer:video:ended',
+      'smartplayer:cta:show',
+      'smartplayer:scroll',
+      'smartplayer-cta-show'
+    ];
+
+    vturbGlobalEvents.forEach(eventName => {
+      window.addEventListener(eventName, handleVTurbScrollEvent, true);
+    });
 
     // 🔧 INTERCEPTADOR DE SCROLL: Detecta quando VTurb tenta fazer scroll (apenas no vídeo principal)
     const interceptScroll = (e: Event) => {
@@ -368,19 +420,30 @@ function App() {
 
       // Para os observers
       scrollObserver.disconnect();
+      playerObserver.disconnect();
 
       // Remove do mainPlayer se existir
       const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
       if (mainPlayer) {
-        mainPlayer.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-        mainPlayer.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
-        mainPlayer.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
+        const vturbEvents = [
+          'smartplayer-scroll-event',
+          'smartplayer:video:ended',
+          'smartplayer:cta:show',
+          'smartplayer:scroll',
+          'smartplayer-cta-show',
+          'cta-show',
+          'scroll-event'
+        ];
+
+        vturbEvents.forEach(eventName => {
+          mainPlayer.removeEventListener(eventName, handleVTurbScrollEvent, { capture: true } as any);
+        });
       }
 
       // Remove os listeners globais
-      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
-      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
-      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
+      vturbGlobalEvents.forEach(eventName => {
+        window.removeEventListener(eventName, handleVTurbScrollEvent, true);
+      });
 
       // Remove todos os listeners de interceptScroll
       const scrollEvents = document.querySelectorAll('[data-scroll-intercepted]');
@@ -406,19 +469,30 @@ function App() {
       clearInterval(playerCheckInterval);
       observer.disconnect();
       scrollObserver.disconnect();
+      playerObserver.disconnect();
 
       // Remove do mainPlayer se existir
       const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
       if (mainPlayer) {
-        mainPlayer.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent);
-        mainPlayer.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
-        mainPlayer.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
+        const vturbEvents = [
+          'smartplayer-scroll-event',
+          'smartplayer:video:ended',
+          'smartplayer:cta:show',
+          'smartplayer:scroll',
+          'smartplayer-cta-show',
+          'cta-show',
+          'scroll-event'
+        ];
+
+        vturbEvents.forEach(eventName => {
+          mainPlayer.removeEventListener(eventName, handleVTurbScrollEvent, { capture: true } as any);
+        });
       }
 
       // Remove os listeners globais
-      window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
-      window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
-      window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
+      vturbGlobalEvents.forEach(eventName => {
+        window.removeEventListener(eventName, handleVTurbScrollEvent, true);
+      });
     };
   }, []);
 
