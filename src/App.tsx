@@ -46,6 +46,7 @@ function App() {
   const [showPurchaseButton, setShowPurchaseButton] = useState(false);
   const [hasVideoTriggeredContent, setHasVideoTriggeredContent] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
+  const hasScrolledRef = useRef(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -81,11 +82,11 @@ function App() {
     console.log('%cEstado ANTES:', 'color: #ff9900', {
       showRestOfContent,
       showPurchaseButton,
-      hasScrolled
+      hasScrolled: hasScrolledRef.current
     });
 
     // 🔧 CORREÇÃO CRÍTICA: Previne múltiplas execuções
-    if (hasScrolled) {
+    if (hasScrolledRef.current) {
       console.log('%c⚠️ Scroll já foi executado, ignorando...', 'color: #ff9900');
       return;
     }
@@ -98,12 +99,14 @@ function App() {
     console.log('%c✅ PASSO 1: Revelando conteúdo...', 'color: #00ff00; font-weight: bold');
 
     // ✅ PASSO 1: ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA IMEDIATAMENTE
+    hasScrolledRef.current = true;
     setShowRestOfContent(true);
     setShowPurchaseButton(true);
     setHasVideoTriggeredContent(true);
     setHasScrolled(true);
 
     console.log('%c✅ Estados atualizados para TRUE', 'color: #00ff00; font-weight: bold');
+    console.log('%c✅ hasScrolledRef.current:', 'color: #00ff00', hasScrolledRef.current);
     console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
 
     // 🔧 PASSO 2: Aguarda DOM renderizar e FAZ O SCROLL
@@ -219,9 +222,11 @@ function App() {
   // 🔧 CORREÇÃO 5: Sistema melhorado de detecção de eventos do VTurb
   useEffect(() => {
     console.log('%c📡 Inicializando sistema de detecção VTurb...', 'color: #00aaff; font-weight: bold');
+    console.log('%c📊 Estado inicial:', 'color: #00aaff', { showRestOfContent, showPurchaseButton, hasScrolled });
 
     const handleVTurbScrollEvent = (e: Event) => {
       console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
+      console.log('%c📊 Estado ANTES do handleVideoPitchReached:', 'color: #ff9900', { showRestOfContent, showPurchaseButton, hasScrolled });
       handleVideoPitchReached();
     };
 
@@ -243,7 +248,7 @@ function App() {
               const duration = e.detail?.duration || 0;
 
               // Desbloqueia quando passar de 80% do vídeo
-              if (duration > 0 && (currentTime / duration) > 0.8 && !showRestOfContent) {
+              if (duration > 0 && (currentTime / duration) > 0.8 && !hasScrolledRef.current) {
                 console.log('%c🎬 Vídeo atingiu 80%, desbloqueando...', 'color: #ff00ff; font-weight: bold');
                 handleVideoPitchReached();
               }
@@ -298,7 +303,7 @@ function App() {
       window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent);
       window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent);
     };
-  }, [showRestOfContent]);
+  }, []);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
