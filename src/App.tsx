@@ -91,25 +91,40 @@ function App() {
       hasScrolled
     });
 
-    // ✅ ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA
-    setShowRestOfContent(true);
-    setShowPurchaseButton(true);
-    setHasVideoTriggeredContent(true);
-
-    console.log('%c✅ Estados atualizados para TRUE', 'color: #00ff00; font-weight: bold');
-    console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
+    // 🔧 CORREÇÃO CRÍTICA: Previne múltiplas execuções
+    if (hasScrolled) {
+      console.log('%c⚠️ Scroll já foi executado, ignorando...', 'color: #ff9900');
+      return;
+    }
 
     // 💾 Salva no sessionStorage (apenas usuários normais)
     if (!isDevelopment) {
       sessionStorage.setItem('has_seen_content', 'true');
     }
 
-    // 🔧 CORREÇÃO 3: Sistema de scroll robusto com múltiplas tentativas
-    if (!hasScrolled) {
-      console.log('%c🎯 Iniciando processo de scroll...', 'color: #00aaff; font-weight: bold');
-      setHasScrolled(true);
-      executeScroll();
-    }
+    console.log('%c✅ PASSO 1: Revelando conteúdo...', 'color: #00ff00; font-weight: bold');
+
+    // ✅ PASSO 1: ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA IMEDIATAMENTE
+    setShowRestOfContent(true);
+    setShowPurchaseButton(true);
+    setHasVideoTriggeredContent(true);
+    setHasScrolled(true);
+
+    console.log('%c✅ Estados atualizados para TRUE', 'color: #00ff00; font-weight: bold');
+    console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
+
+    // 🔧 PASSO 2: Aguarda DOM renderizar e FAZ O SCROLL
+    console.log('%c🎯 PASSO 2: Aguardando DOM renderizar para fazer scroll...', 'color: #00aaff; font-weight: bold');
+
+    // Aguarda múltiplos frames para garantir que o DOM foi atualizado
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          console.log('%c🚀 DOM renderizado, iniciando scroll...', 'color: #00ff00; font-weight: bold');
+          executeScroll();
+        }, 500);
+      });
+    });
   };
 
   // 🔧 CORREÇÃO 4: Função de scroll com fallback
