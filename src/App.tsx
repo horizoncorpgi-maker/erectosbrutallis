@@ -233,8 +233,9 @@ function App() {
     let lastUserInteractionTime = 0;
 
     // Marca quando o usuário interage (para diferenciar de scroll automático do VTurb)
-    const markUserInteraction = () => {
+    const markUserInteraction = (e: Event) => {
       lastUserInteractionTime = Date.now();
+      console.log('%c👆 Interação do usuário detectada:', 'color: #00ff00', e.type);
     };
 
     // Listeners passivos - apenas marcam interação, não bloqueiam nada
@@ -242,6 +243,7 @@ function App() {
     window.addEventListener('touchstart', markUserInteraction, { passive: true });
     window.addEventListener('touchmove', markUserInteraction, { passive: true });
     window.addEventListener('mousedown', markUserInteraction, { passive: true });
+    console.log('%c✅ Listeners de interação adicionados (PASSIVOS - não bloqueiam)', 'color: #00ff00');
 
     // Detecta scroll automático do VTurb
     let rafId: number;
@@ -254,6 +256,15 @@ function App() {
       const currentScrollY = window.scrollY;
       const scrollDiff = Math.abs(currentScrollY - lastScrollY);
       const timeSinceUserInteraction = Date.now() - lastUserInteractionTime;
+
+      // Log detalhado de cada verificação
+      if (scrollDiff > 0) {
+        console.log('%c📏 Scroll detectado:', 'color: #ffaa00', {
+          scrollDiff: scrollDiff.toFixed(2) + 'px',
+          timeSinceInteraction: timeSinceUserInteraction + 'ms',
+          willTrigger: scrollDiff > 3 && timeSinceUserInteraction > 300
+        });
+      }
 
       // Se houve scroll (mesmo que pequeno - 3px) E foi há mais de 300ms da última interação do usuário
       // Isso indica que é scroll automático do VTurb, não do usuário
@@ -269,6 +280,7 @@ function App() {
       rafId = requestAnimationFrame(checkScroll);
     };
 
+    console.log('%c🔄 Iniciando monitoramento de scroll (requestAnimationFrame)', 'color: #00aaff');
     rafId = requestAnimationFrame(checkScroll);
 
     const handleVTurbScrollEvent = (e: Event) => {
