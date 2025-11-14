@@ -40,27 +40,20 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
 
     const unlockContent = () => {
       if (!contentUnlockedRef.current) {
-        console.log('%c🔓 Desbloqueando conteúdo (Upsell)', 'color: #00ff00; font-weight: bold');
+        console.log('%c🔓 Desbloqueando conteúdo e scroll (Upsell)', 'color: #00ff00; font-weight: bold');
         contentUnlockedRef.current = true;
         setContentUnlocked(true);
+        document.body.style.overflow = 'auto';
       }
     };
 
-    // 🔧 FLAG para identificar scroll do VTurb vs scroll manual
+    // BLOQUEIA o scroll manual enquanto conteúdo não está desbloqueado
+    document.body.style.overflow = 'hidden';
+    console.log('%c🔒 Scroll manual BLOQUEADO até VTurb desbloquear', 'color: #ff0000; font-weight: bold');
+
+    // 🔧 Monitora scroll programático (do VTurb)
     let lastScrollY = window.scrollY;
     let scrollCheckCount = 0;
-    let lastUserInteraction = Date.now();
-
-    // Detecta interação manual do usuário
-    const markUserInteraction = () => {
-      lastUserInteraction = Date.now();
-      console.log('%c👆 Interação manual detectada (Upsell)', 'color: #00ff00');
-    };
-
-    // Listeners para detectar interação manual
-    window.addEventListener('wheel', markUserInteraction, { passive: true });
-    window.addEventListener('touchstart', markUserInteraction, { passive: true });
-    window.addEventListener('touchmove', markUserInteraction, { passive: true });
 
     const detectScrollAttempt = () => {
       const currentScrollY = window.scrollY;
@@ -68,30 +61,22 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
 
       // Log a cada 60 verificações
       if (scrollCheckCount % 60 === 0) {
-        console.log('%c📊 Monitorando scroll (Upsell)...', 'color: #888', {
+        console.log('%c📊 Monitorando scroll programático (Upsell)...', 'color: #888', {
           currentScrollY,
           lastScrollY,
-          contentUnlocked: contentUnlockedRef.current,
-          timeSinceUserInteraction: Date.now() - lastUserInteraction
+          contentUnlocked: contentUnlockedRef.current
         });
       }
 
       const scrollDiff = Math.abs(currentScrollY - lastScrollY);
-      const timeSinceInteraction = Date.now() - lastUserInteraction;
 
-      // APENAS desbloqueia se for scroll automático (SEM interação manual recente)
-      if (scrollDiff > 10 && !contentUnlockedRef.current && timeSinceInteraction > 1000) {
+      // Se houve scroll significativo E o overflow está hidden (não foi usuário)
+      if (scrollDiff > 10 && !contentUnlockedRef.current && document.body.style.overflow === 'hidden') {
         console.log('%c🎯 SCROLL AUTOMÁTICO (VTurb) DETECTADO! (Upsell)', 'color: #ff0000; font-weight: bold; font-size: 16px');
         console.log('%c📊 ScrollY anterior:', 'color: #ff9900', lastScrollY);
         console.log('%c📊 ScrollY atual:', 'color: #ff9900', currentScrollY);
         console.log('%c📊 Diferença:', 'color: #ff9900', scrollDiff);
-        console.log('%c📊 Tempo desde interação:', 'color: #ff9900', timeSinceInteraction + 'ms');
         unlockContent();
-      } else if (scrollDiff > 10 && timeSinceInteraction <= 1000) {
-        console.log('%c🚫 Scroll manual BLOQUEADO - não revela conteúdo (Upsell)', 'color: #ff0000', {
-          scrollDiff,
-          timeSinceInteraction
-        });
       }
 
       lastScrollY = currentScrollY;
@@ -122,9 +107,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
       if (!isBoltEnvironment) {
         console.log('%c🧹 Limpando listeners (Upsell)...', 'color: #ff9900');
         cancelAnimationFrame(rafId);
-        window.removeEventListener('wheel', markUserInteraction);
-        window.removeEventListener('touchstart', markUserInteraction);
-        window.removeEventListener('touchmove', markUserInteraction);
+        document.body.style.overflow = 'auto';
         window.removeEventListener('smartplayer-scroll-event', handleVTurbScrollEvent, true);
         window.removeEventListener('smartplayer:video:ended', handleVTurbScrollEvent, true);
         window.removeEventListener('smartplayer:cta:show', handleVTurbScrollEvent, true);
