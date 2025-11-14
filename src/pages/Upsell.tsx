@@ -71,7 +71,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
       const scrollDiff = Math.abs(currentScrollY - lastScrollY);
 
       // Se houve scroll significativo E o overflow está hidden (não foi usuário)
-      if (scrollDiff > 10 && !contentUnlockedRef.current && document.body.style.overflow === 'hidden') {
+      if (scrollDiff > 4 && !contentUnlockedRef.current && document.body.style.overflow === 'hidden') {
         console.log('%c🎯 SCROLL AUTOMÁTICO (VTurb) DETECTADO! (Upsell)', 'color: #ff0000; font-weight: bold; font-size: 16px');
         console.log('%c📊 ScrollY anterior:', 'color: #ff9900', lastScrollY);
         console.log('%c📊 ScrollY atual:', 'color: #ff9900', currentScrollY);
