@@ -58,13 +58,14 @@ function App() {
 
   useEffect(() => {
     const setupVturbTimer = () => {
-      const player = document.querySelector('vturb-smartplayer');
-      if (!player) {
-        console.log('Player não encontrado');
+      const smartplayer = (window as any).smartplayer;
+
+      if (!smartplayer || !smartplayer.instances || smartplayer.instances.length === 0) {
+        console.log('Smartplayer instances não encontradas');
         return;
       }
 
-      console.log('Player encontrado, configurando timer sincronizado');
+      console.log('Smartplayer instances encontradas:', smartplayer.instances.length);
 
       let elapsedTime = 0;
       let timerInterval: number | null = null;
@@ -85,7 +86,7 @@ function App() {
       const startTimer = () => {
         if (timerInterval || isRevealed) return;
 
-        console.log('Timer iniciado, tempo decorrido:', elapsedTime, 'segundos');
+        console.log('Timer iniciado, tempo decorrido:', elapsedTime.toFixed(1), 'segundos');
         timerInterval = window.setInterval(() => {
           elapsedTime += 0.1;
 
@@ -101,36 +102,41 @@ function App() {
 
       const pauseTimer = () => {
         if (timerInterval) {
-          console.log('Timer pausado em', elapsedTime, 'segundos');
+          console.log('Timer pausado em', elapsedTime.toFixed(1), 'segundos');
           clearInterval(timerInterval);
           timerInterval = null;
         }
       };
 
-      (player as any).addEventListener('player:ready', function() {
-        console.log('Player ready! Timer configurado para', delaySeconds, 'segundos');
-      });
+      smartplayer.instances.forEach((instance: any) => {
+        console.log('Configurando eventos para instance:', instance);
 
-      (player as any).addEventListener('player:play', function() {
-        console.log('Vídeo começou/retomou - iniciando timer');
-        startTimer();
-      });
+        instance.on('play', () => {
+          console.log('Evento PLAY detectado - iniciando timer');
+          startTimer();
+        });
 
-      (player as any).addEventListener('player:pause', function() {
-        console.log('Vídeo pausado - pausando timer');
-        pauseTimer();
-      });
+        instance.on('pause', () => {
+          console.log('Evento PAUSE detectado - pausando timer');
+          pauseTimer();
+        });
 
-      (player as any).addEventListener('player:ended', function() {
-        console.log('Vídeo terminou - pausando timer');
-        pauseTimer();
+        instance.on('ended', () => {
+          console.log('Evento ENDED detectado - pausando timer');
+          pauseTimer();
+        });
+
+        instance.on('ready', () => {
+          console.log('Player ready! Timer configurado para', delaySeconds, 'segundos');
+        });
       });
     };
 
     const checkInterval = setInterval(() => {
-      const player = document.querySelector('vturb-smartplayer');
-      if (player) {
-        console.log('Player detectado, configurando timer');
+      const smartplayer = (window as any).smartplayer;
+
+      if (smartplayer && smartplayer.instances && smartplayer.instances.length > 0) {
+        console.log('Smartplayer detectado, configurando timer');
         setupVturbTimer();
         clearInterval(checkInterval);
       }
