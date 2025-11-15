@@ -83,8 +83,9 @@ function App() {
       console.log('✅ Smartplayer instances encontradas:', smartplayer.instances.length);
 
       let elapsedTime = 0;
-      let timerInterval: number | null = null;
       let isRevealed = false;
+      let lastTime = 0;
+      let isPlaying = false;
 
       const revealElements = () => {
         if (isRevealed) return;
@@ -98,77 +99,45 @@ function App() {
         isRevealed = true;
       };
 
-      const startTimer = () => {
-        if (isRevealed) {
-          console.log('⏭️ Timer já completado, ignorando start');
-          return;
-        }
-
-        if (timerInterval) {
-          console.log('⏭️ Timer já está rodando, ignorando start');
-          return;
-        }
-
-        console.log('▶️ TIMER INICIADO - tempo decorrido:', elapsedTime.toFixed(1), 'segundos');
-        timerInterval = window.setInterval(() => {
-          elapsedTime += 0.1;
-          console.log('⏱️ Timer:', elapsedTime.toFixed(1), '/', delaySeconds, 'segundos');
-
-          if (elapsedTime >= delaySeconds) {
-            if (timerInterval) {
-              clearInterval(timerInterval);
-              timerInterval = null;
-            }
-            revealElements();
-          }
-        }, 100);
-      };
-
-      const pauseTimer = () => {
-        if (timerInterval) {
-          console.log('⏸️ TIMER PAUSADO em', elapsedTime.toFixed(1), 'segundos');
-          clearInterval(timerInterval);
-          timerInterval = null;
-        } else {
-          console.log('⏸️ PAUSE chamado mas timer não está rodando');
-        }
-      };
-
       smartplayer.instances.forEach((instance: any, index: number) => {
-        console.log(`📺 Configurando eventos para instance ${index}:`, instance);
-        console.log('Métodos disponíveis:', Object.keys(instance));
-        console.log('instance.video:', instance.video);
+        console.log(`📺 Configurando timer para instance ${index}`);
 
-        const eventsToTry = [
-          'play', 'playing', 'pause', 'paused', 'ended', 'ready',
-          'timeupdate', 'start', 'resume', 'stop', 'playerPlay',
-          'playerPause', 'videoPlay', 'videoPause'
-        ];
+        if (index === 0) {
+          instance.on('timeupdate', () => {
+            if (isRevealed) return;
 
-        eventsToTry.forEach(eventName => {
-          try {
-            instance.on(eventName, () => {
-              console.log(`🔔 EVENTO '${eventName}' DISPARADO (instance ${index})`);
+            const currentTime = instance.video.currentTime;
 
-              if (eventName === 'play' || eventName === 'playing' || eventName === 'start' ||
-                  eventName === 'resume' || eventName === 'playerPlay' || eventName === 'videoPlay') {
-                startTimer();
+            if (currentTime > lastTime) {
+              if (!isPlaying) {
+                console.log('▶️ Vídeo INICIOU (detectado via timeupdate)');
+                isPlaying = true;
               }
 
-              if (eventName === 'pause' || eventName === 'paused' || eventName === 'stop' ||
-                  eventName === 'playerPause' || eventName === 'videoPause') {
-                pauseTimer();
-              }
+              elapsedTime += (currentTime - lastTime);
+              console.log('⏱️ Timer:', elapsedTime.toFixed(1), '/', delaySeconds, 'segundos');
 
-              if (eventName === 'ended') {
-                pauseTimer();
+              if (elapsedTime >= delaySeconds) {
+                revealElements();
               }
-            });
-            console.log(`✅ Evento '${eventName}' registrado com sucesso`);
-          } catch (error) {
-            console.log(`❌ Erro ao registrar evento '${eventName}':`, error);
-          }
-        });
+            } else if (currentTime === lastTime && isPlaying) {
+              console.log('⏸️ Vídeo PAUSADO (detectado via timeupdate)');
+              isPlaying = false;
+            }
+
+            lastTime = currentTime;
+          });
+
+          instance.on('pause', () => {
+            console.log('⏸️ Evento PAUSE detectado');
+            isPlaying = false;
+          });
+
+          instance.on('ended', () => {
+            console.log('🏁 Vídeo terminou');
+            isPlaying = false;
+          });
+        }
       });
 
       console.log('✅ Eventos configurados com sucesso!');
