@@ -97,6 +97,19 @@ function App() {
         });
         console.log('Total de elementos revelados:', hiddenElements.length);
         isRevealed = true;
+
+        setTimeout(() => {
+          const sixBottleButton = document.getElementById('six-bottle-button');
+          if (sixBottleButton) {
+            console.log('🎯 Fazendo scroll suave até o botão de 6 potes');
+            sixBottleButton.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+          } else {
+            console.log('❌ Botão de 6 potes não encontrado');
+          }
+        }, 300);
       };
 
       smartplayer.instances.forEach((instance: any, index: number) => {
