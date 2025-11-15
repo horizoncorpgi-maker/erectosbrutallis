@@ -61,16 +61,6 @@ function App() {
   }, [contentRevealed, scrollRequested]);
 
   useEffect(() => {
-    let hasScrolled = false;
-
-    const handleScroll = () => {
-      if (!hasScrolled && window.scrollY > 20) {
-        hasScrolled = true;
-        setContentRevealed(true);
-        setScrollRequested(true);
-      }
-    };
-
     const getRevealDelay = () => {
       const saved = localStorage.getItem('revealDelay');
       const delay = saved ? parseInt(saved) * 1000 : 10000;
@@ -87,11 +77,8 @@ function App() {
       setScrollRequested(true);
     }, delay);
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
     return () => {
       console.log('Cleaning up timer');
-      window.removeEventListener('scroll', handleScroll);
       clearTimeout(revealTimer);
     };
   }, []);
