@@ -60,19 +60,30 @@ function App() {
     const setupVturbTimer = () => {
       const player = document.querySelector('vturb-smartplayer');
       if (!player) {
+        console.log('Player não encontrado');
         return;
       }
 
+      console.log('Player encontrado, adicionando listener');
+
       (player as any).addEventListener('player:ready', function() {
-        (player as any).displayHiddenElements(delaySeconds, ['.esconder'], {
-          persist: true
-        });
+        console.log('Player ready! Chamando displayHiddenElements com delay:', delaySeconds);
+
+        try {
+          (player as any).displayHiddenElements(delaySeconds, ['.esconder'], {
+            persist: true
+          });
+          console.log('displayHiddenElements chamado com sucesso');
+        } catch (error) {
+          console.error('Erro ao chamar displayHiddenElements:', error);
+        }
       });
     };
 
     const checkInterval = setInterval(() => {
       const player = document.querySelector('vturb-smartplayer');
       if (player) {
+        console.log('Player detectado, configurando timer');
         setupVturbTimer();
         clearInterval(checkInterval);
       }
