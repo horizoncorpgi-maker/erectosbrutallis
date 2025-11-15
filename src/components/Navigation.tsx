@@ -91,7 +91,7 @@ function Navigation() {
               <input
                 type="number"
                 min="0"
-                max="300"
+                max="3600"
                 value={inputValue}
                 onChange={(e) => setInputValue(Math.max(0, parseInt(e.target.value) || 0))}
                 onKeyDown={(e) => {

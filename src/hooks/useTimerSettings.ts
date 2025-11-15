@@ -62,8 +62,8 @@ export function useTimerSettings() {
   };
 
   const saveTimerSettings = async (newDelay: number): Promise<boolean> => {
-    if (newDelay < 0 || newDelay > 300) {
-      setError('Delay must be between 0 and 300 seconds');
+    if (newDelay < 0 || newDelay > 3600) {
+      setError('Delay must be between 0 and 3600 seconds');
       return false;
     }
 
