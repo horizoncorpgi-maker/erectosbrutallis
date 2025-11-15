@@ -64,20 +64,66 @@ function App() {
         return;
       }
 
-      console.log('Player encontrado, adicionando listener');
+      console.log('Player encontrado, configurando timer sincronizado');
+
+      let elapsedTime = 0;
+      let timerInterval: number | null = null;
+      let isRevealed = false;
+
+      const revealElements = () => {
+        if (isRevealed) return;
+
+        console.log('Timer completado! Revelando elementos com classe .esconder');
+        const hiddenElements = document.querySelectorAll('.esconder');
+        hiddenElements.forEach((element: Element) => {
+          (element as HTMLElement).classList.remove('esconder');
+        });
+        console.log('Total de elementos revelados:', hiddenElements.length);
+        isRevealed = true;
+      };
+
+      const startTimer = () => {
+        if (timerInterval || isRevealed) return;
+
+        console.log('Timer iniciado, tempo decorrido:', elapsedTime, 'segundos');
+        timerInterval = window.setInterval(() => {
+          elapsedTime += 0.1;
+
+          if (elapsedTime >= delaySeconds) {
+            if (timerInterval) {
+              clearInterval(timerInterval);
+              timerInterval = null;
+            }
+            revealElements();
+          }
+        }, 100);
+      };
+
+      const pauseTimer = () => {
+        if (timerInterval) {
+          console.log('Timer pausado em', elapsedTime, 'segundos');
+          clearInterval(timerInterval);
+          timerInterval = null;
+        }
+      };
 
       (player as any).addEventListener('player:ready', function() {
-        console.log('Player ready! Iniciando timer de', delaySeconds, 'segundos');
+        console.log('Player ready! Timer configurado para', delaySeconds, 'segundos');
+      });
 
-        setTimeout(() => {
-          console.log('Timer completado! Revelando elementos com classe .esconder');
-          const hiddenElements = document.querySelectorAll('.esconder');
-          hiddenElements.forEach((element: Element) => {
-            (element as HTMLElement).classList.remove('esconder');
-            console.log('Elemento revelado:', element);
-          });
-          console.log('Total de elementos revelados:', hiddenElements.length);
-        }, delaySeconds * 1000);
+      (player as any).addEventListener('player:play', function() {
+        console.log('Vídeo começou/retomou - iniciando timer');
+        startTimer();
+      });
+
+      (player as any).addEventListener('player:pause', function() {
+        console.log('Vídeo pausado - pausando timer');
+        pauseTimer();
+      });
+
+      (player as any).addEventListener('player:ended', function() {
+        console.log('Vídeo terminou - pausando timer');
+        pauseTimer();
       });
     };
 
