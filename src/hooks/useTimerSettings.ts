@@ -14,8 +14,11 @@ const supabase = supabaseUrl && supabaseAnonKey
   : null;
 
 export function useTimerSettings() {
-  const [delaySeconds, setDelaySeconds] = useState<number>(20);
-  const [isLoading, setIsLoading] = useState(true);
+  const [delaySeconds, setDelaySeconds] = useState<number>(() => {
+    const cached = localStorage.getItem('timerDelay');
+    return cached ? parseInt(cached) : 20;
+  });
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -26,12 +29,10 @@ export function useTimerSettings() {
 
   const fetchTimerSettings = async () => {
     if (!supabase) {
-      console.warn('⚠️ Supabase not configured, using default value');
-      setIsLoading(false);
+      console.warn('Supabase not configured, using localStorage');
       return;
     }
 
-    console.log('🔄 Fetching timer settings from Supabase...');
     setIsLoading(true);
     setError(null);
 
@@ -43,37 +44,37 @@ export function useTimerSettings() {
         .maybeSingle();
 
       if (fetchError) {
-        console.error('❌ Error fetching timer settings:', fetchError);
-        setIsLoading(false);
+        console.error('Error fetching timer settings:', fetchError);
         return;
       }
 
       if (data) {
-        console.log('✅ Timer loaded from Supabase:', data.delay_seconds + 's');
+        console.log('Loaded timer from Supabase:', data.delay_seconds);
         setDelaySeconds(data.delay_seconds);
-      } else {
-        console.log('⚠️ No timer data found in Supabase, using default');
+        localStorage.setItem('timerDelay', data.delay_seconds.toString());
       }
     } catch (err) {
-      console.error('❌ Exception fetching timer settings:', err);
+      console.error('Exception fetching timer settings:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
   const saveTimerSettings = async (newDelay: number): Promise<boolean> => {
-    if (newDelay < 0 || newDelay > 3600) {
-      setError('Delay must be between 0 and 3600 seconds');
+    if (newDelay < 0 || newDelay > 300) {
+      setError('Delay must be between 0 and 300 seconds');
       return false;
     }
 
     if (!supabase) {
-      console.warn('⚠️ Supabase not configured, cannot save');
-      setError('Database not configured');
-      return false;
+      console.warn('Supabase not configured, saving to localStorage only');
+      setDelaySeconds(newDelay);
+      localStorage.setItem('timerDelay', newDelay.toString());
+      setSuccessMessage('Timer saved!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+      return true;
     }
 
-    console.log('💾 Saving timer to Supabase:', newDelay + 's');
     setIsSaving(true);
     setError(null);
     setSuccessMessage(null);
@@ -88,20 +89,27 @@ export function useTimerSettings() {
         .eq('id', 1);
 
       if (updateError) {
-        console.error('❌ Error saving timer settings:', updateError);
-        setError('Failed to save: ' + updateError.message);
-        return false;
+        console.error('Error saving timer settings:', updateError);
+        setDelaySeconds(newDelay);
+        localStorage.setItem('timerDelay', newDelay.toString());
+        setSuccessMessage('Timer saved (local)!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+        return true;
       }
 
-      console.log('✅ Timer saved to Supabase successfully');
+      console.log('Saved timer to Supabase:', newDelay);
       setDelaySeconds(newDelay);
+      localStorage.setItem('timerDelay', newDelay.toString());
       setSuccessMessage('Timer saved!');
       setTimeout(() => setSuccessMessage(null), 3000);
       return true;
     } catch (err) {
-      console.error('❌ Exception saving timer settings:', err);
-      setError('Failed to save timer');
-      return false;
+      console.error('Exception saving timer settings:', err);
+      setDelaySeconds(newDelay);
+      localStorage.setItem('timerDelay', newDelay.toString());
+      setSuccessMessage('Timer saved (local)!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+      return true;
     } finally {
       setIsSaving(false);
     }
