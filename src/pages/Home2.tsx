@@ -585,7 +585,7 @@ function Home2() {
                 <button
                   ref={sixBottleButtonRef}
                   id="six-bottle-button"
-                  onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
+                  onClick={() => window.location.href = 'https://erectosbrutallis.co/a/direct/2nsvbL?type=link'}
                   className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
