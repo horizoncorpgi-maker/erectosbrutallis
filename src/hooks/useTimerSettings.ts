@@ -4,7 +4,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+console.log('Supabase config:', {
+  hasUrl: !!supabaseUrl,
+  hasKey: !!supabaseAnonKey
+});
+
+const supabase = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null;
 
 export function useTimerSettings() {
   const [delaySeconds, setDelaySeconds] = useState<number>(() => {
@@ -21,6 +28,11 @@ export function useTimerSettings() {
   }, []);
 
   const fetchTimerSettings = async () => {
+    if (!supabase) {
+      console.warn('Supabase not configured, using localStorage');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -33,17 +45,16 @@ export function useTimerSettings() {
 
       if (fetchError) {
         console.error('Error fetching timer settings:', fetchError);
-        setError('Failed to load timer settings');
         return;
       }
 
       if (data) {
+        console.log('Loaded timer from Supabase:', data.delay_seconds);
         setDelaySeconds(data.delay_seconds);
         localStorage.setItem('timerDelay', data.delay_seconds.toString());
       }
     } catch (err) {
       console.error('Exception fetching timer settings:', err);
-      setError('Failed to load timer settings');
     } finally {
       setIsLoading(false);
     }
@@ -53,6 +64,15 @@ export function useTimerSettings() {
     if (newDelay < 0 || newDelay > 300) {
       setError('Delay must be between 0 and 300 seconds');
       return false;
+    }
+
+    if (!supabase) {
+      console.warn('Supabase not configured, saving to localStorage only');
+      setDelaySeconds(newDelay);
+      localStorage.setItem('timerDelay', newDelay.toString());
+      setSuccessMessage('Timer saved!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+      return true;
     }
 
     setIsSaving(true);
@@ -70,27 +90,26 @@ export function useTimerSettings() {
 
       if (updateError) {
         console.error('Error saving timer settings:', updateError);
-        setError('Failed to save timer settings');
-        localStorage.setItem('timerDelay', newDelay.toString());
         setDelaySeconds(newDelay);
-        return false;
+        localStorage.setItem('timerDelay', newDelay.toString());
+        setSuccessMessage('Timer saved (local)!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+        return true;
       }
 
+      console.log('Saved timer to Supabase:', newDelay);
       setDelaySeconds(newDelay);
       localStorage.setItem('timerDelay', newDelay.toString());
-      setSuccessMessage('Timer saved successfully!');
-
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
-
+      setSuccessMessage('Timer saved!');
+      setTimeout(() => setSuccessMessage(null), 3000);
       return true;
     } catch (err) {
       console.error('Exception saving timer settings:', err);
-      setError('Failed to save timer settings');
-      localStorage.setItem('timerDelay', newDelay.toString());
       setDelaySeconds(newDelay);
-      return false;
+      localStorage.setItem('timerDelay', newDelay.toString());
+      setSuccessMessage('Timer saved (local)!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+      return true;
     } finally {
       setIsSaving(false);
     }
