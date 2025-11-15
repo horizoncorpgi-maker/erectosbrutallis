@@ -14,11 +14,8 @@ const supabase = supabaseUrl && supabaseAnonKey
   : null;
 
 export function useTimerSettings() {
-  const [delaySeconds, setDelaySeconds] = useState<number>(() => {
-    const cached = localStorage.getItem('timerDelay');
-    return cached ? parseInt(cached) : 20;
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [delaySeconds, setDelaySeconds] = useState<number>(20);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -29,10 +26,12 @@ export function useTimerSettings() {
 
   const fetchTimerSettings = async () => {
     if (!supabase) {
-      console.warn('Supabase not configured, using localStorage');
+      console.warn('⚠️ Supabase not configured, using default value');
+      setIsLoading(false);
       return;
     }
 
+    console.log('🔄 Fetching timer settings from Supabase...');
     setIsLoading(true);
     setError(null);
 
@@ -44,17 +43,19 @@ export function useTimerSettings() {
         .maybeSingle();
 
       if (fetchError) {
-        console.error('Error fetching timer settings:', fetchError);
+        console.error('❌ Error fetching timer settings:', fetchError);
+        setIsLoading(false);
         return;
       }
 
       if (data) {
-        console.log('Loaded timer from Supabase:', data.delay_seconds);
+        console.log('✅ Timer loaded from Supabase:', data.delay_seconds + 's');
         setDelaySeconds(data.delay_seconds);
-        localStorage.setItem('timerDelay', data.delay_seconds.toString());
+      } else {
+        console.log('⚠️ No timer data found in Supabase, using default');
       }
     } catch (err) {
-      console.error('Exception fetching timer settings:', err);
+      console.error('❌ Exception fetching timer settings:', err);
     } finally {
       setIsLoading(false);
     }
@@ -67,14 +68,12 @@ export function useTimerSettings() {
     }
 
     if (!supabase) {
-      console.warn('Supabase not configured, saving to localStorage only');
-      setDelaySeconds(newDelay);
-      localStorage.setItem('timerDelay', newDelay.toString());
-      setSuccessMessage('Timer saved!');
-      setTimeout(() => setSuccessMessage(null), 3000);
-      return true;
+      console.warn('⚠️ Supabase not configured, cannot save');
+      setError('Database not configured');
+      return false;
     }
 
+    console.log('💾 Saving timer to Supabase:', newDelay + 's');
     setIsSaving(true);
     setError(null);
     setSuccessMessage(null);
@@ -89,27 +88,20 @@ export function useTimerSettings() {
         .eq('id', 1);
 
       if (updateError) {
-        console.error('Error saving timer settings:', updateError);
-        setDelaySeconds(newDelay);
-        localStorage.setItem('timerDelay', newDelay.toString());
-        setSuccessMessage('Timer saved (local)!');
-        setTimeout(() => setSuccessMessage(null), 3000);
-        return true;
+        console.error('❌ Error saving timer settings:', updateError);
+        setError('Failed to save: ' + updateError.message);
+        return false;
       }
 
-      console.log('Saved timer to Supabase:', newDelay);
+      console.log('✅ Timer saved to Supabase successfully');
       setDelaySeconds(newDelay);
-      localStorage.setItem('timerDelay', newDelay.toString());
       setSuccessMessage('Timer saved!');
       setTimeout(() => setSuccessMessage(null), 3000);
       return true;
     } catch (err) {
-      console.error('Exception saving timer settings:', err);
-      setDelaySeconds(newDelay);
-      localStorage.setItem('timerDelay', newDelay.toString());
-      setSuccessMessage('Timer saved (local)!');
-      setTimeout(() => setSuccessMessage(null), 3000);
-      return true;
+      console.error('❌ Exception saving timer settings:', err);
+      setError('Failed to save timer');
+      return false;
     } finally {
       setIsSaving(false);
     }
