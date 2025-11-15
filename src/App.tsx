@@ -423,7 +423,7 @@ function App() {
     <>
       <style>{`
         .esconder {
-          display: none;
+          display: none !important;
         }
       `}</style>
       <div className="min-h-screen overflow-x-hidden w-full bg-white">
