@@ -136,24 +136,38 @@ function App() {
 
       smartplayer.instances.forEach((instance: any, index: number) => {
         console.log(`📺 Configurando eventos para instance ${index}:`, instance);
+        console.log('Métodos disponíveis:', Object.keys(instance));
+        console.log('instance.video:', instance.video);
 
-        instance.on('play', () => {
-          console.log(`🎬 EVENTO PLAY DETECTADO (instance ${index})`);
-          startTimer();
-        });
+        const eventsToTry = [
+          'play', 'playing', 'pause', 'paused', 'ended', 'ready',
+          'timeupdate', 'start', 'resume', 'stop', 'playerPlay',
+          'playerPause', 'videoPlay', 'videoPause'
+        ];
 
-        instance.on('pause', () => {
-          console.log(`⏸️ EVENTO PAUSE DETECTADO (instance ${index})`);
-          pauseTimer();
-        });
+        eventsToTry.forEach(eventName => {
+          try {
+            instance.on(eventName, () => {
+              console.log(`🔔 EVENTO '${eventName}' DISPARADO (instance ${index})`);
 
-        instance.on('ended', () => {
-          console.log(`🏁 EVENTO ENDED DETECTADO (instance ${index})`);
-          pauseTimer();
-        });
+              if (eventName === 'play' || eventName === 'playing' || eventName === 'start' ||
+                  eventName === 'resume' || eventName === 'playerPlay' || eventName === 'videoPlay') {
+                startTimer();
+              }
 
-        instance.on('ready', () => {
-          console.log(`✅ EVENTO READY DETECTADO (instance ${index}) - Timer configurado para ${delaySeconds} segundos`);
+              if (eventName === 'pause' || eventName === 'paused' || eventName === 'stop' ||
+                  eventName === 'playerPause' || eventName === 'videoPause') {
+                pauseTimer();
+              }
+
+              if (eventName === 'ended') {
+                pauseTimer();
+              }
+            });
+            console.log(`✅ Evento '${eventName}' registrado com sucesso`);
+          } catch (error) {
+            console.log(`❌ Erro ao registrar evento '${eventName}':`, error);
+          }
         });
       });
 
