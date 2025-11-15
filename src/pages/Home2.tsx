@@ -302,15 +302,15 @@ function Home2() {
 
   const handleAcceptOffer = () => {
     setShowUpsellPopup(false);
-    window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1';
+    window.location.href = 'https://erectosbrutallis.co/a/direct/2nsvbL?type=link';
   };
 
   const handleRefuseOffer = () => {
     setShowUpsellPopup(false);
     if (selectedPackage === '3-bottle') {
-      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875570:1';
+      window.location.href = 'https://erectosbrutallis.co/a/direct/q23aca?type=link';
     } else if (selectedPackage === '1-bottle') {
-      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875568:1';
+      window.location.href = 'https://erectosbrutallis.co/a/direct/XG8dsd?type=link';
     }
   };
 
@@ -673,7 +673,7 @@ function Home2() {
                   SAVE $118
                 </div>
                 <button
-                  onClick={() => window.location.href = 'https://erectosbrutallis.co/a/direct/XG8dsd?type=link'}
+                  onClick={() => handlePackageClick('1-bottle')}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
