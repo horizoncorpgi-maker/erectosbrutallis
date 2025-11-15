@@ -424,7 +424,8 @@ function App() {
     <>
       <style>{`
         .esconder {
-          display: none;
+          /* Temporarily disabled for debugging */
+          /* display: none; */
         }
       `}</style>
       <div className="min-h-screen overflow-x-hidden w-full bg-white">
