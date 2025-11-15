@@ -67,16 +67,16 @@ function App() {
       console.log('Player encontrado, adicionando listener');
 
       (player as any).addEventListener('player:ready', function() {
-        console.log('Player ready! Chamando displayHiddenElements com delay:', delaySeconds);
+        console.log('Player ready! Iniciando timer de', delaySeconds, 'segundos');
 
-        try {
-          (player as any).displayHiddenElements(delaySeconds, ['.esconder'], {
-            persist: true
+        setTimeout(() => {
+          console.log('Timer completado! Revelando elementos com classe .esconder');
+          const hiddenElements = document.querySelectorAll('.esconder');
+          hiddenElements.forEach((element: Element) => {
+            (element as HTMLElement).style.display = 'block';
           });
-          console.log('displayHiddenElements chamado com sucesso');
-        } catch (error) {
-          console.error('Erro ao chamar displayHiddenElements:', error);
-        }
+          console.log('Total de elementos revelados:', hiddenElements.length);
+        }, delaySeconds * 1000);
       });
     };
 
