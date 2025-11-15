@@ -34,6 +34,7 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
+  const [showHiddenSections, setShowHiddenSections] = useState(false);
 
   const { delaySeconds } = useTimerSettings();
 
@@ -60,24 +61,35 @@ function App() {
     const setupVturbTimer = () => {
       const player = document.querySelector('vturb-smartplayer#vid-69124ec0b910e6e322c32a69');
       if (!player) {
+        console.log('Vturb player not found yet...');
         return;
       }
 
+      console.log('Vturb player found, adding event listener');
+
       (player as any).addEventListener('player:ready', function() {
         console.log('Vturb player ready, starting timer with delay:', delaySeconds, 'seconds');
-        (player as any).displayHiddenElements(delaySeconds, ['.esconder'], {
-          persist: true
-        });
+
+        setTimeout(() => {
+          console.log('Timer finished! Revealing hidden sections');
+          setShowHiddenSections(true);
+        }, delaySeconds * 1000);
       });
     };
 
     const checkInterval = setInterval(() => {
       const player = document.querySelector('vturb-smartplayer#vid-69124ec0b910e6e322c32a69');
       if (player) {
+        console.log('Player element found, setting up timer');
         setupVturbTimer();
         clearInterval(checkInterval);
       }
     }, 500);
+
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      console.log('Timeout reached, stopping player search');
+    }, 10000);
 
     return () => clearInterval(checkInterval);
   }, [delaySeconds]);
@@ -424,8 +436,7 @@ function App() {
     <>
       <style>{`
         .esconder {
-          /* Temporarily disabled for debugging */
-          /* display: none; */
+          display: ${showHiddenSections ? 'block' : 'none'};
         }
       `}</style>
       <div className="min-h-screen overflow-x-hidden w-full bg-white">
