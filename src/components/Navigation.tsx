@@ -1,40 +1,44 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Clock } from 'lucide-react';
+import { Menu, X, Home, Clock, Check, AlertCircle, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTimerSettings } from '../hooks/useTimerSettings';
 
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const [revealDelay, setRevealDelay] = useState(() => {
-    const saved = localStorage.getItem('revealDelay');
-    return saved ? parseInt(saved) : 10;
-  });
+  const {
+    delaySeconds,
+    isSaving,
+    error,
+    successMessage,
+    saveTimerSettings
+  } = useTimerSettings();
+
+  const [inputValue, setInputValue] = useState(delaySeconds);
+
+  useEffect(() => {
+    setInputValue(delaySeconds);
+  }, [delaySeconds]);
 
   const isDevelopment = import.meta.env.DEV;
 
-  const handleDelayChange = (newDelay: number) => {
-    setRevealDelay(newDelay);
-    try {
-      localStorage.setItem('revealDelay', newDelay.toString());
-      sessionStorage.setItem('revealDelay', newDelay.toString());
-      console.log('Saved to localStorage and sessionStorage:', newDelay);
-      const verified = localStorage.getItem('revealDelay');
-      console.log('Verified localStorage:', verified);
-      console.log('Verified sessionStorage:', sessionStorage.getItem('revealDelay'));
-
-      if (verified !== newDelay.toString()) {
-        console.error('localStorage verification failed! Using sessionStorage as fallback.');
-      }
-    } catch (error) {
-      console.error('Error saving to storage:', error);
+  const handleSaveClick = async () => {
+    const success = await saveTimerSettings(inputValue);
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     }
+  };
 
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('delay', newDelay.toString());
-
-    setTimeout(() => {
-      window.location.href = currentUrl.toString();
-    }, 300);
+  const handleQuickSelect = async (value: number) => {
+    setInputValue(value);
+    const success = await saveTimerSettings(value);
+    if (success) {
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    }
   };
 
   const routes = [
@@ -82,39 +86,80 @@ function Navigation() {
               <h3 className="font-semibold text-gray-900">Content Reveal Timer</h3>
             </div>
             <p className="text-sm text-gray-600 mb-3">Time until content appears</p>
+
             <div className="flex items-center gap-2 mb-3">
               <input
                 type="number"
                 min="0"
                 max="300"
-                value={revealDelay}
-                onChange={(e) => setRevealDelay(Math.max(0, parseInt(e.target.value) || 0))}
-                onBlur={(e) => handleDelayChange(Math.max(0, parseInt(e.target.value) || 0))}
+                value={inputValue}
+                onChange={(e) => setInputValue(Math.max(0, parseInt(e.target.value) || 0))}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    handleDelayChange(Math.max(0, parseInt(e.currentTarget.value) || 0));
+                    handleSaveClick();
                   }
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B80000] focus:border-transparent text-lg font-semibold text-center"
+                disabled={isSaving}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#B80000] focus:border-transparent text-lg font-semibold text-center disabled:opacity-50"
               />
               <span className="text-sm text-gray-600">seconds</span>
             </div>
+
+            <button
+              onClick={handleSaveClick}
+              disabled={isSaving || inputValue === delaySeconds}
+              className="w-full mb-3 px-4 py-2.5 bg-[#B80000] hover:bg-[#900000] text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Check size={18} />
+                  Save Timer
+                </>
+              )}
+            </button>
+
+            {successMessage && (
+              <div className="mb-3 p-2 bg-green-100 text-green-800 text-sm rounded-lg flex items-center gap-2">
+                <Check size={16} />
+                {successMessage}
+              </div>
+            )}
+
+            {error && (
+              <div className="mb-3 p-2 bg-red-100 text-red-800 text-sm rounded-lg flex items-center gap-2">
+                <AlertCircle size={16} />
+                {error}
+              </div>
+            )}
+
+            <div className="text-xs text-gray-500 mb-3 text-center">
+              Current saved: {delaySeconds}s
+            </div>
+
             <div className="flex gap-2">
               <button
-                onClick={() => handleDelayChange(0)}
-                className="flex-1 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                onClick={() => handleQuickSelect(0)}
+                disabled={isSaving}
+                className="flex-1 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors disabled:opacity-50"
               >
                 Instant
               </button>
               <button
-                onClick={() => handleDelayChange(10)}
-                className="flex-1 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                onClick={() => handleQuickSelect(10)}
+                disabled={isSaving}
+                className="flex-1 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors disabled:opacity-50"
               >
                 10s
               </button>
               <button
-                onClick={() => handleDelayChange(30)}
-                className="flex-1 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+                onClick={() => handleQuickSelect(30)}
+                disabled={isSaving}
+                className="flex-1 px-3 py-1.5 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors disabled:opacity-50"
               >
                 30s
               </button>

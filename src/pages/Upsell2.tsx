@@ -1,5 +1,4 @@
 import { AlertTriangle, CheckCircle, Truck, Shield, TrendingUp } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 
 interface Upsell2Props {
   inches: number;
@@ -8,7 +7,6 @@ interface Upsell2Props {
 }
 
 function Upsell2({ inches, price, checkoutLink }: Upsell2Props) {
-  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-purple-50 flex flex-col">

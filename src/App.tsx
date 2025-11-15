@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Play,
-  Lock,
   Truck,
   Shield,
   Star,
@@ -16,6 +15,7 @@ import {
   X
 } from 'lucide-react';
 import ArticleReader from './ArticleReader';
+import { useTimerSettings } from './hooks/useTimerSettings';
 
 function App() {
   const offersRef = useRef<HTMLDivElement>(null);
@@ -34,69 +34,15 @@ function App() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-  const [contentRevealed, setContentRevealed] = useState(false);
-  const [scrollRequested, setScrollRequested] = useState(false);
 
+  const { delaySeconds } = useTimerSettings();
 
   const scrollToOffers = () => {
-    if (!contentRevealed) {
-      setContentRevealed(true);
-      setScrollRequested(true);
-      return;
-    }
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
     setIsVisible(true);
-  }, []);
-
-  useEffect(() => {
-    if (contentRevealed && scrollRequested) {
-      setTimeout(() => {
-        offersRef.current?.scrollIntoView({ behavior: 'smooth' });
-        setScrollRequested(false);
-      }, 100);
-    }
-  }, [contentRevealed, scrollRequested]);
-
-  useEffect(() => {
-    const getRevealDelay = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlDelay = urlParams.get('delay');
-
-      if (urlDelay) {
-        const delay = parseInt(urlDelay) * 1000;
-        console.log('Using delay from URL:', delay, 'ms (', delay/1000, 'seconds)');
-        sessionStorage.setItem('revealDelay', urlDelay);
-        return delay;
-      }
-
-      const sessionDelay = sessionStorage.getItem('revealDelay');
-      if (sessionDelay) {
-        const delay = parseInt(sessionDelay) * 1000;
-        console.log('Using delay from sessionStorage:', delay, 'ms (', delay/1000, 'seconds)');
-        return delay;
-      }
-
-      const saved = localStorage.getItem('revealDelay');
-      console.log('localStorage revealDelay value:', saved);
-      const delay = saved ? parseInt(saved) * 1000 : 10000;
-      console.log('Calculated delay:', delay, 'ms (', delay/1000, 'seconds)');
-      return delay;
-    };
-
-    const delay = getRevealDelay();
-
-    const revealTimer = setTimeout(() => {
-      console.log('Timer fired! Revealing content after', delay/1000, 'seconds');
-      setContentRevealed(true);
-      setScrollRequested(true);
-    }, delay);
-
-    return () => {
-      clearTimeout(revealTimer);
-    };
   }, []);
 
   useEffect(() => {
@@ -111,8 +57,32 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!contentRevealed) return;
+    const setupVturbTimer = () => {
+      const player = document.querySelector('vturb-smartplayer#vid-69124ec0b910e6e322c32a69');
+      if (!player) {
+        return;
+      }
 
+      (player as any).addEventListener('player:ready', function() {
+        console.log('Vturb player ready, starting timer with delay:', delaySeconds, 'seconds');
+        (player as any).displayHiddenElements(delaySeconds, ['.esconder'], {
+          persist: true
+        });
+      });
+    };
+
+    const checkInterval = setInterval(() => {
+      const player = document.querySelector('vturb-smartplayer#vid-69124ec0b910e6e322c32a69');
+      if (player) {
+        setupVturbTimer();
+        clearInterval(checkInterval);
+      }
+    }, 500);
+
+    return () => clearInterval(checkInterval);
+  }, [delaySeconds]);
+
+  useEffect(() => {
     testimonials.forEach((testimonial) => {
       if (testimonial?.videoScript) {
         const existingScript = document.querySelector(`script[src="${testimonial.videoScript}"]`);
@@ -151,7 +121,7 @@ function App() {
       script.async = true;
       document.head.appendChild(script);
     }
-  }, [contentRevealed]);
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -451,7 +421,13 @@ function App() {
   const prevLab = () => setCurrentLab((prev) => (prev - 1 + labImages.length) % labImages.length);
 
   return (
-    <div className={`min-h-screen overflow-x-hidden w-full transition-colors duration-500 ${contentRevealed ? 'bg-white' : 'bg-gradient-to-br from-white via-gray-50 to-red-50'}`}>
+    <>
+      <style>{`
+        .esconder {
+          display: none;
+        }
+      `}</style>
+      <div className="min-h-screen overflow-x-hidden w-full bg-white">
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
@@ -482,11 +458,9 @@ function App() {
         </div>
       </section>
 
-      {contentRevealed && (
-      <>
       <section
         ref={offersRef}
-        className="py-8 md:py-20 px-4 bg-white"
+        className="esconder py-8 md:py-20 px-4 bg-white"
       >
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
@@ -632,7 +606,7 @@ function App() {
       </section>
 
       {/* Experts Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" >
+      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -740,7 +714,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-8 md:py-20 px-4 bg-white" >
+      <section className="esconder py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -804,7 +778,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" >
+      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -881,7 +855,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className="py-8 md:py-20 px-4 bg-white" >
+      <section className="esconder py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1233,7 +1207,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]" >
+      <section className="esconder py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1248,7 +1222,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-black text-gray-400 py-8 px-4" >
+      <footer className="esconder bg-black text-gray-400 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
@@ -1339,10 +1313,8 @@ function App() {
           </div>
         </div>
       )}
-      </>
-      )}
-
     </div>
+    </>
   );
 }
 

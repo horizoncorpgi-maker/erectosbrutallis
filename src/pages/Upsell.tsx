@@ -1,6 +1,5 @@
 import { AlertTriangle, CheckCircle, Truck, Shield, Star } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
 
 interface UpsellProps {
   bottles: number;
@@ -12,7 +11,6 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const total = bottles * pricePerBottle;
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
-  const isUp3bt = location.pathname === '/up3bt';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50 flex flex-col">
