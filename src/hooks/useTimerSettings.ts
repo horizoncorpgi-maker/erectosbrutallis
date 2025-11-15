@@ -16,7 +16,7 @@ const supabase = supabaseUrl && supabaseAnonKey
 export function useTimerSettings() {
   const [delaySeconds, setDelaySeconds] = useState<number>(() => {
     const cached = localStorage.getItem('timerDelay');
-    return cached ? parseInt(cached) : 10;
+    return cached ? parseInt(cached) : 20;
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
