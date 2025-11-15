@@ -73,7 +73,8 @@ function App() {
           console.log('Timer completado! Revelando elementos com classe .esconder');
           const hiddenElements = document.querySelectorAll('.esconder');
           hiddenElements.forEach((element: Element) => {
-            (element as HTMLElement).style.display = 'block';
+            (element as HTMLElement).classList.remove('esconder');
+            console.log('Elemento revelado:', element);
           });
           console.log('Total de elementos revelados:', hiddenElements.length);
         }, delaySeconds * 1000);
