@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import App from './App';
+import Home1 from './pages/Home1';
+import Home2 from './pages/Home2';
 import Upsell from './pages/Upsell';
 import Upsell2 from './pages/Upsell2';
 import Navigation from './components/Navigation';
@@ -9,7 +10,9 @@ function Router() {
     <BrowserRouter>
       <Navigation />
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<Home1 />} />
+        <Route path="/tst1" element={<Home1 />} />
+        <Route path="/tst2" element={<Home2 />} />
 
         <Route path="/up1bt" element={<Upsell bottles={8} pricePerBottle={29} />} />
         <Route path="/up3bt" element={<Upsell bottles={6} pricePerBottle={39} checkoutLink="" />} />

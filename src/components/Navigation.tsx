@@ -42,13 +42,14 @@ function Navigation() {
   };
 
   const routes = [
-    { path: '/', label: 'Home' },
+    { path: '/tst1', label: 'Home1' },
+    { path: '/tst2', label: 'Home2' },
     { path: '/up1bt', label: 'Upsell 1BT' },
     { path: '/up3bt', label: 'Upsell 3BT' },
     { path: '/up6bt', label: 'Upsell 6BT' },
-    { path: '/up21', label: 'Upsell 21' },
-    { path: '/up23', label: 'Upsell 23' },
-    { path: '/up26', label: 'Upsell 26' },
+    { path: '/up2-3in', label: 'Upsell 2 - 3in' },
+    { path: '/up2-5in', label: 'Upsell 2 - 5in' },
+    { path: '/up2-7in', label: 'Upsell 2 - 7in' },
   ];
 
   if (!isDevelopment) {
@@ -180,7 +181,7 @@ function Navigation() {
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    {route.path === '/' && <Home size={18} />}
+                    {(route.path === '/tst1' || route.path === '/tst2') && <Home size={18} />}
                     {route.label}
                   </div>
                 </Link>
