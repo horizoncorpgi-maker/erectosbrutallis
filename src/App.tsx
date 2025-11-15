@@ -62,6 +62,23 @@ function App() {
 
   useEffect(() => {
     const getRevealDelay = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlDelay = urlParams.get('delay');
+
+      if (urlDelay) {
+        const delay = parseInt(urlDelay) * 1000;
+        console.log('Using delay from URL:', delay, 'ms (', delay/1000, 'seconds)');
+        sessionStorage.setItem('revealDelay', urlDelay);
+        return delay;
+      }
+
+      const sessionDelay = sessionStorage.getItem('revealDelay');
+      if (sessionDelay) {
+        const delay = parseInt(sessionDelay) * 1000;
+        console.log('Using delay from sessionStorage:', delay, 'ms (', delay/1000, 'seconds)');
+        return delay;
+      }
+
       const saved = localStorage.getItem('revealDelay');
       console.log('localStorage revealDelay value:', saved);
       const delay = saved ? parseInt(saved) * 1000 : 10000;

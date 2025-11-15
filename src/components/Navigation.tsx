@@ -14,10 +14,27 @@ function Navigation() {
 
   const handleDelayChange = (newDelay: number) => {
     setRevealDelay(newDelay);
-    localStorage.setItem('revealDelay', newDelay.toString());
+    try {
+      localStorage.setItem('revealDelay', newDelay.toString());
+      sessionStorage.setItem('revealDelay', newDelay.toString());
+      console.log('Saved to localStorage and sessionStorage:', newDelay);
+      const verified = localStorage.getItem('revealDelay');
+      console.log('Verified localStorage:', verified);
+      console.log('Verified sessionStorage:', sessionStorage.getItem('revealDelay'));
+
+      if (verified !== newDelay.toString()) {
+        console.error('localStorage verification failed! Using sessionStorage as fallback.');
+      }
+    } catch (error) {
+      console.error('Error saving to storage:', error);
+    }
+
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set('delay', newDelay.toString());
+
     setTimeout(() => {
-      window.location.reload();
-    }, 100);
+      window.location.href = currentUrl.toString();
+    }, 300);
   };
 
   const routes = [
