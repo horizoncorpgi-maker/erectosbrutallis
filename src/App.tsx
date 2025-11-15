@@ -63,22 +63,21 @@ function App() {
   useEffect(() => {
     const getRevealDelay = () => {
       const saved = localStorage.getItem('revealDelay');
+      console.log('localStorage revealDelay value:', saved);
       const delay = saved ? parseInt(saved) * 1000 : 10000;
-      console.log('Reveal delay set to:', delay, 'ms');
+      console.log('Calculated delay:', delay, 'ms (', delay/1000, 'seconds)');
       return delay;
     };
 
     const delay = getRevealDelay();
-    console.log('Starting timer with delay:', delay);
 
     const revealTimer = setTimeout(() => {
-      console.log('Timer fired! Revealing content...');
+      console.log('Timer fired! Revealing content after', delay/1000, 'seconds');
       setContentRevealed(true);
       setScrollRequested(true);
     }, delay);
 
     return () => {
-      console.log('Cleaning up timer');
       clearTimeout(revealTimer);
     };
   }, []);
