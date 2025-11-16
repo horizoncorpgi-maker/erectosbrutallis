@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   Play,
+  Lock,
   Truck,
   Shield,
   Star,
@@ -15,7 +16,6 @@ import {
   X
 } from 'lucide-react';
 import ArticleReader from './ArticleReader';
-import { useTimerSettings } from './hooks/useTimerSettings';
 
 function App() {
   const offersRef = useRef<HTMLDivElement>(null);
@@ -35,7 +35,18 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
 
-  const { delaySeconds } = useTimerSettings();
+  // Detecta se está em ambiente de desenvolvimento
+  const isDevelopment = import.meta.env.DEV ||
+                       window.location.hostname === 'localhost' ||
+                       window.location.hostname.includes('bolt') ||
+                       window.location.hostname.includes('stackblitz') ||
+                       window.location.hostname.includes('webcontainer');
+
+  const [showRestOfContent, setShowRestOfContent] = useState(false);
+  const [showPurchaseButton, setShowPurchaseButton] = useState(false);
+  const [hasVideoTriggeredContent, setHasVideoTriggeredContent] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const hasScrolledRef = useRef(false);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,138 +56,528 @@ function App() {
     setIsVisible(true);
   }, []);
 
+  // Persistência: verifica se usuário já viu o conteúdo antes
   useEffect(() => {
-    const heroVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124ec0b910e6e322c32a69/v4/player.js';
-    const existingHeroScript = document.querySelector(`script[src="${heroVideoScript}"]`);
-    if (!existingHeroScript) {
-      const script = document.createElement('script');
-      script.src = heroVideoScript;
-      script.async = true;
-      document.head.appendChild(script);
+    if (!isDevelopment) {
+      const hasSeenContent = sessionStorage.getItem('has_seen_content') === 'true';
+
+      if (hasSeenContent) {
+        console.log('👤 Usuário já viu o conteúdo antes - mostrando tudo');
+        setShowRestOfContent(true);
+        setShowPurchaseButton(true);
+      }
     }
-  }, []);
+  }, [isDevelopment]);
 
+  // 🔧 DEBUG: Monitora mudanças no estado showRestOfContent
   useEffect(() => {
-    console.log('=== INICIANDO SETUP DO VTURB TIMER ===');
-    console.log('Delay configurado:', delaySeconds, 'segundos');
+    console.log('%c📊 Estado showRestOfContent mudou:', 'color: #00aaff; font-weight: bold; font-size: 14px', showRestOfContent);
+    console.log('%c📊 Estado showPurchaseButton:', 'color: #00aaff', showPurchaseButton);
+  }, [showRestOfContent, showPurchaseButton]);
 
-    const setupVturbTimer = () => {
-      console.log('--- setupVturbTimer chamado ---');
-      console.log('window.smartplayer existe?', !!(window as any).smartplayer);
+  // 🔧 CORREÇÃO 1: Callback que revela o conteúdo quando VTurb chega no pitch
+  const handleVideoPitchReached = () => {
+    console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
+    console.log('%c🎬 VTurb video triggered content reveal', 'color: #ff00ff; font-weight: bold; font-size: 14px');
+    console.log('%cEstado ANTES:', 'color: #ff9900', {
+      showRestOfContent,
+      showPurchaseButton,
+      hasScrolled: hasScrolledRef.current
+    });
 
-      const smartplayer = (window as any).smartplayer;
+    // 🔧 CORREÇÃO CRÍTICA: Previne múltiplas execuções
+    if (hasScrolledRef.current) {
+      console.log('%c⚠️ Scroll já foi executado, ignorando...', 'color: #ff9900');
+      return;
+    }
 
-      if (!smartplayer) {
-        console.log('❌ window.smartplayer não existe');
-        return;
+    // 💾 Salva no sessionStorage (apenas usuários normais)
+    if (!isDevelopment) {
+      sessionStorage.setItem('has_seen_content', 'true');
+    }
+
+    console.log('%c✅ PASSO 1: Revelando conteúdo...', 'color: #00ff00; font-weight: bold');
+
+    // ✅ PASSO 1: ATIVA A EXIBIÇÃO DO RESTO DA PÁGINA IMEDIATAMENTE
+    hasScrolledRef.current = true;
+    setShowRestOfContent(true);
+    setShowPurchaseButton(true);
+    setHasVideoTriggeredContent(true);
+    setHasScrolled(true);
+
+    console.log('%c✅ Estados atualizados para TRUE', 'color: #00ff00; font-weight: bold');
+    console.log('%c✅ hasScrolledRef.current:', 'color: #00ff00', hasScrolledRef.current);
+    console.log('%c========================================', 'color: #ff00ff; font-weight: bold');
+
+    // 🔥 DISPARA EVENTO CUSTOMIZADO para remover todos os bloqueadores
+    console.log('%c🔥 Disparando evento de liberação total...', 'color: #ff0000; font-weight: bold');
+    window.dispatchEvent(new CustomEvent('content-revealed'));
+
+    // 🔧 PASSO 2: Aguarda DOM renderizar e FAZ O SCROLL
+    console.log('%c🎯 PASSO 2: Aguardando DOM renderizar para fazer scroll...', 'color: #00aaff; font-weight: bold');
+
+    // Aguarda múltiplos frames para garantir que o DOM foi atualizado
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          console.log('%c🚀 DOM renderizado, iniciando scroll...', 'color: #00ff00; font-weight: bold');
+          executeScroll();
+        }, 500);
+      });
+    });
+  };
+
+  // 🔧 CORREÇÃO 4: Função de scroll com fallback
+  const executeScroll = () => {
+    console.log('%c📍 executeScroll iniciado', 'color: #0099ff; font-weight: bold');
+
+    const tryScroll = (attempts = 0) => {
+      console.log(`%c🔄 Tentativa ${attempts + 1} de 20`, 'color: #00aaff; font-weight: bold');
+
+      // 🔧 Múltiplas estratégias de busca
+      const strategies = [
+        { name: 'ref', element: sixBottleButtonRef.current },
+        { name: 'id', element: document.getElementById('six-bottle-button') },
+        { name: 'class', element: document.querySelector('.smartplayer-scroll-event') },
+        { name: 'data-attr', element: document.querySelector('[data-scroll-target="offers"]') }
+      ];
+
+      let foundElement = null;
+      let foundStrategy = '';
+
+      for (const strategy of strategies) {
+        if (strategy.element) {
+          foundElement = strategy.element;
+          foundStrategy = strategy.name;
+          console.log(`%c✓ Elemento encontrado via ${strategy.name}!`, 'color: #00ff00; font-weight: bold');
+          break;
+        }
       }
 
-      console.log('✅ window.smartplayer existe');
-      console.log('smartplayer.instances existe?', !!smartplayer.instances);
-      console.log('smartplayer.instances.length:', smartplayer.instances?.length);
+      if (foundElement) {
+        // 🔧 CORREÇÃO 2: Verifica se elemento está visível
+        const rect = foundElement.getBoundingClientRect();
+        const isVisible = rect.width > 0 && rect.height > 0;
 
-      if (!smartplayer.instances || smartplayer.instances.length === 0) {
-        console.log('❌ Smartplayer instances não encontradas');
-        return;
-      }
-
-      console.log('✅ Smartplayer instances encontradas:', smartplayer.instances.length);
-
-      let elapsedTime = 0;
-      let isRevealed = false;
-      let lastTime = 0;
-      let isPlaying = false;
-
-      const revealElements = () => {
-        if (isRevealed) return;
-
-        console.log('🎉 Timer completado! Revelando elementos com classe .esconder');
-        const hiddenElements = document.querySelectorAll('.esconder');
-        hiddenElements.forEach((element: Element) => {
-          (element as HTMLElement).classList.remove('esconder');
+        console.log('%cDimensões do elemento:', 'color: #00aaff', {
+          width: rect.width,
+          height: rect.height,
+          top: rect.top,
+          isVisible
         });
-        console.log('Total de elementos revelados:', hiddenElements.length);
-        isRevealed = true;
+
+        if (isVisible) {
+          console.log(`%c✅ Fazendo scroll via ${foundStrategy}...`, 'color: #00ff00; font-weight: bold; font-size: 16px');
+
+          const elementTop = foundElement.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementTop - (window.innerHeight / 2) + (rect.height / 2);
+
+          console.log('%c📍 Posições:', 'color: #00aaff', {
+            elementTop,
+            windowHeight: window.innerHeight,
+            elementHeight: rect.height,
+            scrollTo: offsetPosition
+          });
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        } else {
+          console.log('%c⚠️ Elemento encontrado mas não está visível, tentando fallback...', 'color: #ff9900');
+          scrollToOffersSection();
+        }
+      } else if (attempts < 20) {
+        console.log('%c⏳ Elemento não encontrado, aguardando...', 'color: #ff9900');
+        setTimeout(() => tryScroll(attempts + 1), 500);
+      } else {
+        console.log('%c❌ Limite de tentativas atingido, usando fallback...', 'color: #ff0000; font-weight: bold');
+        scrollToOffersSection();
+      }
+    };
+
+    // 🔧 CORREÇÃO 4: Fallback para scroll da section
+    const scrollToOffersSection = () => {
+      console.log('%c🔄 Executando fallback: scroll para section de ofertas', 'color: #ff9900; font-weight: bold');
+
+      if (offersRef.current) {
+        console.log('%c✓ Section encontrada, fazendo scroll...', 'color: #00ff00');
+
+        const offsetTop = offersRef.current.offsetTop - 100;
+        window.scrollTo({
+          top: offsetTop,
+          behavior: 'smooth'
+        });
 
         setTimeout(() => {
-          const sixBottleButton = document.getElementById('six-bottle-button');
-          if (sixBottleButton) {
-            console.log('🎯 Fazendo scroll suave até o botão de 6 potes');
-            sixBottleButton.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center'
+          console.log('%c✅ Scroll para section completado!', 'color: #00ff00; font-weight: bold');
+        }, 1000);
+      } else {
+        console.log('%c❌ ERRO: Section de ofertas não encontrada!', 'color: #ff0000; font-weight: bold');
+      }
+    };
+
+    // 🔧 Aguarda DOM atualizar completamente antes de tentar scroll
+    requestAnimationFrame(() => {
+      setTimeout(() => tryScroll(), 300);
+    });
+  };
+
+  // 🔧 CORREÇÃO 5: Sistema melhorado de detecção de eventos do VTurb
+  useEffect(() => {
+    console.log('%c📡 Inicializando sistema de detecção VTurb...', 'color: #00aaff; font-weight: bold');
+    console.log('%c📊 Estado inicial:', 'color: #00aaff', { showRestOfContent, showPurchaseButton, hasScrolled });
+
+    // Sistema de detecção de scroll do VTurb - NÃO bloqueia scroll manual
+    let lastScrollY = window.scrollY;
+    let lastUserInteractionTime = 0;
+    let lastScrollEventTime = 0;
+
+    // Marca quando o usuário interage (para diferenciar de scroll automático do VTurb)
+    const markUserInteraction = () => {
+      lastUserInteractionTime = Date.now();
+    };
+
+    // Marca quando há evento de scroll (atualiza durante scroll manual)
+    const markScrollEvent = () => {
+      lastScrollEventTime = Date.now();
+    };
+
+    // Listeners passivos - apenas marcam interação, não bloqueiam nada
+    window.addEventListener('wheel', markUserInteraction, { passive: true });
+    window.addEventListener('touchstart', markUserInteraction, { passive: true });
+    window.addEventListener('touchmove', markUserInteraction, { passive: true });
+    window.addEventListener('mousedown', markUserInteraction, { passive: true });
+    window.addEventListener('scroll', markScrollEvent, { passive: true });
+
+    // Detecta scroll automático do VTurb
+    let rafId: number;
+    const checkScroll = () => {
+      // Para de monitorar se o conteúdo já foi revelado
+      if (hasScrolledRef.current) {
+        return;
+      }
+
+      const currentScrollY = window.scrollY;
+      const scrollDiff = Math.abs(currentScrollY - lastScrollY);
+      const timeSinceUserInteraction = Date.now() - lastUserInteractionTime;
+      const timeSinceScrollEvent = Date.now() - lastScrollEventTime;
+
+      // Verifica se está no limite inferior da página
+      const isAtBottom = (window.innerHeight + currentScrollY) >= (document.documentElement.scrollHeight - 5);
+
+      // CONDIÇÃO 1: Scroll normal do VTurb (> 1px de movimento)
+      // 1. Houve scroll > 1px (sensibilidade reduzida)
+      // 2. Passou mais de 500ms desde última interação do usuário
+      // 3. E há eventos de scroll acontecendo (< 100ms desde último evento de scroll)
+      const isNormalVTurbScroll = scrollDiff > 1 && timeSinceUserInteraction > 500 && timeSinceScrollEvent < 100;
+
+      // CONDIÇÃO 2: Tentativa de scroll do VTurb no limite da página
+      // O VTurb tenta fazer scroll mas está no limite, então:
+      // 1. Está no limite inferior da página
+      // 2. Houve evento de scroll recente (< 50ms)
+      // 3. Passou mais de 500ms desde última interação do usuário
+      // 4. Movimento mínimo ou nenhum (scrollDiff <= 1px)
+      const isVTurbAtBottom = isAtBottom && timeSinceScrollEvent < 50 && timeSinceUserInteraction > 500 && scrollDiff <= 1;
+
+      if (isNormalVTurbScroll || isVTurbAtBottom) {
+        console.log('%c🎯 SCROLL AUTOMÁTICO DO VTURB DETECTADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
+        console.log('%c📊 Tipo:', isVTurbAtBottom ? 'No limite da página' : 'Scroll normal');
+        console.log('%c📊 Scroll de:', lastScrollY, 'para:', currentScrollY, '| Diferença:', scrollDiff + 'px');
+        console.log('%c📊 No limite?', isAtBottom);
+        console.log('%c⏱️ Tempo desde última interação:', timeSinceUserInteraction + 'ms');
+        console.log('%c⏱️ Tempo desde último scroll event:', timeSinceScrollEvent + 'ms');
+        handleVideoPitchReached();
+        return; // Para de monitorar após revelar
+      }
+
+      lastScrollY = currentScrollY;
+      rafId = requestAnimationFrame(checkScroll);
+    };
+
+    rafId = requestAnimationFrame(checkScroll);
+
+    const handleVTurbScrollEvent = (e: Event) => {
+      console.log('%c🎯 Evento VTurb detectado!', 'color: #ff00ff; font-weight: bold; font-size: 14px', e.type);
+
+      // Se o conteúdo já foi revelado, não faz NADA - deixa o evento fluir normalmente
+      if (hasScrolledRef.current) {
+        console.log('%c✓ Conteúdo já revelado - evento VTurb liberado completamente', 'color: #00ff00');
+        return;
+      }
+
+      // Só processa eventos do vídeo principal, não dos depoimentos ou experts
+      const target = e.target as HTMLElement;
+      const isMainVideo = target?.id === 'vid-69124ec0b910e6e322c32a69' ||
+                          target?.closest('#vid-69124ec0b910e6e322c32a69');
+
+      console.log('%c📊 Detalhes:', 'color: #00aaff', {
+        eventType: e.type,
+        targetId: target?.id,
+        isMainVideo,
+        hasScrolled: hasScrolledRef.current
+      });
+
+      // Só bloqueia se for do vídeo principal E o conteúdo ainda não foi revelado
+      if (isMainVideo) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        console.log('%c🛑 Evento VTurb do vídeo principal bloqueado - revelando conteúdo', 'color: #ff0000; font-weight: bold');
+        handleVideoPitchReached();
+      } else {
+        console.log('%c✓ Evento de outro vídeo - não bloqueia', 'color: #00ff00');
+      }
+    };
+
+    // Função para adicionar listeners ao player principal
+    const attachListenersToMainPlayer = (player: HTMLElement) => {
+      if (player.hasAttribute('data-listeners-attached')) {
+        return;
+      }
+
+      console.log('%c🎬 Adicionando listeners ao player principal', 'color: #00ff00; font-weight: bold');
+      player.setAttribute('data-listeners-attached', 'true');
+
+      // Todos os eventos possíveis do VTurb
+      const vturbEvents = [
+        'smartplayer-scroll-event',
+        'smartplayer:video:ended',
+        'smartplayer:cta:show',
+        'smartplayer:scroll',
+        'smartplayer-cta-show',
+        'cta-show',
+        'scroll-event'
+      ];
+
+      vturbEvents.forEach(eventName => {
+        player.addEventListener(eventName, handleVTurbScrollEvent, { capture: true });
+      });
+    };
+
+    // Tenta adicionar listeners ao player principal se ele já existe
+    const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+    if (mainPlayer) {
+      attachListenersToMainPlayer(mainPlayer);
+    }
+
+    // Observer para detectar quando o player principal for adicionado ao DOM
+    const playerObserver = new MutationObserver((mutations) => {
+      const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (mainPlayer && !mainPlayer.hasAttribute('data-listeners-attached')) {
+        console.log('%c🎬 Player principal detectado no DOM!', 'color: #ff00ff; font-weight: bold');
+        attachListenersToMainPlayer(mainPlayer);
+      }
+    });
+
+    playerObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Fallback global caso os eventos não sejam capturados no player
+    const vturbGlobalEvents = [
+      'smartplayer-scroll-event',
+      'smartplayer:video:ended',
+      'smartplayer:cta:show',
+      'smartplayer:scroll',
+      'smartplayer-cta-show'
+    ];
+
+    vturbGlobalEvents.forEach(eventName => {
+      window.addEventListener(eventName, handleVTurbScrollEvent, true);
+    });
+
+    // 🔧 INTERCEPTADOR DE SCROLL: Detecta quando VTurb tenta fazer scroll (apenas no vídeo principal)
+    const interceptScroll = (e: Event) => {
+      // Se o conteúdo já foi revelado, não faz NADA
+      if (hasScrolledRef.current) {
+        console.log('%c✓ Conteúdo já revelado - scroll liberado completamente', 'color: #00ff00');
+        return;
+      }
+
+      console.log('%c🎯 Scroll detectado - verificando se conteúdo já foi revelado', 'color: #ff00ff; font-weight: bold');
+      console.log('%c⚠️ Conteúdo ainda não revelado - revelando AGORA', 'color: #ff9900; font-weight: bold');
+      e.preventDefault();
+      e.stopPropagation();
+      handleVideoPitchReached();
+    };
+
+    // Monitora tentativas de scroll do VTurb apenas nos botões de oferta
+    const scrollObserver = new MutationObserver(() => {
+      const scrollEvents = document.querySelectorAll('.smartplayer-scroll-event');
+      scrollEvents.forEach((el) => {
+        const isOfferButton = el.id === 'six-bottle-button' || el.hasAttribute('data-scroll-target');
+        if (isOfferButton && !el.hasAttribute('data-scroll-intercepted')) {
+          el.setAttribute('data-scroll-intercepted', 'true');
+          el.addEventListener('click', interceptScroll, true);
+        }
+      });
+    });
+
+    scrollObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // 🔧 NOVO: Listener alternativo para timeupdate (quando vídeo atinge certo ponto)
+    const checkVideoProgress = () => {
+      const players = document.querySelectorAll('vturb-smartplayer');
+      players.forEach((player: any) => {
+        if (player && !player._progressListenerAdded) {
+          player._progressListenerAdded = true;
+
+          try {
+            player.addEventListener('timeupdate', (e: any) => {
+              const currentTime = e.detail?.currentTime || 0;
+              const duration = e.detail?.duration || 0;
+
+              // Desbloqueia quando passar de 80% do vídeo
+              if (duration > 0 && (currentTime / duration) > 0.8 && !hasScrolledRef.current) {
+                console.log('%c🎬 Vídeo atingiu 80%, desbloqueando...', 'color: #ff00ff; font-weight: bold');
+                handleVideoPitchReached();
+              }
             });
-          } else {
-            console.log('❌ Botão de 6 potes não encontrado');
+
+            // Adiciona listener para ended
+            player.addEventListener('ended', () => {
+              console.log('%c🎬 Vídeo terminou, desbloqueando...', 'color: #ff00ff; font-weight: bold');
+              handleVideoPitchReached();
+            });
+          } catch (error) {
+            console.log('%c⚠️ Não foi possível adicionar listener de progresso:', 'color: #ff9900', error);
           }
-        }, 300);
-      };
+        }
+      });
+    };
 
-      smartplayer.instances.forEach((instance: any, index: number) => {
-        console.log(`📺 Configurando timer para instance ${index}`);
+    // Verifica players periodicamente
+    const playerCheckInterval = setInterval(() => {
+      const players = document.querySelectorAll('vturb-smartplayer');
+      if (players.length > 0) {
+        console.log(`%c✓ ${players.length} player(s) VTurb encontrado(s)`, 'color: #00ff00');
+        checkVideoProgress();
+      }
+    }, 2000);
 
-        if (index === 0) {
-          instance.on('timeupdate', () => {
-            if (isRevealed) return;
-
-            const currentTime = instance.video.currentTime;
-
-            if (currentTime > lastTime) {
-              if (!isPlaying) {
-                console.log('▶️ Vídeo INICIOU (detectado via timeupdate)');
-                isPlaying = true;
-              }
-
-              elapsedTime += (currentTime - lastTime);
-              console.log('⏱️ Timer:', elapsedTime.toFixed(1), '/', delaySeconds, 'segundos');
-
-              if (elapsedTime >= delaySeconds) {
-                revealElements();
-              }
-            } else if (currentTime === lastTime && isPlaying) {
-              console.log('⏸️ Vídeo PAUSADO (detectado via timeupdate)');
-              isPlaying = false;
+    // Observer para mudanças no DOM
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.addedNodes.length > 0) {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeName === 'VTURB-SMARTPLAYER') {
+              console.log('%c🎬 Novo player VTurb detectado no DOM', 'color: #ff00ff; font-weight: bold');
+              checkVideoProgress();
             }
-
-            lastTime = currentTime;
-          });
-
-          instance.on('pause', () => {
-            console.log('⏸️ Evento PAUSE detectado');
-            isPlaying = false;
-          });
-
-          instance.on('ended', () => {
-            console.log('🏁 Vídeo terminou');
-            isPlaying = false;
           });
         }
       });
+    });
 
-      console.log('✅ Eventos configurados com sucesso!');
-    };
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
 
-    let attempts = 0;
-    const checkInterval = setInterval(() => {
-      attempts++;
-      console.log(`🔍 Tentativa ${attempts} de detectar smartplayer...`);
+    // 🔥 LISTENER PARA REMOVER TODOS OS BLOQUEADORES quando o conteúdo for revelado
+    const removeAllBlockers = () => {
+      console.log('%c🔥🔥🔥 REMOVENDO TODOS OS BLOQUEADORES - SCROLL TOTALMENTE LIBERADO!', 'color: #ff0000; font-weight: bold; font-size: 16px');
 
-      const smartplayer = (window as any).smartplayer;
+      // Cancela o monitoramento de scroll
+      cancelAnimationFrame(rafId);
 
-      if (smartplayer && smartplayer.instances && smartplayer.instances.length > 0) {
-        console.log('✅ Smartplayer detectado! Configurando timer...');
-        setupVturbTimer();
-        clearInterval(checkInterval);
-      } else {
-        console.log('❌ Smartplayer ainda não disponível');
+      // Remove listeners de interação
+      window.removeEventListener('wheel', markUserInteraction);
+      window.removeEventListener('touchstart', markUserInteraction);
+      window.removeEventListener('touchmove', markUserInteraction);
+      window.removeEventListener('mousedown', markUserInteraction);
+      window.removeEventListener('scroll', markScrollEvent);
+
+      // Para os observers
+      scrollObserver.disconnect();
+      playerObserver.disconnect();
+
+      // Remove do mainPlayer se existir
+      const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (mainPlayer) {
+        const vturbEvents = [
+          'smartplayer-scroll-event',
+          'smartplayer:video:ended',
+          'smartplayer:cta:show',
+          'smartplayer:scroll',
+          'smartplayer-cta-show',
+          'cta-show',
+          'scroll-event'
+        ];
+
+        vturbEvents.forEach(eventName => {
+          mainPlayer.removeEventListener(eventName, handleVTurbScrollEvent, { capture: true } as any);
+        });
       }
-    }, 500);
 
-    return () => {
-      console.log('🧹 Limpando interval do checkInterval');
-      clearInterval(checkInterval);
+      // Remove os listeners globais
+      vturbGlobalEvents.forEach(eventName => {
+        window.removeEventListener(eventName, handleVTurbScrollEvent, true);
+      });
+
+      // Remove todos os listeners de interceptScroll
+      const scrollEvents = document.querySelectorAll('[data-scroll-intercepted]');
+      scrollEvents.forEach((el) => {
+        el.removeEventListener('click', interceptScroll, true);
+        el.removeAttribute('data-scroll-intercepted');
+      });
+
+      console.log('%c✅ TODOS OS BLOQUEADORES REMOVIDOS - PÁGINA COMPLETAMENTE LIVRE!', 'color: #00ff00; font-weight: bold; font-size: 16px');
     };
-  }, [delaySeconds]);
+
+    // Adiciona listener para o evento customizado
+    window.addEventListener('content-revealed', removeAllBlockers, { once: true });
+
+    // Cleanup
+    return () => {
+      console.log('%c🧹 Limpando listeners e intervals...', 'color: #ff9900');
+
+      // Remove o listener do evento customizado
+      window.removeEventListener('content-revealed', removeAllBlockers);
+
+      // Limpa tudo (caso o componente seja desmontado antes da revelação)
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('wheel', markUserInteraction);
+      window.removeEventListener('touchstart', markUserInteraction);
+      window.removeEventListener('touchmove', markUserInteraction);
+      window.removeEventListener('mousedown', markUserInteraction);
+      window.removeEventListener('scroll', markScrollEvent);
+      clearInterval(playerCheckInterval);
+      observer.disconnect();
+      scrollObserver.disconnect();
+      playerObserver.disconnect();
+
+      // Remove do mainPlayer se existir
+      const mainPlayer = document.getElementById('vid-69124ec0b910e6e322c32a69');
+      if (mainPlayer) {
+        const vturbEvents = [
+          'smartplayer-scroll-event',
+          'smartplayer:video:ended',
+          'smartplayer:cta:show',
+          'smartplayer:scroll',
+          'smartplayer-cta-show',
+          'cta-show',
+          'scroll-event'
+        ];
+
+        vturbEvents.forEach(eventName => {
+          mainPlayer.removeEventListener(eventName, handleVTurbScrollEvent, { capture: true } as any);
+        });
+      }
+
+      // Remove os listeners globais
+      vturbGlobalEvents.forEach(eventName => {
+        window.removeEventListener(eventName, handleVTurbScrollEvent, true);
+      });
+    };
+  }, []);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -190,6 +591,15 @@ function App() {
         }
       }
     });
+
+    const heroVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124ec0b910e6e322c32a69/v4/player.js';
+    const existingHeroScript = document.querySelector(`script[src="${heroVideoScript}"]`);
+    if (!existingHeroScript) {
+      const script = document.createElement('script');
+      script.src = heroVideoScript;
+      script.async = true;
+      document.head.appendChild(script);
+    }
 
     const expertVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/69124f9036636797770589e5/v4/player.js';
     const existingExpertScript = document.querySelector(`script[src="${expertVideoScript}"]`);
@@ -517,13 +927,39 @@ function App() {
   const prevLab = () => setCurrentLab((prev) => (prev - 1 + labImages.length) % labImages.length);
 
   return (
-    <>
-      <style>{`
-        .esconder {
-          display: none !important;
-        }
-      `}</style>
-      <div className="min-h-screen overflow-x-hidden w-full bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden w-full">
+      {/* 🔧 DEBUG: Botão de teste para forçar reveal */}
+      {isDevelopment && (
+        <div style={{ position: 'fixed', top: '10px', right: '10px', zIndex: 9999, display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => {
+              console.log('🧪 Teste manual: Forçando reveal do conteúdo');
+              handleVideoPitchReached();
+            }}
+            style={{
+              padding: '10px 20px',
+              background: '#00ff00',
+              color: '#000',
+              border: 'none',
+              borderRadius: '5px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            🧪 TESTAR REVEAL
+          </button>
+          <div style={{
+            padding: '10px',
+            background: showRestOfContent ? '#00ff00' : '#ff0000',
+            color: '#000',
+            borderRadius: '5px',
+            fontWeight: 'bold'
+          }}>
+            {showRestOfContent ? '✅ VISÍVEL' : '❌ OCULTO'}
+          </div>
+        </div>
+      )}
+
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
@@ -538,25 +974,34 @@ function App() {
             <vturb-smartplayer id="vid-69124ec0b910e6e322c32a69" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
 
+          {/* 🔧 CORREÇÃO: Botão invisível removido - não precisa da classe de scroll */}
           <div
-            id="vturb-scroll-target"
-            className="smartplayer-scroll-event"
             style={{
+              position: 'absolute',
+              bottom: '-50px',
+              left: '50%',
+              transform: 'translateX(-50%)',
               width: '1px',
               height: '1px',
               opacity: 0,
-              pointerEvents: 'none',
-              margin: '20px auto'
+              pointerEvents: 'none'
             }}
             aria-hidden="true"
           />
-
         </div>
       </section>
 
+      {/* 🔧 CORREÇÃO 2: Section SEMPRE no DOM, controle via visibility ao invés de display */}
       <section
         ref={offersRef}
-        className="esconder py-8 md:py-20 px-4 bg-white"
+        className="py-8 md:py-20 px-4 bg-white transition-all duration-500"
+        style={{
+          maxHeight: showRestOfContent ? '10000px' : '0',
+          overflow: showRestOfContent ? 'visible' : 'hidden',
+          opacity: showRestOfContent ? 1 : 0,
+          visibility: showRestOfContent ? 'visible' : 'hidden',
+          pointerEvents: showRestOfContent ? 'auto' : 'none'
+        }}
       >
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
@@ -585,8 +1030,13 @@ function App() {
                 <button
                   ref={sixBottleButtonRef}
                   id="six-bottle-button"
+                  data-scroll-target="offers"
                   onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
-                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                  style={{
+                    visibility: showPurchaseButton ? 'visible' : 'hidden',
+                    pointerEvents: showPurchaseButton ? 'auto' : 'none'
+                  }}
                 >
                   CLAIM OFFER NOW
                 </button>
@@ -701,8 +1151,11 @@ function App() {
         </div>
       </section>
 
+      {/* Resto do código continua igual... */}
+      {/* Por questões de espaço, as demais sections continuam iguais ao código original */}
+
       {/* Experts Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -810,7 +1263,7 @@ function App() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -874,7 +1327,7 @@ function App() {
       </section>
 
       {/* Media Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -951,7 +1404,7 @@ function App() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1303,7 +1756,7 @@ function App() {
       )}
 
       {/* Final CTA Section */}
-      <section className="esconder py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1318,7 +1771,7 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="esconder bg-black text-gray-400 py-8 px-4">
+      <footer className="bg-black text-gray-400 py-8 px-4" style={{ display: showRestOfContent ? 'block' : 'none' }}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
@@ -1409,8 +1862,8 @@ function App() {
           </div>
         </div>
       )}
+
     </div>
-    </>
   );
 }
 
