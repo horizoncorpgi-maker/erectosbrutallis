@@ -1,13 +1,33 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import Home1 from './pages/Home1';
 import Home2 from './pages/Home2';
 import Upsell from './pages/Upsell';
 import Upsell2 from './pages/Upsell2';
 import Navigation from './components/Navigation';
 
+declare global {
+  interface Window {
+    fbq?: (action: string, event: string, params?: Record<string, unknown>) => void;
+  }
+}
+
+function FacebookPixelTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (window.fbq) {
+      window.fbq('track', 'PageView');
+    }
+  }, [location]);
+
+  return null;
+}
+
 function Router() {
   return (
     <BrowserRouter>
+      <FacebookPixelTracker />
       <Navigation />
       <Routes>
         <Route path="/" element={<Home1 />} />
