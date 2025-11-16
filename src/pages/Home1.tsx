@@ -14,10 +14,10 @@ import {
   AlertCircle,
   X
 } from 'lucide-react';
-import ArticleReader from './ArticleReader';
-import { useTimerSettings } from './hooks/useTimerSettings';
+import ArticleReader from '../ArticleReader';
+import { useTimerSettings } from '../hooks/useTimerSettings';
 
-function App() {
+function Home1() {
   const offersRef = useRef<HTMLDivElement>(null);
   const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
@@ -1414,4 +1414,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home1;

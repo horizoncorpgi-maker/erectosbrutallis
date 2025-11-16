@@ -5,6 +5,7 @@ declare namespace JSX {
     'vturb-smartplayer': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
       id?: string;
       style?: React.CSSProperties;
+      preload?: string;
     };
   }
 }

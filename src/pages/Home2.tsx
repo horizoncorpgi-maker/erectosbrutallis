@@ -14,10 +14,10 @@ import {
   AlertCircle,
   X
 } from 'lucide-react';
-import ArticleReader from './ArticleReader';
-import { useTimerSettings } from './hooks/useTimerSettings';
+import ArticleReader from '../ArticleReader';
+import { useTimerSettings } from '../hooks/useTimerSettings';
 
-function App() {
+function Home2() {
   const offersRef = useRef<HTMLDivElement>(null);
   const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
@@ -302,15 +302,15 @@ function App() {
 
   const handleAcceptOffer = () => {
     setShowUpsellPopup(false);
-    window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1';
+    window.location.href = 'https://erectosbrutallis.co/a/direct/2nsvbL?type=link';
   };
 
   const handleRefuseOffer = () => {
     setShowUpsellPopup(false);
     if (selectedPackage === '3-bottle') {
-      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875570:1';
+      window.location.href = 'https://erectosbrutallis.co/a/direct/q23aca?type=link';
     } else if (selectedPackage === '1-bottle') {
-      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875568:1';
+      window.location.href = 'https://erectosbrutallis.co/a/direct/XG8dsd?type=link';
     }
   };
 
@@ -585,7 +585,7 @@ function App() {
                 <button
                   ref={sixBottleButtonRef}
                   id="six-bottle-button"
-                  onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
+                  onClick={() => window.location.href = 'https://erectosbrutallis.co/a/direct/2nsvbL?type=link'}
                   className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
@@ -1414,4 +1414,4 @@ function App() {
   );
 }
 
-export default App;
+export default Home2;
