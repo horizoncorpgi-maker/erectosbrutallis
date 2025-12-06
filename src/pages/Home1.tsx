@@ -527,10 +527,10 @@ function Home1() {
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
+          <h1 className="hidden">
             Why are men adding salt to their <span className="text-[#B80000]">morning coffee?</span>
           </h1>
-          <p className="text-base sm:text-xl md:text-2xl text-gray-600 mb-6 md:mb-12 font-light px-4">
+          <p className="hidden">
             It sounds weird… but this simple trick is changing how guys start their day — boosting focus, drive, and energy within minutes.
           </p>
 
