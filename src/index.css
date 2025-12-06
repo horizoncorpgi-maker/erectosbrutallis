@@ -43,19 +43,14 @@
     max-width: 100%;
   }
 
-  .aspect-video vturb-smartplayer {
+  vturb-smartplayer {
+    display: block !important;
     width: 100% !important;
     height: 100% !important;
-    max-width: none !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
   }
 
-  .aspect-video vturb-smartplayer *,
-  .aspect-video vturb-smartplayer iframe,
-  .aspect-video vturb-smartplayer video {
-    max-width: none !important;
+  vturb-smartplayer iframe,
+  vturb-smartplayer video {
     width: 100% !important;
     height: 100% !important;
   }
