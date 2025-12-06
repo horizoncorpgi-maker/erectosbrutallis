@@ -530,7 +530,6 @@ function Home1() {
           <h1 className="text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
           </h1>
           <p className="text-base sm:text-xl md:text-2xl text-gray-600 mb-6 md:mb-12 font-light px-4">
-            It sounds weird… but this simple trick is changing how guys start their day — boosting focus, drive, and energy within minutes.
           </p>
 
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
