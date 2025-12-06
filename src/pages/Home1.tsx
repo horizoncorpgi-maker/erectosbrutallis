@@ -52,31 +52,8 @@ function Home1() {
       const script = document.createElement('script');
       script.src = heroVideoScript;
       script.async = true;
-      script.onload = () => {
-        console.log('✅ Script do vídeo hero carregado com sucesso');
-        console.log('Elemento vturb-smartplayer:', document.querySelector('vturb-smartplayer#vid-6934af4ba9b4b605fd3397f5'));
-      };
-      script.onerror = () => {
-        console.error('❌ Erro ao carregar script do vídeo hero');
-      };
       document.head.appendChild(script);
-      console.log('📦 Script do vídeo hero adicionado ao DOM');
-    } else {
-      console.log('ℹ️ Script do vídeo hero já existe no DOM');
     }
-
-    setTimeout(() => {
-      const player = document.querySelector('vturb-smartplayer#vid-6934af4ba9b4b605fd3397f5');
-      console.log('🔍 Verificando player após 2s:', player);
-      if (player) {
-        console.log('Player encontrado! Dimensões:', {
-          width: player.clientWidth,
-          height: player.clientHeight,
-          display: getComputedStyle(player).display,
-          visibility: getComputedStyle(player).visibility
-        });
-      }
-    }, 2000);
   }, []);
 
   useEffect(() => {
@@ -550,19 +527,15 @@ function Home1() {
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
-          <div className="w-full max-w-3xl mx-auto mb-8">
-            <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl" style={{ paddingBottom: '56.25%', background: '#000' }}>
-              <vturb-smartplayer
-                id="vid-6934af4ba9b4b605fd3397f5"
-                style={{
-                  position: 'absolute',
-                  top: '0',
-                  left: '0',
-                  width: '100%',
-                  height: '100%'
-                }}
-              ></vturb-smartplayer>
-            </div>
+          <h1 className="text-2xl sm:text-4xl md:text-7xl font-bold text-gray-900 mb-3 md:mb-6 leading-tight px-2">
+            Why are men adding salt to their <span className="text-[#B80000]">morning coffee?</span>
+          </h1>
+          <p className="text-base sm:text-xl md:text-2xl text-gray-600 mb-6 md:mb-12 font-light px-4">
+            It sounds weird… but this simple trick is changing how guys start their day — boosting focus, drive, and energy within minutes.
+          </p>
+
+          <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16]">
+            <vturb-smartplayer id="vid-6934af4ba9b4b605fd3397f5" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
 
           <div

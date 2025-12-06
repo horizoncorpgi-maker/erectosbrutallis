@@ -42,18 +42,6 @@
   * {
     max-width: 100%;
   }
-
-  vturb-smartplayer {
-    display: block !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  vturb-smartplayer iframe,
-  vturb-smartplayer video {
-    width: 100% !important;
-    height: 100% !important;
-  }
 }
 
 @keyframes fadeIn {
