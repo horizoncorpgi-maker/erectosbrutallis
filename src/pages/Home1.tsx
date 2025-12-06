@@ -52,8 +52,31 @@ function Home1() {
       const script = document.createElement('script');
       script.src = heroVideoScript;
       script.async = true;
+      script.onload = () => {
+        console.log('✅ Script do vídeo hero carregado com sucesso');
+        console.log('Elemento vturb-smartplayer:', document.querySelector('vturb-smartplayer#vid-6934af4ba9b4b605fd3397f5'));
+      };
+      script.onerror = () => {
+        console.error('❌ Erro ao carregar script do vídeo hero');
+      };
       document.head.appendChild(script);
+      console.log('📦 Script do vídeo hero adicionado ao DOM');
+    } else {
+      console.log('ℹ️ Script do vídeo hero já existe no DOM');
     }
+
+    setTimeout(() => {
+      const player = document.querySelector('vturb-smartplayer#vid-6934af4ba9b4b605fd3397f5');
+      console.log('🔍 Verificando player após 2s:', player);
+      if (player) {
+        console.log('Player encontrado! Dimensões:', {
+          width: player.clientWidth,
+          height: player.clientHeight,
+          display: getComputedStyle(player).display,
+          visibility: getComputedStyle(player).visibility
+        });
+      }
+    }, 2000);
   }, []);
 
   useEffect(() => {
@@ -528,10 +551,19 @@ function Home1() {
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
           <div className="relative w-full max-w-3xl mx-auto mb-8">
-            <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-              <div className="absolute inset-0 bg-black rounded-2xl overflow-hidden shadow-2xl">
-                <vturb-smartplayer id="vid-6934af4ba9b4b605fd3397f5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'block' }}></vturb-smartplayer>
-              </div>
+            <div className="relative w-full bg-black rounded-2xl overflow-hidden shadow-2xl" style={{ paddingTop: '56.25%', minHeight: '300px' }}>
+              <vturb-smartplayer
+                id="vid-6934af4ba9b4b605fd3397f5"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  display: 'block',
+                  minHeight: '300px'
+                }}
+              ></vturb-smartplayer>
             </div>
           </div>
 
