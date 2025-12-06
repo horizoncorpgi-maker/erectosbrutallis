@@ -527,8 +527,10 @@ function Home1() {
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
-          <div className="relative w-full mx-auto" style={{ maxWidth: '640px' }}>
-            <vturb-smartplayer id="vid-6934af4ba9b4b605fd3397f5"></vturb-smartplayer>
+          <div className="relative w-full max-w-3xl mx-auto">
+            <div style={{ position: 'relative', paddingTop: '56.25%' }}>
+              <vturb-smartplayer id="vid-6934af4ba9b4b605fd3397f5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></vturb-smartplayer>
+            </div>
           </div>
 
           <div
