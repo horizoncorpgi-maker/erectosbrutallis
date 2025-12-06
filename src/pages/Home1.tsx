@@ -527,8 +527,8 @@ function Home1() {
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
-          <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl aspect-[9/16] mb-8">
-            <vturb-smartplayer id="vid-6934af4ba9b4b605fd3397f5" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
+          <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl mb-8" style={{ aspectRatio: '9/16', minHeight: '500px' }}>
+            <vturb-smartplayer id="vid-6934af4ba9b4b605fd3397f5" style={{ display: 'block', margin: '0 auto', width: '100%', height: '100%' }}></vturb-smartplayer>
           </div>
 
           <div
