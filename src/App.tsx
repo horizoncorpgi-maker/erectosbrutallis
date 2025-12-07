@@ -35,10 +35,7 @@ function App() {
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
 
-  const { delaySeconds, isLoading } = useTimerSettings();
-
-  console.log('🔴 App.tsx - delaySeconds:', delaySeconds);
-  console.log('🔴 App.tsx - isLoading:', isLoading);
+  const { delaySeconds } = useTimerSettings();
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
