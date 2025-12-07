@@ -20,7 +20,13 @@ export function useTimerSettings() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  console.log('🟡 useTimerSettings hook inicializado');
+  console.log('🟡 Supabase URL:', supabaseUrl);
+  console.log('🟡 Supabase Key exists:', !!supabaseAnonKey);
+  console.log('🟡 Supabase client exists:', !!supabase);
+
   useEffect(() => {
+    console.log('🟢 useEffect executado - carregando timer do Supabase');
     localStorage.removeItem('timerDelay');
     fetchTimerSettings();
   }, []);
