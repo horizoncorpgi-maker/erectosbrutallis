@@ -35,14 +35,18 @@ export function useTimerSettings() {
     setError(null);
 
     try {
+      console.log('Fetching timer settings from Supabase...');
       const { data, error: fetchError } = await supabase
         .from('timer_settings')
         .select('delay_seconds')
         .eq('id', 1)
         .maybeSingle();
 
+      console.log('Supabase response:', { data, error: fetchError });
+
       if (fetchError) {
         console.error('Error fetching timer settings:', fetchError);
+        setError(`Failed to load: ${fetchError.message}`);
         return;
       }
 
@@ -50,9 +54,12 @@ export function useTimerSettings() {
         console.log('Loaded timer from Supabase:', data.delay_seconds);
         setDelaySeconds(data.delay_seconds);
         localStorage.setItem('timerDelay', data.delay_seconds.toString());
+      } else {
+        console.warn('No timer settings found in database');
       }
     } catch (err) {
       console.error('Exception fetching timer settings:', err);
+      setError(`Exception: ${err}`);
     } finally {
       setIsLoading(false);
     }
