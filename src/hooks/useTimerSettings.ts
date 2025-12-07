@@ -21,6 +21,7 @@ export function useTimerSettings() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    localStorage.removeItem('timerDelay');
     fetchTimerSettings();
   }, []);
 
