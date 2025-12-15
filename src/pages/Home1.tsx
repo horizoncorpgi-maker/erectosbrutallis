@@ -666,7 +666,7 @@ function Home1() {
                   SAVE $236
                 </div>
                 <button
-                  onClick={() => handlePackageClick('1-bottle')}
+                  onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875569:1'}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
