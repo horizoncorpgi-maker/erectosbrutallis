@@ -16,8 +16,12 @@ import {
 } from 'lucide-react';
 import ArticleReader from './ArticleReader';
 import { useTimerSettings } from './hooks/useTimerSettings';
+import { useFacebookPixel } from './hooks/useFacebookPixel';
+import { trackViewContent } from './utils/facebookPixel';
 
 function App() {
+  useFacebookPixel();
+
   const offersRef = useRef<HTMLDivElement>(null);
   const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
@@ -43,6 +47,33 @@ function App() {
 
   useEffect(() => {
     setIsVisible(true);
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target.id === 'offers-section') {
+            trackViewContent({
+              content_name: 'Erectos Brutallis Package Options',
+              content_category: 'Product',
+              content_ids: ['6-bottle', '3-bottle', '1-bottle'],
+              currency: 'USD',
+              value: 294,
+            });
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    const offersSection = document.getElementById('offers-section');
+    if (offersSection) {
+      observer.observe(offersSection);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -555,6 +586,7 @@ function App() {
       </section>
 
       <section
+        id="offers-section"
         ref={offersRef}
         className="esconder py-8 md:py-20 px-4 bg-white"
       >
