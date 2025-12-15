@@ -310,7 +310,7 @@ function Home1() {
     if (selectedPackage === '3-bottle') {
       window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875570:1';
     } else if (selectedPackage === '1-bottle') {
-      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875568:1';
+      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875569:1';
     }
   };
 
@@ -666,7 +666,7 @@ function Home1() {
                   SAVE $236
                 </div>
                 <button
-                  onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875569:1'}
+                  onClick={() => handlePackageClick('1-bottle')}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
