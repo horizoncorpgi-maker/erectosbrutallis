@@ -652,18 +652,18 @@ function Home1() {
               </div>
             </div>
 
-            {/* 1-Bottle Package */}
+            {/* 2-Bottle Package */}
             <div className="relative bg-gradient-to-br from-[#FF7043] to-[#FF5722] rounded-[30px] p-4 md:p-10 shadow-xl">
               <div className="text-center">
                 <img
                   src="https://i.postimg.cc/90Q1yNtc/erectos-brutallis-9.png"
-                  alt="1-Bottle Package"
+                  alt="2-Bottle Package"
                   className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
                 />
                 <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
-                <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">1 BOTTLE PACKAGE</p>
+                <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">2 BOTTLE PACKAGE</p>
                 <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
-                  SAVE $118
+                  SAVE $236
                 </div>
                 <button
                   onClick={() => handlePackageClick('1-bottle')}
@@ -672,7 +672,7 @@ function Home1() {
                   BUY NOW
                 </button>
                 <div className="text-white/90 text-xs md:text-base mb-2 md:mb-4">
-                  $89 <span className="font-bold">$79 + $9.99 ship</span>
+                  $79 per bottle, <span className="font-bold">$168 total</span>
                 </div>
                 <div className="flex justify-center items-center gap-3 md:gap-4 text-white/90 text-xs md:text-sm">
                   <div className="flex items-center gap-1">
