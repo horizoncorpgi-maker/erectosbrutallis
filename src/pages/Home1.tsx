@@ -624,7 +624,7 @@ function Home1() {
                 <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
                 <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">3 BOTTLE PACKAGE</p>
                 <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
-                  SAVE $414
+                  SAVE $384
                 </div>
                 <button
                   onClick={() => handlePackageClick('3-bottle')}
@@ -633,7 +633,7 @@ function Home1() {
                   BUY NOW
                 </button>
                 <div className="text-white/90 text-xs md:text-base mb-2 md:mb-4">
-                  $59 per bottle, <span className="font-bold">$177 total</span>
+                  $69 per bottle, <span className="font-bold">$207 total</span>
                 </div>
                 <div className="flex justify-center items-center gap-3 md:gap-4 text-white/90 text-xs md:text-sm">
                   <div className="flex items-center gap-1">
