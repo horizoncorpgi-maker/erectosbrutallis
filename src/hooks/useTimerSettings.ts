@@ -14,7 +14,7 @@ const supabase = supabaseUrl && supabaseAnonKey
   : null;
 
 export function useTimerSettings() {
-  const [delaySeconds, setDelaySeconds] = useState<number>(2467);
+  const [delaySeconds, setDelaySeconds] = useState<number>(2430);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,8 +26,8 @@ export function useTimerSettings() {
 
   const fetchTimerSettings = async () => {
     if (!supabase) {
-      console.warn('Supabase not configured, using default 2467 seconds');
-      setDelaySeconds(2467);
+      console.warn('Supabase not configured, using default 2430 seconds');
+      setDelaySeconds(2430);
       return;
     }
 
@@ -43,7 +43,7 @@ export function useTimerSettings() {
 
       if (fetchError) {
         console.error('Error fetching timer settings:', fetchError);
-        setDelaySeconds(2467);
+        setDelaySeconds(2430);
         return;
       }
 
@@ -52,12 +52,12 @@ export function useTimerSettings() {
         setDelaySeconds(data.delay_seconds);
         localStorage.setItem('timerDelay', data.delay_seconds.toString());
       } else {
-        console.log('No timer settings found, using default 2467 seconds');
-        setDelaySeconds(2467);
+        console.log('No timer settings found, using default 2430 seconds');
+        setDelaySeconds(2430);
       }
     } catch (err) {
       console.error('Exception fetching timer settings:', err);
-      setDelaySeconds(2467);
+      setDelaySeconds(2430);
     } finally {
       setIsLoading(false);
     }
