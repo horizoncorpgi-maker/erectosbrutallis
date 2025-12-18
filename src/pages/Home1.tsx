@@ -70,6 +70,22 @@ function Home1() {
   }, []);
 
   useEffect(() => {
+    const utmifyUtmsScript = 'https://cdn.utmify.com.br/scripts/utms/latest.js';
+    const existingUtmsScript = document.querySelector(`script[src="${utmifyUtmsScript}"]`);
+    if (!existingUtmsScript) {
+      const script = document.createElement("script");
+      script.setAttribute("src", utmifyUtmsScript);
+      script.setAttribute("data-utmify-prevent-xcod-sck", "");
+      script.setAttribute("data-utmify-prevent-subids", "");
+      script.setAttribute("data-utmify-ignore-iframe", "");
+      script.setAttribute("data-utmify-is-cartpanda", "");
+      script.setAttribute("async", "");
+      script.setAttribute("defer", "");
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  useEffect(() => {
     console.log('=== INICIANDO SETUP DO VTURB TIMER ===');
     console.log('Delay configurado:', delaySeconds, 'segundos');
 
