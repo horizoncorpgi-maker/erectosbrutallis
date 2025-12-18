@@ -86,6 +86,32 @@ function Home1() {
   }, []);
 
   useEffect(() => {
+    const allowPrefixes = ["utm_"];
+    const allowExact = ["gclid", "fbclid"];
+
+    const fromUrl = new URLSearchParams(window.location.search);
+
+    const pass = new URLSearchParams();
+    for (const [k, v] of fromUrl.entries()) {
+      const ok = allowExact.includes(k) || allowPrefixes.some(p => k.startsWith(p));
+      if (ok && v) pass.set(k, v);
+    }
+    if ([...pass.keys()].length === 0) return;
+
+    const buyLinks = document.querySelectorAll('a[href*="pay.erectosbrutallis.com"]');
+
+    buyLinks.forEach(a => {
+      try {
+        const url = new URL((a as HTMLAnchorElement).href);
+        for (const [k, v] of pass.entries()) {
+          if (!url.searchParams.has(k)) url.searchParams.set(k, v);
+        }
+        (a as HTMLAnchorElement).href = url.toString();
+      } catch(e) {}
+    });
+  }, []);
+
+  useEffect(() => {
     console.log('=== INICIANDO SETUP DO VTURB TIMER ===');
     console.log('Delay configurado:', delaySeconds, 'segundos');
 
