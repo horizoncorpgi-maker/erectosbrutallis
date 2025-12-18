@@ -57,6 +57,19 @@ function Home1() {
   }, []);
 
   useEffect(() => {
+    (window as any).pixelId = "694352c02c9b8add9117f60a";
+    const utmifyScript = 'https://cdn.utmify.com.br/scripts/pixel/pixel.js';
+    const existingUtmifyScript = document.querySelector(`script[src="${utmifyScript}"]`);
+    if (!existingUtmifyScript) {
+      const a = document.createElement("script");
+      a.setAttribute("async", "");
+      a.setAttribute("defer", "");
+      a.setAttribute("src", utmifyScript);
+      document.head.appendChild(a);
+    }
+  }, []);
+
+  useEffect(() => {
     console.log('=== INICIANDO SETUP DO VTURB TIMER ===');
     console.log('Delay configurado:', delaySeconds, 'segundos');
 
