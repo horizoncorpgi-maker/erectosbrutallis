@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Home, Clock, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Menu, X, Home, Clock, Check, AlertCircle, Loader2, Eye } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTimerSettings } from '../hooks/useTimerSettings';
 
@@ -39,6 +39,14 @@ function Navigation() {
         window.location.reload();
       }, 1000);
     }
+  };
+
+  const handleShowOffers = () => {
+    const hiddenElements = document.querySelectorAll('.esconder');
+    hiddenElements.forEach((element: Element) => {
+      (element as HTMLElement).classList.remove('esconder');
+    });
+    setIsOpen(false);
   };
 
   const routes = [
@@ -165,6 +173,21 @@ function Navigation() {
                 30s
               </button>
             </div>
+          </div>
+
+          <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center gap-2 mb-3">
+              <Eye size={20} className="text-blue-600" />
+              <h3 className="font-semibold text-gray-900">Show Offers (Test)</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">Reveal offer blocks without waiting</p>
+            <button
+              onClick={handleShowOffers}
+              className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+            >
+              <Eye size={18} />
+              Show Offers Now
+            </button>
           </div>
 
           <h3 className="font-semibold text-gray-700 mb-3">Pages</h3>
