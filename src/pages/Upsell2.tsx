@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle, Truck, Shield, TrendingUp } from 'lucide-react';
+import { appendParamsToUrl } from '../utils/urlParams';
 
 interface Upsell2Props {
   inches: number;
@@ -189,7 +190,7 @@ function Upsell2({ inches, price, checkoutLink }: Upsell2Props) {
             </div>
 
             <button
-              onClick={() => window.location.href = checkoutLink || ''}
+              onClick={() => window.location.href = appendParamsToUrl(checkoutLink || '')}
               className="w-full max-w-md mx-auto bg-yellow-400 text-gray-900 py-3 sm:py-4 md:py-6 rounded-full font-bold hover:bg-yellow-300 transition-all shadow-lg text-sm sm:text-base md:text-xl leading-tight mb-4"
             >
               YES! I WANT TO GROW {inches} INCHES
@@ -222,7 +223,7 @@ function Upsell2({ inches, price, checkoutLink }: Upsell2Props) {
             </div>
 
             <button
-              onClick={() => window.location.href = checkoutLink || ''}
+              onClick={() => window.location.href = appendParamsToUrl(checkoutLink || '')}
               className="w-full max-w-md mx-auto bg-white/20 text-white py-2.5 sm:py-3 md:py-4 rounded-full font-bold hover:bg-white/30 transition-all shadow-md text-base sm:text-lg md:text-xl"
             >
               NO THANKS

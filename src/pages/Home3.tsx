@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import ArticleReader from '../ArticleReader';
 import { useTimerSettings } from '../hooks/useTimerSettings';
+import { updateCheckoutLinks, appendParamsToUrl } from '../utils/urlParams';
 
 function Home3() {
   const offersRef = useRef<HTMLDivElement>(null);
@@ -87,29 +88,7 @@ function Home3() {
   }, []);
 
   useEffect(() => {
-    const allowPrefixes = ["utm_"];
-    const allowExact = ["gclid", "fbclid"];
-
-    const fromUrl = new URLSearchParams(window.location.search);
-
-    const pass = new URLSearchParams();
-    for (const [k, v] of fromUrl.entries()) {
-      const ok = allowExact.includes(k) || allowPrefixes.some(p => k.startsWith(p));
-      if (ok && v) pass.set(k, v);
-    }
-    if ([...pass.keys()].length === 0) return;
-
-    const buyLinks = document.querySelectorAll('a[href*="pay.erectosbrutallis.com"]');
-
-    buyLinks.forEach(a => {
-      try {
-        const url = new URL((a as HTMLAnchorElement).href);
-        for (const [k, v] of pass.entries()) {
-          if (!url.searchParams.has(k)) url.searchParams.set(k, v);
-        }
-        (a as HTMLAnchorElement).href = url.toString();
-      } catch(e) {}
-    });
+    updateCheckoutLinks();
   }, []);
 
   useEffect(() => {
@@ -358,15 +337,15 @@ function Home3() {
 
   const handleAcceptOffer = () => {
     setShowUpsellPopup(false);
-    window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1';
+    window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1');
   };
 
   const handleRefuseOffer = () => {
     setShowUpsellPopup(false);
     if (selectedPackage === '3-bottle') {
-      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875570:1';
+      window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875570:1');
     } else if (selectedPackage === '1-bottle') {
-      window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875569:1';
+      window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875569:1');
     }
   };
 
@@ -634,7 +613,7 @@ function Home3() {
                 <button
                   ref={sixBottleButtonRef}
                   id="six-bottle-button"
-                  onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197875571:1'}
+                  onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1')}
                   className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW

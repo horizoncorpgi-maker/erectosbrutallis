@@ -1,5 +1,6 @@
 import { AlertTriangle, CheckCircle, Truck, Shield, Star } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { appendParamsToUrl } from '../utils/urlParams';
 
 interface UpsellProps {
   bottles: number;
@@ -156,7 +157,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               </div>
 
               <button
-                onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/201842174:1'}
+                onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/201842174:1')}
                 className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 sm:py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-sm sm:text-base md:text-xl leading-tight"
               >
                 YES! I WANT RESULTS IN 3 MONTHS, NOT 6
@@ -174,7 +175,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               </div>
 
               <button
-                onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/201842172:1'}
+                onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/201842172:1')}
                 className="w-full max-w-md mx-auto bg-white/20 text-white py-2.5 sm:py-3 md:py-4 rounded-full font-bold hover:bg-white/30 transition-all shadow-md text-base sm:text-lg md:text-xl"
               >
                 NO THANKS
@@ -201,7 +202,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                     $39 PER BOTTLE
                   </div>
                   <button
-                    onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/198160252:1'}
+                    onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/198160252:1')}
                     className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 sm:py-4 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-sm sm:text-base md:text-xl mb-3 md:mb-5 leading-tight"
                   >
                     YES! I WANT RESULTS IN 3 MONTHS, NOT 6
@@ -245,7 +246,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               </div>
 
               <button
-                onClick={() => window.location.href = 'https://pay.erectosbrutallis.com/checkout/197882332:1'}
+                onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197882332:1')}
                 className="w-full max-w-md mx-auto bg-white/20 text-white py-2.5 sm:py-3 md:py-4 rounded-full font-bold hover:bg-white/30 transition-all shadow-md text-base sm:text-lg md:text-xl"
               >
                 NO THANKS
@@ -277,7 +278,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               </div>
 
               <button
-                onClick={() => window.location.href = checkoutLink || ''}
+                onClick={() => window.location.href = appendParamsToUrl(checkoutLink || '')}
                 className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 sm:py-4 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-sm sm:text-base md:text-xl leading-tight"
               >
                 YES! I WANT RESULTS IN 3 MONTHS, NOT 6
@@ -295,7 +296,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               </div>
 
               <button
-                onClick={() => window.location.href = checkoutLink || ''}
+                onClick={() => window.location.href = appendParamsToUrl(checkoutLink || '')}
                 className="w-full max-w-md mx-auto bg-white/20 text-white py-2.5 sm:py-3 md:py-4 rounded-full font-bold hover:bg-white/30 transition-all shadow-md text-base sm:text-lg md:text-xl"
               >
                 NO THANKS
