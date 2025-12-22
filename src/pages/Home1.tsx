@@ -36,7 +36,8 @@ function Home1() {
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
 
-  const { delaySeconds } = useTimerSettings();
+  const { delaySeconds: _delaySeconds } = useTimerSettings();
+  const delaySeconds = 0;
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
