@@ -345,7 +345,7 @@ function Home3() {
     if (selectedPackage === '3-bottle') {
       window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/q23aca?type=link');
     } else if (selectedPackage === '1-bottle') {
-      window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875569:1');
+      window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/W7bEKF?type=link');
     }
   };
 
