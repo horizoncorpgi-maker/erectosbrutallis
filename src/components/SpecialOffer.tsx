@@ -29,18 +29,18 @@ function SpecialOffer({ onAccept }: SpecialOfferProps) {
     <div className="bg-white rounded-2xl p-6 md:p-12 shadow-xl max-w-5xl mx-auto my-8">
       <div className="text-center mb-8">
         <div className="inline-block bg-red-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-6 uppercase tracking-wide">
-          Oferta Exclusiva de Upsell
+          Exclusive Upsell Offer
         </div>
 
         <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
-          ESPERE! Não feche esta página...
+          WAIT! Don't close this page...
         </h2>
 
         <p className="text-xl md:text-2xl text-gray-700 mb-2">
-          Adicione <span className="text-red-600 font-bold">7 frascos extras</span> ao seu pedido
+          Add <span className="text-red-600 font-bold">7 extra bottles</span> to your order
         </p>
         <p className="text-lg md:text-xl text-gray-600">
-          E pague apenas <span className="font-bold text-red-600">$39 por frasco</span>
+          And pay only <span className="font-bold text-red-600">$39 per bottle</span>
         </p>
 
         <div className="inline-flex items-center gap-2 bg-red-50 border-2 border-red-200 rounded-lg px-6 py-3 mt-6">
@@ -64,7 +64,7 @@ function SpecialOffer({ onAccept }: SpecialOfferProps) {
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border-2 border-gray-200">
             <div className="space-y-3">
               <div className="flex justify-between items-center text-lg">
-                <span className="text-gray-700">7 frascos extras</span>
+                <span className="text-gray-700">7 extra bottles</span>
                 <span className="font-bold text-gray-900">$273.00</span>
               </div>
               <div className="border-t-2 border-gray-300 pt-3">
@@ -80,21 +80,21 @@ function SpecialOffer({ onAccept }: SpecialOfferProps) {
             onClick={onAccept}
             className="w-full bg-gradient-to-r from-green-600 to-green-500 text-white py-6 rounded-xl font-bold text-xl hover:from-green-700 hover:to-green-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] uppercase tracking-wide"
           >
-            Sim! Adicionar ao meu pedido
+            YES! Add to my order
           </button>
 
           <div className="grid grid-cols-3 gap-3">
             <div className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-lg">
               <Shield className="w-6 h-6 text-green-600 mb-2" />
-              <span className="text-xs font-semibold text-gray-700">Garantia de Satisfação</span>
+              <span className="text-xs font-semibold text-gray-700">Satisfaction Guarantee</span>
             </div>
             <div className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-lg">
               <Lock className="w-6 h-6 text-blue-600 mb-2" />
-              <span className="text-xs font-semibold text-gray-700">Checkout Seguro</span>
+              <span className="text-xs font-semibold text-gray-700">Secure Checkout</span>
             </div>
             <div className="flex flex-col items-center text-center p-3 bg-gray-50 rounded-lg">
               <CheckCircle className="w-6 h-6 text-green-600 mb-2" />
-              <span className="text-xs font-semibold text-gray-700">180 Dias Garantia</span>
+              <span className="text-xs font-semibold text-gray-700">180-Day Guarantee</span>
             </div>
           </div>
         </div>
@@ -102,9 +102,9 @@ function SpecialOffer({ onAccept }: SpecialOfferProps) {
 
       <div className="bg-blue-50 border-l-4 border-blue-600 rounded-lg p-6">
         <p className="text-gray-700 leading-relaxed">
-          <span className="font-bold text-blue-900">Por que adicionar mais frascos?</span> Estudos mostram que clientes
-          que compram 7+ frascos têm <span className="font-bold">3x mais resultados</span> devido ao uso prolongado
-          e consistente do produto. Aproveite o menor preço disponível!
+          <span className="font-bold text-blue-900">Why add more bottles?</span> Studies show that customers
+          who purchase 7+ bottles achieve <span className="font-bold">3x better results</span> due to prolonged
+          and consistent use of the product. Take advantage of the lowest price available!
         </p>
       </div>
     </div>
