@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import { Clock, Shield, CheckCircle, Lock } from 'lucide-react';
 
 interface SpecialOfferProps {
+  bottles: number;
+  pricePerBottle: number;
   onAccept: () => void;
 }
 
-function SpecialOffer({ onAccept }: SpecialOfferProps) {
+function SpecialOffer({ bottles, pricePerBottle, onAccept }: SpecialOfferProps) {
+  const total = bottles * pricePerBottle;
   const [timeLeft, setTimeLeft] = useState(600);
 
   useEffect(() => {
@@ -37,10 +40,10 @@ function SpecialOffer({ onAccept }: SpecialOfferProps) {
         </h2>
 
         <p className="text-xl md:text-2xl text-gray-700 mb-2">
-          Add <span className="text-red-600 font-bold">7 extra bottles</span> to your order
+          Add <span className="text-red-600 font-bold">{bottles} extra bottle{bottles > 1 ? 's' : ''}</span> to your order
         </p>
         <p className="text-lg md:text-xl text-gray-600">
-          And pay only <span className="font-bold text-red-600">$39 per bottle</span>
+          And pay only <span className="font-bold text-red-600">${pricePerBottle} per bottle</span>
         </p>
 
         <div className="inline-flex items-center gap-2 bg-red-50 border-2 border-red-200 rounded-lg px-6 py-3 mt-6">
@@ -62,15 +65,15 @@ function SpecialOffer({ onAccept }: SpecialOfferProps) {
 
         <div className="space-y-6">
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 border-2 border-gray-200">
-            <div className="space-y-3">
-              <div className="flex justify-between items-center text-lg">
-                <span className="text-gray-700">7 extra bottles</span>
-                <span className="font-bold text-gray-900">$273.00</span>
-              </div>
-              <div className="border-t-2 border-gray-300 pt-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl font-black text-gray-900">TOTAL</span>
-                  <span className="text-3xl font-black text-red-600">$312.00</span>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-lg text-gray-700">{bottles} extra bottle{bottles > 1 ? 's' : ''}</p>
+                  <p className="text-sm text-gray-500">${pricePerBottle} per bottle</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-3xl font-black text-red-600">${total.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">TOTAL</p>
                 </div>
               </div>
             </div>
@@ -103,7 +106,7 @@ function SpecialOffer({ onAccept }: SpecialOfferProps) {
       <div className="bg-blue-50 border-l-4 border-blue-600 rounded-lg p-6">
         <p className="text-gray-700 leading-relaxed">
           <span className="font-bold text-blue-900">Why add more bottles?</span> Studies show that customers
-          who purchase 7+ bottles achieve <span className="font-bold">3x better results</span> due to prolonged
+          who purchase {bottles}+ bottles achieve <span className="font-bold">3x better results</span> due to prolonged
           and consistent use of the product. Take advantage of the lowest price available!
         </p>
       </div>

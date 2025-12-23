@@ -34,7 +34,7 @@ function Router() {
         <Route path="/tst1" element={<Home1 />} />
         <Route path="/tst3" element={<Home3 />} />
 
-        <Route path="/up1bt" element={<Upsell bottles={8} pricePerBottle={29} />} />
+        <Route path="/up1bt" element={<Upsell bottles={7} pricePerBottle={39} />} />
         <Route path="/up3bt" element={<Upsell bottles={6} pricePerBottle={39} checkoutLink="" />} />
         <Route path="/up6bt" element={<Upsell bottles={3} pricePerBottle={39} checkoutLink="" />} />
 
