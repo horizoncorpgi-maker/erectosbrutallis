@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { appendParamsToUrl } from '../utils/urlParams';
+import SpecialOffer from '../components/SpecialOffer';
 
 interface UpsellProps {
   bottles: number;
@@ -80,14 +81,11 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           />
 
           {isUp1bt ? (
-            <div className="mt-8">
-              <button
-                onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/201842174:1')}
-                className="smartplayer-scroll-event w-full max-w-md mx-auto bg-[#B80000] text-white py-4 md:py-6 rounded-full font-bold hover:bg-[#900000] transition-all shadow-2xl text-base md:text-2xl leading-tight"
-              >
-                YES! I WANT THIS UPGRADE
-              </button>
-            </div>
+            <>
+              <SpecialOffer
+                onAccept={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/201842174:1')}
+              />
+            </>
           ) : location.pathname === '/up3bt' ? (
             <div className="mt-8">
               <button
