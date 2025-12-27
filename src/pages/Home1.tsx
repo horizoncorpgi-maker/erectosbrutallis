@@ -342,7 +342,7 @@ function Home1() {
   const handleRefuseOffer = () => {
     setShowUpsellPopup(false);
     if (selectedPackage === '3-bottle') {
-      window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/q23aca?type=link');
+      window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875570:1');
     } else if (selectedPackage === '1-bottle') {
       window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875569:1');
     }
