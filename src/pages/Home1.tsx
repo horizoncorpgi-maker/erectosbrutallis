@@ -336,7 +336,7 @@ function Home1() {
 
   const handleAcceptOffer = () => {
     setShowUpsellPopup(false);
-    window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/2nsvbL?type=link');
+    window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1');
   };
 
   const handleRefuseOffer = () => {
