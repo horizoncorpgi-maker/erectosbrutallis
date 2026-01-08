@@ -14,6 +14,8 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const total = bottles * pricePerBottle;
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
+  const isUp3bt = location.pathname === '/up3bt';
+  const isUp6bt = location.pathname === '/up6bt';
   const [isVisible, setIsVisible] = useState(false);
   const { delaySeconds } = useTimerSettings();
 
@@ -80,11 +82,12 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (!isUp1bt) return;
+    if (!isUp1bt && !isUp3bt && !isUp6bt) return;
 
     const revealDelay = 160;
 
-    console.log('=== INICIANDO SETUP DO VTURB TIMER (UP1BT) ===');
+    const pageName = isUp1bt ? 'UP1BT' : isUp3bt ? 'UP3BT' : 'UP6BT';
+    console.log(`=== INICIANDO SETUP DO VTURB TIMER (${pageName}) ===`);
     console.log('Delay configurado:', revealDelay, 'segundos');
 
     const setupVturbTimer = () => {
@@ -190,7 +193,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
       console.log('🧹 Limpando interval do checkInterval');
       clearInterval(checkInterval);
     };
-  }, [isUp1bt]);
+  }, [isUp1bt, isUp3bt, isUp6bt]);
 
   return (
     <>
@@ -228,21 +231,21 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               />
             </div>
           ) : location.pathname === '/up3bt' ? (
-            <>
+            <div className="esconder">
               <SpecialOffer
                 bottles={bottles}
                 pricePerBottle={pricePerBottle}
                 onAccept={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/ex-ocu/next-offer/zbVP6eAjm4?accepted=yes')}
               />
-            </>
+            </div>
           ) : location.pathname === '/up6bt' ? (
-            <>
+            <div className="esconder">
               <SpecialOffer
                 bottles={bottles}
                 pricePerBottle={pricePerBottle}
                 onAccept={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/ex-ocu/next-offer/8rj73r9j6N?accepted=yes')}
               />
-            </>
+            </div>
           ) : (
             <>
               <SpecialOffer
