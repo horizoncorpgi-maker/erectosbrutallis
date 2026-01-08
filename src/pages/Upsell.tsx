@@ -60,7 +60,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   }, []);
 
   useEffect(() => {
-    if (location.pathname === '/up3bt' || location.pathname === '/up6bt') {
+    if (location.pathname === '/up1bt' || location.pathname === '/up3bt' || location.pathname === '/up6bt') {
       const ocuExternalScript = 'https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js';
       const existingOcuScript = document.querySelector(`script[src="${ocuExternalScript}"]`);
 
