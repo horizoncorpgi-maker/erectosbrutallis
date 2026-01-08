@@ -96,6 +96,14 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
                 onAccept={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/198160252:1')}
               />
             </>
+          ) : location.pathname === '/up6bt' ? (
+            <>
+              <SpecialOffer
+                bottles={bottles}
+                pricePerBottle={pricePerBottle}
+                onAccept={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/201842173:1')}
+              />
+            </>
           ) : (
             <>
               <SpecialOffer
