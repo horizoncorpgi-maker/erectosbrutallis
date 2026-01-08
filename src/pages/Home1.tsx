@@ -336,15 +336,15 @@ function Home1() {
 
   const handleAcceptOffer = () => {
     setShowUpsellPopup(false);
-    window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/2nsvbL?type=link');
+    window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1');
   };
 
   const handleRefuseOffer = () => {
     setShowUpsellPopup(false);
     if (selectedPackage === '3-bottle') {
-      window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/q23aca?type=link');
+      window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875570:1');
     } else if (selectedPackage === '1-bottle') {
-      window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/W7bEKF?type=link');
+      window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875569:1');
     }
   };
 
@@ -612,7 +612,7 @@ function Home1() {
                 <button
                   ref={sixBottleButtonRef}
                   id="six-bottle-button"
-                  onClick={() => window.location.href = appendParamsToUrl('https://erectosbrutallis.co/a/direct/2nsvbL?type=link')}
+                  onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1')}
                   className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
                   CLAIM OFFER NOW
