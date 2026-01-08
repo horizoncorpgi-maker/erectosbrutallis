@@ -82,7 +82,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   useEffect(() => {
     if (!isUp1bt) return;
 
-    const revealDelay = 5;
+    const revealDelay = 160;
 
     console.log('=== INICIANDO SETUP DO VTURB TIMER (UP1BT) ===');
     console.log('Delay configurado:', revealDelay, 'segundos');
