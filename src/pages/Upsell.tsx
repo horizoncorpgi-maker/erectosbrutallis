@@ -28,6 +28,8 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
 
     if (isUp1bt) {
       videoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/694b146ef757812677c31d5a/v4/player.js';
+    } else if (isUp3bt) {
+      videoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/694b12f787bdd2a5aeac487b/v4/player.js';
     } else {
       videoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/694b13b163476f09ce02d94e/v4/player.js';
     }
@@ -39,7 +41,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
       script.async = true;
       document.head.appendChild(script);
     }
-  }, [isUp1bt]);
+  }, [isUp1bt, isUp3bt]);
 
   useEffect(() => {
     (window as any).pixelId = "694352c02c9b8add9117f60a";
@@ -215,6 +217,8 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl mb-8" style={{ aspectRatio: '9/16', minHeight: '500px' }}>
             {isUp1bt ? (
               <vturb-smartplayer id="vid-694b146ef757812677c31d5a" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
+            ) : isUp3bt ? (
+              <vturb-smartplayer id="vid-694b12f787bdd2a5aeac487b" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
             ) : (
               <vturb-smartplayer id="vid-694b13b163476f09ce02d94e" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
             )}
