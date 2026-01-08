@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { appendParamsToUrl } from '../utils/urlParams';
 import SpecialOffer from '../components/SpecialOffer';
+import { useTimerSettings } from '../hooks/useTimerSettings';
 
 interface UpsellProps {
   bottles: number;
@@ -14,6 +15,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   const location = useLocation();
   const isUp1bt = location.pathname === '/up1bt';
   const [isVisible, setIsVisible] = useState(false);
+  const { delaySeconds } = useTimerSettings();
 
   useEffect(() => {
     setIsVisible(true);
@@ -77,9 +79,126 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!isUp1bt) return;
+
+    console.log('=== INICIANDO SETUP DO VTURB TIMER (UP1BT) ===');
+    console.log('Delay configurado:', delaySeconds, 'segundos');
+
+    const setupVturbTimer = () => {
+      console.log('--- setupVturbTimer chamado ---');
+      console.log('window.smartplayer existe?', !!(window as any).smartplayer);
+
+      const smartplayer = (window as any).smartplayer;
+
+      if (!smartplayer) {
+        console.log('❌ window.smartplayer não existe');
+        return;
+      }
+
+      console.log('✅ window.smartplayer existe');
+      console.log('smartplayer.instances existe?', !!smartplayer.instances);
+      console.log('smartplayer.instances.length:', smartplayer.instances?.length);
+
+      if (!smartplayer.instances || smartplayer.instances.length === 0) {
+        console.log('❌ Smartplayer instances não encontradas');
+        return;
+      }
+
+      console.log('✅ Smartplayer instances encontradas:', smartplayer.instances.length);
+
+      let elapsedTime = 0;
+      let isRevealed = false;
+      let lastTime = 0;
+      let isPlaying = false;
+
+      const revealElements = () => {
+        if (isRevealed) return;
+
+        console.log('🎉 Timer completado! Revelando elementos com classe .esconder');
+        const hiddenElements = document.querySelectorAll('.esconder');
+        hiddenElements.forEach((element: Element) => {
+          (element as HTMLElement).classList.remove('esconder');
+        });
+        console.log('Total de elementos revelados:', hiddenElements.length);
+        isRevealed = true;
+      };
+
+      smartplayer.instances.forEach((instance: any, index: number) => {
+        console.log(`📺 Configurando timer para instance ${index}`);
+
+        if (index === 0) {
+          instance.on('timeupdate', () => {
+            if (isRevealed) return;
+
+            const currentTime = instance.video.currentTime;
+
+            if (currentTime > lastTime) {
+              if (!isPlaying) {
+                console.log('▶️ Vídeo INICIOU (detectado via timeupdate)');
+                isPlaying = true;
+              }
+
+              elapsedTime += (currentTime - lastTime);
+              console.log('⏱️ Timer:', elapsedTime.toFixed(1), '/', delaySeconds, 'segundos');
+
+              if (elapsedTime >= delaySeconds) {
+                revealElements();
+              }
+            } else if (currentTime === lastTime && isPlaying) {
+              console.log('⏸️ Vídeo PAUSADO (detectado via timeupdate)');
+              isPlaying = false;
+            }
+
+            lastTime = currentTime;
+          });
+
+          instance.on('pause', () => {
+            console.log('⏸️ Evento PAUSE detectado');
+            isPlaying = false;
+          });
+
+          instance.on('ended', () => {
+            console.log('🏁 Vídeo terminou');
+            isPlaying = false;
+          });
+        }
+      });
+
+      console.log('✅ Eventos configurados com sucesso!');
+    };
+
+    let attempts = 0;
+    const checkInterval = setInterval(() => {
+      attempts++;
+      console.log(`🔍 Tentativa ${attempts} de detectar smartplayer...`);
+
+      const smartplayer = (window as any).smartplayer;
+
+      if (smartplayer && smartplayer.instances && smartplayer.instances.length > 0) {
+        console.log('✅ Smartplayer detectado! Configurando timer...');
+        setupVturbTimer();
+        clearInterval(checkInterval);
+      } else {
+        console.log('❌ Smartplayer ainda não disponível');
+      }
+    }, 500);
+
+    return () => {
+      console.log('🧹 Limpando interval do checkInterval');
+      clearInterval(checkInterval);
+    };
+  }, [delaySeconds, isUp1bt]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50">
-      <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <>
+      <style>{`
+        .esconder {
+          display: none !important;
+        }
+      `}</style>
+      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50">
+        <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl mb-8" style={{ aspectRatio: '9/16', minHeight: '500px' }}>
             <vturb-smartplayer id="vid-694b13b163476f09ce02d94e" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
@@ -99,13 +218,13 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
           />
 
           {isUp1bt ? (
-            <>
+            <div className="esconder">
               <SpecialOffer
                 bottles={bottles}
                 pricePerBottle={pricePerBottle}
                 onAccept={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/ex-ocu/next-offer/G4jyMqojOE?accepted=yes')}
               />
-            </>
+            </div>
           ) : location.pathname === '/up3bt' ? (
             <>
               <SpecialOffer
@@ -134,6 +253,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
         </div>
       </section>
     </div>
+    </>
   );
 }
 
