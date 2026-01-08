@@ -82,8 +82,10 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
   useEffect(() => {
     if (!isUp1bt) return;
 
+    const revealDelay = 5;
+
     console.log('=== INICIANDO SETUP DO VTURB TIMER (UP1BT) ===');
-    console.log('Delay configurado:', delaySeconds, 'segundos');
+    console.log('Delay configurado:', revealDelay, 'segundos');
 
     const setupVturbTimer = () => {
       console.log('--- setupVturbTimer chamado ---');
@@ -140,9 +142,9 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
               }
 
               elapsedTime += (currentTime - lastTime);
-              console.log('⏱️ Timer:', elapsedTime.toFixed(1), '/', delaySeconds, 'segundos');
+              console.log('⏱️ Timer:', elapsedTime.toFixed(1), '/', revealDelay, 'segundos');
 
-              if (elapsedTime >= delaySeconds) {
+              if (elapsedTime >= revealDelay) {
                 revealElements();
               }
             } else if (currentTime === lastTime && isPlaying) {
@@ -188,7 +190,7 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
       console.log('🧹 Limpando interval do checkInterval');
       clearInterval(checkInterval);
     };
-  }, [delaySeconds, isUp1bt]);
+  }, [isUp1bt]);
 
   return (
     <>
