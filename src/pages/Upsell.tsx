@@ -59,6 +59,24 @@ function Upsell({ bottles, pricePerBottle, checkoutLink }: UpsellProps) {
     }
   }, []);
 
+  useEffect(() => {
+    if (location.pathname === '/up6bt') {
+      const ocuExternalScript = 'https://assets.mycartpanda.com/cartx-ecomm-ui-assets/js/libs/ocu-external.js';
+      const existingOcuScript = document.querySelector(`script[src="${ocuExternalScript}"]`);
+
+      if (!existingOcuScript) {
+        const script = document.createElement('script');
+        script.src = ocuExternalScript;
+        script.onload = () => {
+          const initScript = document.createElement('script');
+          initScript.textContent = 'new OcuExternal();';
+          document.head.appendChild(initScript);
+        };
+        document.head.appendChild(script);
+      }
+    }
+  }, [location.pathname]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-red-50">
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
