@@ -1145,6 +1145,147 @@ function BackRedirect() {
         </div>
       </section>
 
+      <section className="py-8 md:py-20 px-4 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
+            Choose Your Transformation Package
+          </h2>
+
+          {/* 6-Bottle Package - Full Width */}
+          <div className="mb-4 md:mb-8">
+            <div className="relative bg-gradient-to-br from-[#C62828] to-[#B71C1C] rounded-[30px] p-4 md:p-12 lg:p-16 shadow-2xl">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FFD600] text-gray-900 px-6 py-2 rounded-full text-sm md:text-lg font-bold shadow-lg flex items-center gap-1 md:gap-2">
+                <Star className="w-4 h-4 md:w-5 md:h-5 fill-gray-900" />
+                BEST VALUE
+              </div>
+              <div className="text-center">
+                <img
+                  src="https://i.postimg.cc/Wz1S0fmQ/erectos-brutallis-10.png"
+                  alt="6-Bottle Package"
+                  className="w-full h-48 md:h-80 lg:h-96 object-contain mb-3 md:mb-8 mt-2 md:mt-4"
+                />
+                <h3 className="text-2xl md:text-5xl font-bold text-white mb-1 md:mb-2 tracking-wide">ERECTOS BRUTALLIS</h3>
+                <p className="text-base md:text-2xl text-white/90 font-semibold mb-2 md:mb-4">6 BOTTLE PACKAGE</p>
+                <div className="text-2xl md:text-4xl font-bold text-[#FFD600] mb-3 md:mb-6">
+                  YOU'RE SAVING $88
+                </div>
+                <button
+                  onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1?discount=BACK30')}
+                  className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
+                >
+                  CLAIM OFFER NOW
+                </button>
+                <div className="text-white/90 text-sm md:text-lg mb-3 md:mb-6">
+                  only <span className="font-bold">$34 per bottle, $206 total</span>
+                </div>
+                <div className="flex justify-center items-center gap-3 md:gap-6 text-white/90 text-xs md:text-base mb-3 md:mb-6">
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <CheckCircle className="w-4 h-4 md:w-5 md:h-5" />
+                    <span>180-Day</span>
+                  </div>
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <Truck className="w-4 h-4 md:w-5 md:h-5" />
+                    <span>Free Ship</span>
+                  </div>
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <Shield className="w-4 h-4 md:w-5 md:h-5" />
+                    <span>Secure</span>
+                  </div>
+                </div>
+                <div className="bg-white/10 rounded-2xl p-2 md:p-4 max-w-lg mx-auto">
+                  <img
+                    src="https://i.imgur.com/1in1oo5.png"
+                    alt="Payment Methods"
+                    className="w-full h-auto"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3-Bottle and 1-Bottle Packages - Side by Side */}
+          <div className="grid grid-cols-2 gap-4 md:gap-8 mb-8 md:mb-12">
+            {/* 3-Bottle Package */}
+            <div className="relative bg-gradient-to-br from-[#EF5350] to-[#E53935] rounded-[30px] p-4 md:p-10 shadow-xl">
+              <div className="text-center">
+                <img
+                  src="https://i.postimg.cc/FzHG0ng9/erectos-brutallis-13.png"
+                  alt="3-Bottle Package"
+                  className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
+                />
+                <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
+                <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">3 BOTTLE PACKAGE</p>
+                <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
+                  SAVE $62
+                </div>
+                <button
+                  onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875570:1?discount=BACK30')}
+                  className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
+                >
+                  BUY NOW
+                </button>
+                <div className="text-white/90 text-xs md:text-base mb-2 md:mb-4">
+                  $48 per bottle, <span className="font-bold">$145 total</span>
+                </div>
+                <div className="flex justify-center items-center gap-3 md:gap-4 text-white/90 text-xs md:text-sm">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>180d</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Truck className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>Free</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Shield className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>Safe</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2-Bottle Package */}
+            <div className="relative bg-gradient-to-br from-[#FF7043] to-[#FF5722] rounded-[30px] p-4 md:p-10 shadow-xl">
+              <div className="text-center">
+                <img
+                  src="/erectos_brutallis-11.png"
+                  alt="2-Bottle Package"
+                  className="w-full h-32 md:h-56 object-contain mb-2 md:mb-4"
+                />
+                <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
+                <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">2 BOTTLE PACKAGE</p>
+                <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
+                  SAVE $47
+                </div>
+                <button
+                  onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875569:1?discount=BACK30')}
+                  className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
+                >
+                  BUY NOW
+                </button>
+                <div className="text-white/90 text-xs md:text-base mb-2 md:mb-4">
+                  $55 per bottle, <span className="font-bold">$111 total</span>
+                </div>
+                <div className="flex justify-center items-center gap-3 md:gap-4 text-white/90 text-xs md:text-sm">
+                  <div className="flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>180d</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Truck className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>Free</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Shield className="w-3 h-3 md:w-4 md:h-4" />
+                    <span>Safe</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Science & Manufacturing Section */}
       <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
