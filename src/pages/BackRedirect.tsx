@@ -15,7 +15,6 @@ import {
   X
 } from 'lucide-react';
 import ArticleReader from '../ArticleReader';
-import { useTimerSettings } from '../hooks/useTimerSettings';
 import { updateCheckoutLinks, appendParamsToUrl } from '../utils/urlParams';
 
 function BackRedirect() {
@@ -35,8 +34,6 @@ function BackRedirect() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
-
-  const { delaySeconds } = useTimerSettings();
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -89,128 +86,6 @@ function BackRedirect() {
   useEffect(() => {
     updateCheckoutLinks();
   }, []);
-
-  useEffect(() => {
-    console.log('=== INICIANDO SETUP DO VTURB TIMER ===');
-    console.log('Delay configurado:', delaySeconds, 'segundos');
-
-    const setupVturbTimer = () => {
-      console.log('--- setupVturbTimer chamado ---');
-      console.log('window.smartplayer existe?', !!(window as any).smartplayer);
-
-      const smartplayer = (window as any).smartplayer;
-
-      if (!smartplayer) {
-        console.log('❌ window.smartplayer não existe');
-        return;
-      }
-
-      console.log('✅ window.smartplayer existe');
-      console.log('smartplayer.instances existe?', !!smartplayer.instances);
-      console.log('smartplayer.instances.length:', smartplayer.instances?.length);
-
-      if (!smartplayer.instances || smartplayer.instances.length === 0) {
-        console.log('❌ Smartplayer instances não encontradas');
-        return;
-      }
-
-      console.log('✅ Smartplayer instances encontradas:', smartplayer.instances.length);
-
-      let elapsedTime = 0;
-      let isRevealed = false;
-      let lastTime = 0;
-      let isPlaying = false;
-
-      const revealElements = () => {
-        if (isRevealed) return;
-
-        console.log('🎉 Timer completado! Revelando elementos com classe .esconder');
-        const hiddenElements = document.querySelectorAll('.esconder');
-        hiddenElements.forEach((element: Element) => {
-          (element as HTMLElement).classList.remove('esconder');
-        });
-        console.log('Total de elementos revelados:', hiddenElements.length);
-        isRevealed = true;
-
-        setTimeout(() => {
-          const sixBottleButton = document.getElementById('six-bottle-button');
-          if (sixBottleButton) {
-            console.log('🎯 Fazendo scroll suave até o botão de 6 potes');
-            sixBottleButton.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center'
-            });
-          } else {
-            console.log('❌ Botão de 6 potes não encontrado');
-          }
-        }, 300);
-      };
-
-      smartplayer.instances.forEach((instance: any, index: number) => {
-        console.log(`📺 Configurando timer para instance ${index}`);
-
-        if (index === 0) {
-          instance.on('timeupdate', () => {
-            if (isRevealed) return;
-
-            const currentTime = instance.video.currentTime;
-
-            if (currentTime > lastTime) {
-              if (!isPlaying) {
-                console.log('▶️ Vídeo INICIOU (detectado via timeupdate)');
-                isPlaying = true;
-              }
-
-              elapsedTime += (currentTime - lastTime);
-              console.log('⏱️ Timer:', elapsedTime.toFixed(1), '/', delaySeconds, 'segundos');
-
-              if (elapsedTime >= delaySeconds) {
-                revealElements();
-              }
-            } else if (currentTime === lastTime && isPlaying) {
-              console.log('⏸️ Vídeo PAUSADO (detectado via timeupdate)');
-              isPlaying = false;
-            }
-
-            lastTime = currentTime;
-          });
-
-          instance.on('pause', () => {
-            console.log('⏸️ Evento PAUSE detectado');
-            isPlaying = false;
-          });
-
-          instance.on('ended', () => {
-            console.log('🏁 Vídeo terminou');
-            isPlaying = false;
-          });
-        }
-      });
-
-      console.log('✅ Eventos configurados com sucesso!');
-    };
-
-    let attempts = 0;
-    const checkInterval = setInterval(() => {
-      attempts++;
-      console.log(`🔍 Tentativa ${attempts} de detectar smartplayer...`);
-
-      const smartplayer = (window as any).smartplayer;
-
-      if (smartplayer && smartplayer.instances && smartplayer.instances.length > 0) {
-        console.log('✅ Smartplayer detectado! Configurando timer...');
-        setupVturbTimer();
-        clearInterval(checkInterval);
-      } else {
-        console.log('❌ Smartplayer ainda não disponível');
-      }
-    }, 500);
-
-    return () => {
-      console.log('🧹 Limpando interval do checkInterval');
-      clearInterval(checkInterval);
-    };
-  }, [delaySeconds]);
 
   useEffect(() => {
     testimonials.forEach((testimonial) => {
@@ -552,11 +427,6 @@ function BackRedirect() {
 
   return (
     <>
-      <style>{`
-        .esconder {
-          display: none !important;
-        }
-      `}</style>
       <div className="min-h-screen overflow-x-hidden w-full bg-white">
       {/* Hero / VSL Section */}
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
@@ -583,7 +453,7 @@ function BackRedirect() {
 
       <section
         ref={offersRef}
-        className="esconder py-8 md:py-20 px-4 bg-white"
+        className="py-8 md:py-20 px-4 bg-white"
       >
         <div className="max-w-7xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
@@ -729,7 +599,7 @@ function BackRedirect() {
       </section>
 
       {/* Experts Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Approved by Leading Men's Health Specialists
@@ -837,7 +707,7 @@ function BackRedirect() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 px-2">
             Real Men. Real Results.
@@ -901,7 +771,7 @@ function BackRedirect() {
       </section>
 
       {/* Media Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-6 md:mb-16 px-2">
             Featured in Top Men's Health Outlets
@@ -978,7 +848,7 @@ function BackRedirect() {
       </section>
 
       {/* Science & Manufacturing Section */}
-      <section className="esconder py-8 md:py-20 px-4 bg-white">
+      <section className="py-8 md:py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-5xl font-bold text-center text-gray-900 mb-3 md:mb-8 px-2">
             Where Science Meets Strength.
@@ -1330,7 +1200,7 @@ function BackRedirect() {
       )}
 
       {/* Final CTA Section */}
-      <section className="esconder py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
+      <section className="py-10 md:py-20 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl md:text-6xl font-bold text-white mb-3 md:mb-6 px-2">
             Your Transformation Starts Today.
@@ -1345,7 +1215,7 @@ function BackRedirect() {
       </section>
 
       {/* Footer */}
-      <footer className="esconder bg-black text-gray-400 py-8 px-4">
+      <footer className="bg-black text-gray-400 py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <div className="text-2xl font-bold text-white mb-4">Erectos Brutallis</div>
