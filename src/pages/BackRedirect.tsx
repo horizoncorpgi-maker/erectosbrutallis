@@ -536,7 +536,7 @@ function BackRedirect() {
                 <h3 className="text-2xl md:text-5xl font-bold text-white mb-1 md:mb-2 tracking-wide">ERECTOS BRUTALLIS</h3>
                 <p className="text-base md:text-2xl text-white/90 font-semibold mb-2 md:mb-4">6 BOTTLE PACKAGE</p>
                 <div className="text-2xl md:text-4xl font-bold text-[#FFD600] mb-3 md:mb-6">
-                  YOU'RE SAVING $888
+                  YOU'RE SAVING $88
                 </div>
                 <button
                   onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1')}
@@ -545,7 +545,7 @@ function BackRedirect() {
                   CLAIM OFFER NOW
                 </button>
                 <div className="text-white/90 text-sm md:text-lg mb-3 md:mb-6">
-                  only <span className="font-bold">$49 per bottle, $294 total</span>
+                  only <span className="font-bold">$34 per bottle, $206 total</span>
                 </div>
                 <div className="flex justify-center items-center gap-3 md:gap-6 text-white/90 text-xs md:text-base mb-3 md:mb-6">
                   <div className="flex items-center gap-1 md:gap-2">
@@ -585,7 +585,7 @@ function BackRedirect() {
                 <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
                 <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">3 BOTTLE PACKAGE</p>
                 <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
-                  SAVE $384
+                  SAVE $62
                 </div>
                 <button
                   onClick={() => handlePackageClick('3-bottle')}
@@ -594,7 +594,7 @@ function BackRedirect() {
                   BUY NOW
                 </button>
                 <div className="text-white/90 text-xs md:text-base mb-2 md:mb-4">
-                  $69 per bottle, <span className="font-bold">$207 total</span>
+                  $48 per bottle, <span className="font-bold">$145 total</span>
                 </div>
                 <div className="flex justify-center items-center gap-3 md:gap-4 text-white/90 text-xs md:text-sm">
                   <div className="flex items-center gap-1">
@@ -624,7 +624,7 @@ function BackRedirect() {
                 <h3 className="text-lg md:text-3xl font-bold text-white mb-0.5 md:mb-1 tracking-wide">ERECTOS BRUTALLIS</h3>
                 <p className="text-sm md:text-lg text-white/90 font-semibold mb-2 md:mb-3">2 BOTTLE PACKAGE</p>
                 <div className="text-xl md:text-3xl font-bold text-[#FFD600] mb-2 md:mb-4">
-                  SAVE $236
+                  SAVE $47
                 </div>
                 <button
                   onClick={() => handlePackageClick('1-bottle')}
@@ -633,7 +633,7 @@ function BackRedirect() {
                   BUY NOW
                 </button>
                 <div className="text-white/90 text-xs md:text-base mb-2 md:mb-4">
-                  $79 per bottle + $9.99 ship, <span className="font-bold">$178 total</span>
+                  $55 per bottle, <span className="font-bold">$111 total</span>
                 </div>
                 <div className="flex justify-center items-center gap-3 md:gap-4 text-white/90 text-xs md:text-sm">
                   <div className="flex items-center gap-1">
@@ -642,7 +642,7 @@ function BackRedirect() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Truck className="w-3 h-3 md:w-4 md:h-4" />
-                    <span>$9.99</span>
+                    <span>Free</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Shield className="w-3 h-3 md:w-4 md:h-4" />
