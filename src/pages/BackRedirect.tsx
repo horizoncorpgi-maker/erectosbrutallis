@@ -436,6 +436,61 @@ function BackRedirect() {
   return (
     <>
       <div className="min-h-screen overflow-x-hidden w-full bg-white">
+
+      {/* Special Offer Alert */}
+      <section className="py-8 md:py-12 px-4 bg-gradient-to-br from-[#FFD600] via-[#FFC400] to-[#FFB700]">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-[30px] shadow-2xl p-6 md:p-12 border-4 border-[#B80000]">
+            <div className="text-center mb-6">
+              <div className="inline-block bg-[#B80000] text-white px-6 py-3 rounded-full text-lg md:text-2xl font-bold mb-4 shadow-lg animate-pulse">
+                YOU HAVE BEEN CHOSEN AMONG 2,000 PEOPLE!
+              </div>
+            </div>
+
+            <div className="space-y-4 text-gray-800">
+              <p className="text-base md:text-lg leading-relaxed">
+                <strong>As a reward for being selected from thousands of people, you've unlocked a 30% discount on all Erectos Brutallis kits today.</strong>
+              </p>
+
+              <p className="text-base md:text-lg leading-relaxed">
+                Due to the enormous demand on our promotional page, our Erectos Brutallis bottles are selling out extremely fast.
+              </p>
+
+              <p className="text-base md:text-lg leading-relaxed">
+                To be honest: <strong>we're at the very end of our stock — currently fewer than 100 units remain.</strong>
+              </p>
+
+              <p className="text-base md:text-lg leading-relaxed">
+                And, to be as fair as possible, we are rewarding the last people who secure Erectos Brutallis with something never seen before.
+              </p>
+
+              <p className="text-base md:text-lg leading-relaxed">
+                Therefore, <strong className="text-[#B80000]">you can purchase any Erectos Brutallis kit today with a 30% discount compared to everyone else.</strong>
+              </p>
+
+              <div className="bg-red-50 border-2 border-[#B80000] rounded-2xl p-4 md:p-6 my-6">
+                <p className="text-base md:text-lg leading-relaxed text-[#B80000] font-semibold">
+                  But be warned: this condition applies only on this page.
+                </p>
+                <p className="text-base md:text-lg leading-relaxed mt-2">
+                  So don't waste time and secure the last and best offer to get one of the final Erectos Brutallis bottles now!
+                </p>
+              </div>
+
+              <p className="text-lg md:text-xl leading-relaxed font-bold text-[#B80000] text-center">
+                This is truly your last chance to secure Erectos Brutallis — there will be no other after this.
+              </p>
+
+              <div className="text-center mt-6">
+                <div className="inline-block bg-gradient-to-r from-[#B80000] to-[#900000] text-white px-8 py-4 rounded-full text-2xl md:text-3xl font-bold shadow-lg">
+                  NOW OR NEVER!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section
         ref={offersRef}
         className="py-8 md:py-20 px-4 bg-white"
