@@ -19,14 +19,12 @@ import { updateCheckoutLinks, appendParamsToUrl } from '../utils/urlParams';
 
 function BackRedirect() {
   const offersRef = useRef<HTMLDivElement>(null);
-  const sixBottleButtonRef = useRef<HTMLButtonElement>(null);
   const [currentExpert, setCurrentExpert] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [currentMedia, setCurrentMedia] = useState(0);
   const [dragStart, setDragStart] = useState<number | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
   const [currentLab, setCurrentLab] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
   const [showTrustScorePopup, setShowTrustScorePopup] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<{name: string; logo: string; headline: string; description: string} | null>(null);
@@ -39,20 +37,6 @@ function BackRedirect() {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
-
-  useEffect(() => {
-    const heroVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/6964498823fc590cf3632719/v4/player.js';
-    const existingHeroScript = document.querySelector(`script[src="${heroVideoScript}"]`);
-    if (!existingHeroScript) {
-      const script = document.createElement('script');
-      script.src = heroVideoScript;
-      script.async = true;
-      document.head.appendChild(script);
-    }
-  }, []);
 
   useEffect(() => {
     (window as any).pixelId = "694352c02c9b8add9117f60a";
@@ -428,29 +412,6 @@ function BackRedirect() {
   return (
     <>
       <div className="min-h-screen overflow-x-hidden w-full bg-white">
-      {/* Hero / VSL Section */}
-      <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl mb-8" style={{ aspectRatio: '9/16', minHeight: '500px' }}>
-            <vturb-smartplayer id="vid-6964498823fc590cf3632719" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
-          </div>
-
-          <div
-            id="vturb-scroll-target"
-            className="smartplayer-scroll-event"
-            style={{
-              width: '1px',
-              height: '1px',
-              opacity: 0,
-              pointerEvents: 'none',
-              margin: '20px auto'
-            }}
-            aria-hidden="true"
-          />
-
-        </div>
-      </section>
-
       <section
         ref={offersRef}
         className="py-8 md:py-20 px-4 bg-white"
@@ -478,10 +439,7 @@ function BackRedirect() {
                 <div className="text-2xl md:text-4xl font-bold text-[#FFD600] mb-3 md:mb-6">
                   YOU'RE SAVING $888
                 </div>
-                {/* 🔧 CORREÇÃO 2: Botão SEMPRE no DOM com visibility */}
                 <button
-                  ref={sixBottleButtonRef}
-                  id="six-bottle-button"
                   onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875571:1')}
                   className="w-full max-w-md mx-auto bg-[#FFD600] text-gray-900 py-3 md:py-6 rounded-full font-bold hover:bg-[#FFC400] transition-all shadow-lg text-base md:text-2xl mb-3 md:mb-6"
                 >
