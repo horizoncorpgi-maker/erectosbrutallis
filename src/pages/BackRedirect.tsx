@@ -847,6 +847,52 @@ function BackRedirect() {
         </div>
       </section>
 
+      <section className="py-8 md:py-12 px-4 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-[30px] shadow-2xl p-6 md:p-12 border-2 border-gray-200">
+            <div className="space-y-6 text-gray-800">
+              <div className="flex items-center justify-center gap-2 text-[#B80000] mb-6">
+                <AlertCircle className="w-8 h-8 animate-pulse" />
+                <h3 className="text-xl md:text-2xl font-bold">Warning: If you leave this page, you will lose the discount forever.</h3>
+              </div>
+
+              <p className="text-lg md:text-xl font-semibold text-center text-gray-900 mb-6">
+                Now you need to make a decision:
+              </p>
+
+              <div className="space-y-4 text-base md:text-lg leading-relaxed">
+                <p>
+                  Either you ignore this page and continue your life as before — as a weak man in bed, impotent and unable to give true pleasure to your partner; disappointed every time you want to have sex and your penis doesn't get hard or the erection doesn't last… until you're replaced by a stronger, more virile man…
+                </p>
+
+                <p className="font-semibold text-[#B80000]">
+                  Or you can take this last chance to become a sexual machine: a man capable of driving any woman wild with desire, who gets aroused just by thinking about sex. You'll be able to have sex for 1, 2, or even 3 hours straight without getting tired…
+                </p>
+
+                <p className="text-xl font-bold text-center text-gray-900 mt-8 mb-6">
+                  Don't be afraid — I'll take all the risk for you!
+                </p>
+
+                <div className="bg-green-50 border-2 border-green-500 rounded-2xl p-6">
+                  <p className="font-semibold mb-4">
+                    Buy with peace of mind! You are protected by our 60-day guarantee. We are so confident in Erectos Brutallis that you can try it for 60 days to continuously boost your virility.
+                  </p>
+                  <p>
+                    If, at the end of 60 days, you feel it wasn't worth investing 10 seconds to take the Erectos Brutallis capsule, and that your sexual energy and your penis did not become harder, larger, and stronger every day…
+                  </p>
+                </div>
+
+                <div className="bg-[#B80000] text-white rounded-2xl p-6 text-center">
+                  <p className="text-lg md:text-xl font-bold">
+                    Simply send an email to <span className="underline">contact@erectosbrutallis.com</span> with the word: Refund. The system will automatically issue a full refund. It's that easy!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Experts Section */}
       <section className="py-8 md:py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-6xl mx-auto">
