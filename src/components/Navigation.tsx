@@ -52,6 +52,7 @@ function Navigation() {
   const routes = [
     { path: '/tst1', label: 'Home1' },
     { path: '/tst3', label: 'Home3' },
+    { path: '/back-redirect', label: 'Back Redirect' },
     { path: '/up1bt', label: 'Upsell 1BT' },
     { path: '/up3bt', label: 'Upsell 3BT' },
     { path: '/up6bt', label: 'Upsell 6BT' },
@@ -204,7 +205,7 @@ function Navigation() {
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    {(route.path === '/tst1' || route.path === '/tst3') && <Home size={18} />}
+                    {(route.path === '/tst1' || route.path === '/tst3' || route.path === '/back-redirect') && <Home size={18} />}
                     {route.label}
                   </div>
                 </Link>
