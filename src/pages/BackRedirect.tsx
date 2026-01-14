@@ -79,6 +79,7 @@ function BackRedirect() {
           const script = document.createElement('script');
           script.src = testimonial.videoScript;
           script.async = true;
+          script.type = 'text/javascript';
           document.head.appendChild(script);
         }
       }
@@ -90,6 +91,7 @@ function BackRedirect() {
       const script = document.createElement('script');
       script.src = expertVideoScript;
       script.async = true;
+      script.type = 'text/javascript';
       document.head.appendChild(script);
     }
 
@@ -99,6 +101,7 @@ function BackRedirect() {
       const script = document.createElement('script');
       script.src = expertVideoScript2;
       script.async = true;
+      script.type = 'text/javascript';
       document.head.appendChild(script);
     }
 
@@ -108,6 +111,7 @@ function BackRedirect() {
       const script = document.createElement('script');
       script.src = expertVideoScript3;
       script.async = true;
+      script.type = 'text/javascript';
       document.head.appendChild(script);
     }
   }, []);
@@ -133,12 +137,14 @@ function BackRedirect() {
             player.pause();
           }
         } catch (e) {
-          console.log('Erro ao pausar vídeo:', e);
+
         }
       });
     };
 
-    pauseAllVturbVideos();
+    setTimeout(() => {
+      pauseAllVturbVideos();
+    }, 100);
   }, [currentTestimonial]);
 
   useEffect(() => {
@@ -151,7 +157,7 @@ function BackRedirect() {
             player.pause();
           }
         } catch (e) {
-          console.log('Erro ao pausar vídeo:', e);
+
         }
       });
     };
@@ -174,7 +180,7 @@ function BackRedirect() {
                   video.addEventListener('play', handleVturbPlay);
                 }
               } catch (e) {
-                // Ignora erros de cross-origin
+
               }
             });
           }
@@ -186,6 +192,22 @@ function BackRedirect() {
       clearInterval(checkForPlayers);
     };
   }, [currentTestimonial]);
+
+  useEffect(() => {
+    const initVideos = () => {
+      const allPlayers = document.querySelectorAll('vturb-smartplayer');
+      if (allPlayers.length > 0) {
+        allPlayers.forEach((player: any) => {
+          if (player && !player._initialized) {
+            player._initialized = true;
+          }
+        });
+      }
+    };
+
+    const initTimer = setTimeout(initVideos, 1000);
+    return () => clearTimeout(initTimer);
+  }, []);
 
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
@@ -336,20 +358,22 @@ function BackRedirect() {
       'vid-69124f958af45b5e1aef9024'
     ];
 
-    const player = document.getElementById(videoIds[expertIndex]) as any;
-    if (player) {
-      try {
-        if (expertVideosPlaying[expertIndex]) {
-          player.pause();
-          setExpertVideosPlaying({...expertVideosPlaying, [expertIndex]: false});
-        } else {
-          player.play();
-          setExpertVideosPlaying({...expertVideosPlaying, [expertIndex]: true});
+    setTimeout(() => {
+      const player = document.getElementById(videoIds[expertIndex]) as any;
+      if (player) {
+        try {
+          if (expertVideosPlaying[expertIndex]) {
+            player.pause();
+            setExpertVideosPlaying({...expertVideosPlaying, [expertIndex]: false});
+          } else {
+            player.play();
+            setExpertVideosPlaying({...expertVideosPlaying, [expertIndex]: true});
+          }
+        } catch (e) {
+
         }
-      } catch (e) {
-        console.log('Erro ao controlar vídeo:', e);
       }
-    }
+    }, 100);
   };
 
   const nextTestimonial = () => setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
@@ -568,8 +592,8 @@ function BackRedirect() {
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-12">
                 <div className="w-full md:w-1/2 flex-shrink-0">
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 0 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(0)}>
-                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} preload="metadata"></vturb-smartplayer>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', backgroundColor: '#000' }}>
+                      <vturb-smartplayer id="vid-69124f9036636797770589e5" style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[0] && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
@@ -580,8 +604,8 @@ function BackRedirect() {
                     )}
                   </div>
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 1 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(1)}>
-                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                      <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} preload="metadata"></vturb-smartplayer>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', backgroundColor: '#000' }}>
+                      <vturb-smartplayer id="vid-69124f9a3663679777058a0c" style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[1] && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
@@ -592,8 +616,8 @@ function BackRedirect() {
                     )}
                   </div>
                   <div className="relative w-full rounded-[15px] overflow-hidden shadow-lg cursor-pointer group" style={{ display: currentExpert === 2 ? 'block' : 'none' }} onClick={() => toggleExpertVideo(2)}>
-                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
-                      <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} preload="metadata"></vturb-smartplayer>
+                    <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', backgroundColor: '#000' }}>
+                      <vturb-smartplayer id="vid-69124f958af45b5e1aef9024" style={{ position: 'absolute', top: '0', left: '0', width: '100%', height: '100%' }}></vturb-smartplayer>
                     </div>
                     {!expertVideosPlaying[2] && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity group-hover:bg-black/30" style={{ pointerEvents: 'none' }}>
@@ -678,16 +702,19 @@ function BackRedirect() {
 
           <div className="relative px-8 md:px-0">
             <div className="flex flex-col items-center text-center">
-              <div className="relative w-full max-w-xs aspect-[9/16] rounded-[15px] overflow-hidden mb-3">
+              <div className="relative w-full max-w-xs aspect-[9/16] rounded-[15px] overflow-hidden mb-3" style={{ backgroundColor: '#000' }}>
                 {testimonials.map((testimonial, index) => (
                   <div
                     key={testimonial.videoId}
-                    style={{ display: index === currentTestimonial ? 'block' : 'none' }}
+                    style={{
+                      display: index === currentTestimonial ? 'block' : 'none',
+                      width: '100%',
+                      height: '100%'
+                    }}
                   >
                     <vturb-smartplayer
                       id={testimonial.videoId}
-                      style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}
-                      preload="metadata"
+                      style={{ display: 'block', margin: '0 auto', width: '100%', height: '100%' }}
                     ></vturb-smartplayer>
                   </div>
                 ))}
