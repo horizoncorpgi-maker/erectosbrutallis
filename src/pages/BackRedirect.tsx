@@ -588,7 +588,7 @@ function BackRedirect() {
                   SAVE $62
                 </div>
                 <button
-                  onClick={() => handlePackageClick('3-bottle')}
+                  onClick={() => window.location.href = appendParamsToUrl('https://pay.erectosbrutallis.com/checkout/197875570:1?discount=BACK30')}
                   className="w-full bg-[#FFD600] text-gray-900 py-3 md:py-5 rounded-full font-bold hover:bg-[#FFC400] transition-all text-base md:text-xl mb-2 md:mb-4"
                 >
                   BUY NOW
