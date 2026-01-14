@@ -91,6 +91,31 @@ function Home1() {
   }, []);
 
   useEffect(() => {
+    let backRedirectLink = 'https://www.erectosbrutallis.com/back-redirect';
+
+    const urlParams = window.location.search;
+
+    if (urlParams) {
+      backRedirectLink += urlParams;
+    }
+
+    history.pushState({}, "", location.href);
+    history.pushState({}, "", location.href);
+
+    const handlePopState = () => {
+      setTimeout(() => {
+        location.href = backRedirectLink;
+      }, 0);
+    };
+
+    window.onpopstate = handlePopState;
+
+    return () => {
+      window.onpopstate = null;
+    };
+  }, []);
+
+  useEffect(() => {
     console.log('=== INICIANDO SETUP DO VTURB TIMER ===');
     console.log('Delay configurado:', delaySeconds, 'segundos');
 
