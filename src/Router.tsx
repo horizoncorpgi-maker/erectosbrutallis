@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Home1 from './pages/Home1';
 import Home3 from './pages/Home3';
+import BackRedirect from './pages/BackRedirect';
 import Upsell from './pages/Upsell';
 import Upsell2 from './pages/Upsell2';
 import Navigation from './components/Navigation';
@@ -33,6 +34,7 @@ function Router() {
         <Route path="/" element={<Home1 />} />
         <Route path="/tst1" element={<Home1 />} />
         <Route path="/tst3" element={<Home3 />} />
+        <Route path="/back-redirect" element={<BackRedirect />} />
 
         <Route path="/up1bt" element={<Upsell bottles={7} pricePerBottle={39} />} />
         <Route path="/up3bt" element={<Upsell bottles={6} pricePerBottle={39} checkoutLink="" />} />
