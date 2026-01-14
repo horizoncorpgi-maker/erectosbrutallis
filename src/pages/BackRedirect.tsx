@@ -32,6 +32,7 @@ function BackRedirect() {
   const [upsellTimer, setUpsellTimer] = useState(10);
   const [selectedPackage, setSelectedPackage] = useState<'3-bottle' | '1-bottle' | null>(null);
   const [expertVideosPlaying, setExpertVideosPlaying] = useState<{[key: number]: boolean}>({});
+  const [timeLeft, setTimeLeft] = useState(30 * 60);
 
   const scrollToOffers = () => {
     offersRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -208,6 +209,25 @@ function BackRedirect() {
     const initTimer = setTimeout(initVideos, 1000);
     return () => clearTimeout(initTimer);
   }, []);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      window.location.href = '/';
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handlePackageClick = (packageType: '3-bottle' | '1-bottle') => {
     setSelectedPackage(packageType);
@@ -629,6 +649,57 @@ function BackRedirect() {
                     <span>Safe</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Warning Timer Section */}
+      <section className="py-8 md:py-12 px-4 bg-gradient-to-br from-[#B80000] to-[#900000]">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-[30px] shadow-2xl p-6 md:p-12 border-4 border-[#FFD600]">
+            <div className="text-center space-y-4 md:space-y-6">
+              <div className="flex items-center justify-center gap-2 text-[#B80000]">
+                <AlertCircle className="w-8 h-8 md:w-12 md:h-12 animate-pulse" />
+                <h3 className="text-xl md:text-3xl font-bold">WARNING</h3>
+                <AlertCircle className="w-8 h-8 md:w-12 md:h-12 animate-pulse" />
+              </div>
+
+              <p className="text-base md:text-xl text-gray-800 font-semibold">
+                If you leave this page, you will lose the discount forever.
+              </p>
+
+              <div className="bg-[#B80000] text-white py-3 px-6 rounded-2xl inline-block">
+                <p className="text-sm md:text-lg font-bold uppercase">
+                  The discount is valid only for the next 30 minutes
+                </p>
+              </div>
+
+              <div className="flex items-center justify-center gap-2 text-gray-800">
+                <span className="text-3xl">⏳</span>
+                <p className="text-lg md:text-2xl font-bold">
+                  Time is running out…
+                </p>
+              </div>
+
+              <div className="bg-gradient-to-br from-[#FFD600] to-[#FFA500] rounded-3xl p-6 md:p-10 shadow-xl">
+                <div className="text-5xl md:text-7xl font-bold text-[#B80000] mb-2 tracking-wider font-mono">
+                  {formatTime(timeLeft)}
+                </div>
+                <p className="text-sm md:text-base text-gray-800 font-semibold">
+                  MINUTES : SECONDS
+                </p>
+              </div>
+
+              <div className="space-y-3 text-gray-800">
+                <p className="text-base md:text-lg font-medium">
+                  When the countdown reaches zero, you will be redirected from this page…
+                </p>
+
+                <p className="text-xl md:text-2xl font-bold text-[#B80000] uppercase tracking-wide">
+                  AND YOU WILL NEVER SEE THIS OFFER AGAIN…
+                </p>
               </div>
             </div>
           </div>
