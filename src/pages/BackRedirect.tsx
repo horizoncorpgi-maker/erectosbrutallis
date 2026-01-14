@@ -438,7 +438,7 @@ function BackRedirect() {
       <div className="min-h-screen overflow-x-hidden w-full bg-white">
 
       {/* Special Offer Alert */}
-      <section className="py-8 md:py-12 px-4 bg-gradient-to-br from-[#FFD600] via-[#FFC400] to-[#FFB700]">
+      <section className="py-8 md:py-12 px-4 bg-black">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-[30px] shadow-2xl p-6 md:p-12 border-4 border-[#B80000]">
             <div className="text-center mb-6">
