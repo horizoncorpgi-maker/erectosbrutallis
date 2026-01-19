@@ -47,7 +47,7 @@ function Home1() {
   }, []);
 
   useEffect(() => {
-    const heroVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/696997338fa0828662f9ab7c/v4/player.js';
+    const heroVideoScript = 'https://scripts.converteai.net/6c140fb2-fd70-48d5-8d70-c2f66a937ef9/players/6964498823fc590cf3632719/v4/player.js';
     const existingHeroScript = document.querySelector(`script[src="${heroVideoScript}"]`);
     if (!existingHeroScript) {
       const script = document.createElement('script');
@@ -587,7 +587,7 @@ function Home1() {
       <section className={`min-h-screen flex items-center justify-center px-4 py-8 md:py-20 bg-gradient-to-br from-white via-gray-50 to-red-50 transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
         <div className="max-w-4xl mx-auto text-center">
           <div className="relative w-full max-w-sm md:max-w-md mx-auto bg-black rounded-[20px] overflow-hidden shadow-2xl mb-8" style={{ aspectRatio: '9/16', minHeight: '500px' }}>
-            <vturb-smartplayer id="vid-696997338fa0828662f9ab7c" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
+            <vturb-smartplayer id="vid-6964498823fc590cf3632719" style={{ display: 'block', margin: '0 auto', width: '100%', maxWidth: '400px' }}></vturb-smartplayer>
           </div>
 
           <div
